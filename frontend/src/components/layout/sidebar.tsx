@@ -1,4 +1,4 @@
-import { ChevronDown, PanelLeftClose, Plus, Search } from "lucide-react";
+import { ChevronsUpDown, PanelLeftClose, Search } from "lucide-react";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -9,43 +9,49 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "../ui/input";
 
 export default function Sidebar() {
   return (
-    <div className="p-4 h-full w-full">
-      <div className="p-4 flex flex-col bg-secondary rounded-xl border border-zinc-200 shadow h-full">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xl font-medium tracking-wider">Tralalelo</p>
+    <div className="p-4 flex flex-col gap-5 h-full border-r border-zinc-200">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xl font-medium tracking-wider">Tralalelo</p>
 
-            <PanelLeftClose className="size-5 opacity-40 cursor-pointer" />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 justify-center w-full py-2 border border-zinc-300 shadow-sm shadow-zinc-200 rounded-lg cursor-pointer active:shadow-none duration-200">
-              <Plus className="size-4" />
-              <p className="text-sm font-normal">Create Project</p>
-            </div>
-            <div className="flex items-center gap-2 justify-center w-full max-w-10 h-full border border-zinc-300 shadow-sm shadow-zinc-200 rounded-lg cursor-pointer active:shadow-none duration-200">
-              <Search className="size-4 opacity-40 stroke-3" />
-            </div>
-          </div>
+          <PanelLeftClose className="size-5 opacity-40 cursor-pointer" />
         </div>
 
+        <div className="flex items-center px-2 justify-center w-full border border-zinc-300 rounded-lg bg-secondary/30">
+          <Search className="size-5 opacity-50 w-full max-w-5 pb-0.5" />
+
+          <Input
+            type="text"
+            placeholder="Search..."
+            className="bg-transparent! border-none focus-visible:ring-0 shadow-none py-0! px-2!"
+          />
+        </div>
+      </div>
+
+      <hr className="border-zinc-200" />
+
+      <div className="mt-auto p-2 bg-white rounded-lg shadow border border-zinc-200">
         <DropdownMenu>
-          <DropdownMenuTrigger className="mt-auto flex items-center gap-3 cursor-pointer focus-within:outline-none">
+          <DropdownMenuTrigger className="flex w-full items-center gap-3 cursor-pointer focus-within:outline-none">
             <Avatar className="size-10 border border-zinc-300">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>A</AvatarFallback>
             </Avatar>
 
-            <p className="font-medium font-quicksand">Puhdidi</p>
+            <div className="flex flex-col justify-center gap-0.5">
+              <p className="text-xs text-zinc-400 font-light">Employee</p>
+              <p className="font-medium font-quicksand">Puhdidi</p>
+            </div>
 
             <div className="flex items-center justify-center ml-auto">
-              <ChevronDown className="size-4 stroke-3 opacity-40" />
+              <ChevronsUpDown className="size-4 opacity-40 duration-200" />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[242px] mb-4">
+          <DropdownMenuContent className="mb-4">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
