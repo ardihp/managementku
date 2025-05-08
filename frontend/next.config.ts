@@ -12,11 +12,6 @@ const nextConfig: NextConfig = {
         destination: paths.dashboard,
         permanent: true,
       },
-      {
-        source: "/auth",
-        destination: paths.auth.sign_in,
-        permanent: true,
-      },
     ];
   },
 };
