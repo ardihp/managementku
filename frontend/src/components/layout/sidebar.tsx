@@ -10,8 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "../ui/input";
+import { sidebarItem } from "@/const/sidebar-item";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { paths } from "@/const/routes";
+import { useRouter } from "next/router";
 
 export default function Sidebar() {
+  const router = useRouter();
+
   return (
     <div className="p-4 flex flex-col gap-5 h-full border-r border-zinc-200">
       <div className="flex flex-col gap-4">
@@ -34,9 +41,32 @@ export default function Sidebar() {
 
       <hr className="border-zinc-200" />
 
-      <div className="mt-auto p-2 bg-white rounded-lg shadow border border-zinc-200">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex w-full items-center gap-3 cursor-pointer focus-within:outline-none">
+      <div className="flex flex-col gap-1">
+        <p className="mb-3 opacity-40 text-sm font-medium px-3">Menu</p>
+
+        {sidebarItem.map((item, index) => (
+          <Link
+            href={item.href}
+            key={index}
+            className={cn(
+              "flex items-center gap-4 p-3 rounded-lg bg-white border duration-200",
+              router.asPath === item.href ||
+                (router.asPath.includes(item.href) &&
+                  item.href !== paths.dashboard.root)
+                ? "shadow-xs border-zinc-200 opacity-100"
+                : "border-transparent hover:bg-zinc-50 opacity-50"
+            )}
+          >
+            {item.icon}
+
+            <p className="font-medium">{item.title}</p>
+          </Link>
+        ))}
+      </div>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger className="mt-auto p-2 bg-white rounded-lg shadow border border-zinc-200 cursor-pointer">
+          <div className="flex w-full items-center gap-3 focus-within:outline-none">
             <Avatar className="size-10 border border-zinc-300">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>A</AvatarFallback>
@@ -50,15 +80,15 @@ export default function Sidebar() {
             <div className="flex items-center justify-center ml-auto">
               <ChevronsUpDown className="size-4 opacity-40 duration-200" />
             </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="mb-4">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="mb-2 w-[calc(300px_-_32px)]">
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem>Logout</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
