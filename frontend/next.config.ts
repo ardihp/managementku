@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       // Basic redirect
       {
         source: "/",
-        destination: paths.dashboard,
+        destination: paths.dashboard.root,
         permanent: true,
       },
     ];
