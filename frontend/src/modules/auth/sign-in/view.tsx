@@ -1,5 +1,104 @@
-import React from "react";
+import AuthLayout from "@/components/layout/auth";
+import { Input } from "@/components/ui/input";
+import { paths } from "@/const/routes";
+import { cn } from "@/lib/utils";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Eye, EyeClosed } from "lucide-react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+
+interface FormInputValue {
+  username: string;
+  password: string;
+}
+
+const schema = yup.object().shape({
+  username: yup.string().required(""),
+  password: yup.string().required(""),
+});
 
 export default function SignInView() {
-  return <div>SignInPage</div>;
+  const [showPassword, setShowPassword] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormInputValue>({
+    resolver: yupResolver(schema),
+  });
+  const router = useRouter();
+
+  const onSubmit = (data: FormInputValue) => {
+    console.log(data);
+  };
+
+  return (
+    <AuthLayout>
+      <div className="relative -top-10 xl:-top-0 z-[2] flex flex-col w-full max-w-[420px] gap-10 xl:justify-center px-6">
+        <p className="text-2xl font-semibold">Sign In</p>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="username" className="text-sm">
+              Username
+            </label>
+            <Input
+              type="text"
+              placeholder="Input your username..."
+              className="bg-transparent!"
+              {...register("username")}
+            />
+            <small className="text-red-500">{errors.username?.message}</small>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="password" className="text-sm">
+              Password
+            </label>
+
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="Input you password..."
+              className="bg-transparent!"
+              rightIcon={
+                <div
+                  className="flex items-center justify-center bg-white w-10 h-full right-0 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <Eye className="size-4" />
+                  ) : (
+                    <EyeClosed className="size-4" />
+                  )}
+                </div>
+              }
+              {...register("password")}
+            />
+            <small className="text-red-500">{errors.password?.message}</small>
+          </div>
+
+          <div className="flex flex-col gap-5 items-center">
+            <button
+              className={cn(
+                "border border-zinc-200 h-10 bg-zinc-700 rounded-lg shadow w-full cursor-pointer"
+              )}
+            >
+              <p className="text-white text-sm leading-none">Sign In</p>
+            </button>
+
+            <p className="text-sm text-zinc-500">
+              {`Don't have an account? `}
+              <span
+                className="text-sm text-zinc-700 cursor-pointer font-semibold"
+                onClick={() => router.push(paths.auth.sign_up)}
+              >
+                Sign Up
+              </span>
+            </p>
+          </div>
+        </form>
+      </div>
+    </AuthLayout>
+  );
 }
