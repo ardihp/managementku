@@ -2,7 +2,7 @@ import { paths } from "@/const/routes";
 import { NextResponse, NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const isAuthenticated = true;
+  const isAuthenticated = !!request.cookies.get("token");
 
   // If the user is authenticated, continue as normal
   if (isAuthenticated) {
