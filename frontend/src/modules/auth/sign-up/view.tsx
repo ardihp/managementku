@@ -1,23 +1,26 @@
 import AuthLayout from "@/components/layout/auth";
 import { Input } from "@/components/ui/input";
 import { paths } from "@/const/routes";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { cn } from "@/lib/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Eye, EyeClosed } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as yup from "yup";
+import Cookies from "js-cookie";
 
 interface FormInputValue {
-  fullname: string;
+  name: string;
   username: string;
   email: string;
   password: string;
 }
 
 const schema = yup.object().shape({
-  fullname: yup.string().required(""),
+  name: yup.string().required(""),
   username: yup.string().required(""),
   email: yup.string().email().required(""),
   password: yup.string().required(""),
@@ -33,9 +36,28 @@ export default function SignInView() {
     resolver: yupResolver(schema),
   });
   const router = useRouter();
+  const { userSignUp } = useAuth();
+  const { mutate, isPending } = userSignUp();
 
   const onSubmit = (data: FormInputValue) => {
-    console.log(data);
+    const formData = {
+      ...data,
+      role: "employee",
+    };
+
+    const toastID = "sign-up";
+    toast("Loading...", { id: toastID });
+    mutate(formData, {
+      onError: (error: any) => {
+        toast(error?.response?.data?.message, { id: toastID });
+      },
+      onSuccess: (response) => {
+        toast(response?.message, { id: toastID });
+        Cookies.set("token", response?.data?.token);
+        Cookies.set("user", JSON.stringify(response?.data));
+        router.push(paths.dashboard.root);
+      },
+    });
   };
 
   return (
@@ -44,16 +66,17 @@ export default function SignInView() {
         <p className="text-2xl font-semibold">Sign Up</p>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label htmlFor="fullname" className="text-sm">
-              Fullname
+            <label htmlFor="name" className="text-sm">
+              Name
             </label>
             <Input
               type="text"
-              placeholder="Input your fullname..."
+              placeholder="Input your name..."
               className="bg-transparent!"
-              {...register("fullname")}
+              disabled={isPending}
+              {...register("name")}
             />
-            <small className="text-red-500">{errors.fullname?.message}</small>
+            <small className="text-red-500">{errors.name?.message}</small>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -64,6 +87,7 @@ export default function SignInView() {
               type="email"
               placeholder="Input your email..."
               className="bg-transparent!"
+              disabled={isPending}
               {...register("email")}
             />
             <small className="text-red-500">{errors.email?.message}</small>
@@ -77,6 +101,7 @@ export default function SignInView() {
               type="text"
               placeholder="Input your username..."
               className="bg-transparent!"
+              disabled={isPending}
               {...register("username")}
             />
             <small className="text-red-500">{errors.username?.message}</small>
@@ -103,6 +128,7 @@ export default function SignInView() {
                   )}
                 </div>
               }
+              disabled={isPending}
               {...register("password")}
             />
             <small className="text-red-500">{errors.password?.message}</small>
@@ -111,10 +137,14 @@ export default function SignInView() {
           <div className="flex flex-col gap-5 items-center">
             <button
               className={cn(
-                "border border-zinc-200 h-10 bg-zinc-700 rounded-lg shadow w-full cursor-pointer"
+                "border border-zinc-200 h-10 bg-zinc-700 rounded-lg shadow w-full cursor-pointer duration-200",
+                isPending && "cursor-not-allowed opacity-60"
               )}
+              disabled={isPending}
             >
-              <p className="text-white text-sm leading-none">Sign Up</p>
+              <p className="text-white text-sm leading-none">
+                {isPending ? "Loading..." : "Sign Up"}
+              </p>
             </button>
 
             <p className="text-sm text-zinc-500">

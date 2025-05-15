@@ -1,13 +1,16 @@
 import AuthLayout from "@/components/layout/auth";
 import { Input } from "@/components/ui/input";
 import { paths } from "@/const/routes";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { cn } from "@/lib/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Eye, EyeClosed } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as yup from "yup";
+import Cookies from "js-cookie";
 
 interface FormInputValue {
   username: string;
@@ -29,9 +32,23 @@ export default function SignInView() {
     resolver: yupResolver(schema),
   });
   const router = useRouter();
+  const { userSignIn } = useAuth();
+  const { mutate, isPending } = userSignIn();
 
   const onSubmit = (data: FormInputValue) => {
-    console.log(data);
+    const toastID = "sign-in";
+    toast("Loading...", { id: toastID });
+    mutate(data, {
+      onError: (error: any) => {
+        toast(error?.response?.data?.message, { id: toastID });
+      },
+      onSuccess: (response) => {
+        toast(response?.message, { id: toastID });
+        Cookies.set("token", response?.data?.token);
+        Cookies.set("user", JSON.stringify(response?.data));
+        router.push(paths.dashboard.root);
+      },
+    });
   };
 
   return (
@@ -47,6 +64,7 @@ export default function SignInView() {
               type="text"
               placeholder="Input your username..."
               className="bg-transparent!"
+              disabled={isPending}
               {...register("username")}
             />
             <small className="text-red-500">{errors.username?.message}</small>
@@ -73,6 +91,7 @@ export default function SignInView() {
                   )}
                 </div>
               }
+              disabled={isPending}
               {...register("password")}
             />
             <small className="text-red-500">{errors.password?.message}</small>
@@ -81,8 +100,10 @@ export default function SignInView() {
           <div className="flex flex-col gap-5 items-center">
             <button
               className={cn(
-                "border border-zinc-200 h-10 bg-zinc-700 rounded-lg shadow w-full cursor-pointer"
+                "border border-zinc-200 h-10 bg-zinc-700 rounded-lg shadow w-full cursor-pointer duration-200",
+                isPending && "cursor-not-allowed opacity-60"
               )}
+              disabled={isPending}
             >
               <p className="text-white text-sm leading-none">Sign In</p>
             </button>
