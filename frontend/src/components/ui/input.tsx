@@ -5,17 +5,24 @@ import { cn } from "@/lib/utils";
 interface InputAdditional extends React.ComponentProps<"input"> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  wrapperClassname?: string;
 }
 
 function Input({
   className,
+  wrapperClassname,
   type,
   leftIcon,
   rightIcon,
   ...props
 }: InputAdditional) {
   return (
-    <div className="flex items-center border border-input rounded-lg overflow-hidden focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] shadow-xs transition-[color,box-shadow]">
+    <div
+      className={cn(
+        "flex items-center border border-input rounded-lg overflow-hidden focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] shadow-xs transition-[color,box-shadow]",
+        wrapperClassname
+      )}
+    >
       {leftIcon}
       <input
         type={type}
