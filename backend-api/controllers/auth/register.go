@@ -47,6 +47,8 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	token := helpers.GenerateToken(user.Username)
+
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
 		Message: "User created successfully",
@@ -58,6 +60,7 @@ func RegisterUser(c *gin.Context) {
 			Role:      user.Role,
 			CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
+			Token:     &token,
 		},
 	})
 }
