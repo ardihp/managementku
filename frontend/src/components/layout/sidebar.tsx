@@ -61,8 +61,8 @@ export default function Sidebar() {
               router.asPath === item.href ||
                 (router.asPath.includes(item.href) &&
                   item.href !== paths.dashboard.root)
-                ? "shadow-xs border-zinc-200 opacity-100"
-                : "border-transparent hover:bg-zinc-50 opacity-50"
+                ? "shadow border-zinc-200 opacity-100"
+                : "border-transparent hover:bg-zinc-300/50 opacity-30"
             )}
           >
             {item.icon}
