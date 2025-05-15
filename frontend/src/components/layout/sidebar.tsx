@@ -1,5 +1,5 @@
 import { ChevronsUpDown, PanelLeftClose, Search } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   DropdownMenu,
@@ -15,9 +15,16 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { paths } from "@/const/routes";
 import { useRouter } from "next/router";
+import { useAuth, UserDetail } from "@/hooks/auth/use-auth";
 
 export default function Sidebar() {
   const router = useRouter();
+  const { user, userSignOut } = useAuth();
+  const [userDetail, setUserDetail] = useState<UserDetail | null>();
+
+  useEffect(() => {
+    setUserDetail(user);
+  }, []);
 
   return (
     <div className="p-4 flex flex-col gap-5 h-full border-r border-zinc-200">
@@ -34,7 +41,8 @@ export default function Sidebar() {
           <Input
             type="text"
             placeholder="Search..."
-            className="bg-transparent! border-none focus-visible:ring-0 shadow-none py-0! px-2!"
+            wrapperClassname="border-none focus-within:ring-0 shadow-none py-0! px-0! w-full"
+            className="bg-transparent! shadow-none"
           />
         </div>
       </div>
@@ -72,9 +80,13 @@ export default function Sidebar() {
               <AvatarFallback>A</AvatarFallback>
             </Avatar>
 
-            <div className="flex flex-col justify-center gap-0.5">
-              <p className="text-xs text-zinc-400 font-light">Employee</p>
-              <p className="font-medium font-quicksand">Puhdidi</p>
+            <div className="flex flex-col items-start gap-1.5">
+              <p className="text-xs text-zinc-400 font-light capitalize leading-none">
+                {userDetail?.role}
+              </p>
+              <p className="font-medium font-quicksand text-left capitalize leading-none">
+                {userDetail?.name}
+              </p>
             </div>
 
             <div className="flex items-center justify-center ml-auto">
@@ -86,7 +98,7 @@ export default function Sidebar() {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={userSignOut}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

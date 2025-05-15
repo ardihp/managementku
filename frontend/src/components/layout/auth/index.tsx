@@ -15,6 +15,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             src="/assets/kanban-example.png"
             alt="Auth Illustration"
             fill
+            sizes="800px"
             className="object-cover object-center xl:object-left"
           />
         </div>
