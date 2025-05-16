@@ -1,10 +1,10 @@
 import React from "react";
 import LayoutPage from "@/components/layout";
 
-export default function ProjectView() {
+export default function WorkspacesView() {
   return (
     <LayoutPage>
-      <p>Project Page</p>
+      <p>Workspace Page</p>
     </LayoutPage>
   );
 }

@@ -16,8 +16,8 @@ export const sidebarItem: SidebarItem[] = [
     icon: <Gauge className={cn("size-6")} />,
   },
   {
-    title: "Projects",
-    href: paths.dashboard.project,
+    title: "Workspaces",
+    href: paths.dashboard.workspace,
     icon: <FolderOpen className={cn("size-6")} />,
   },
   {

@@ -1,7 +1,7 @@
 export const paths = {
   dashboard: {
     root: "/dashboard",
-    project: "/dashboard/project",
+    workspace: "/dashboard/workspaces",
     notification: "/dashboard/notification",
   },
   auth: {
