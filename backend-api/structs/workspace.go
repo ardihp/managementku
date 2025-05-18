@@ -24,3 +24,8 @@ type WorkspaceUpdateRequest struct {
 	Category    string `json:"category,omitempty"`
 	Members     []int  `json:"members"`
 }
+
+type WorkspaceAssignMember struct {
+	WorkspaceId int   `json:"workspace_id" binding:"required"`
+	UserId      []int `json:"user_id" binding:"required"`
+}

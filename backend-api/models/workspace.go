@@ -12,7 +12,7 @@ type Workspace struct {
 }
 
 type WorkspaceMember struct {
-	WorkspaceId int `json:"workspaceId"`
+	WorkspaceId int `json:"workspace_id"`
 	Workspace   Workspace
 	UserId      int `json:"user_id"`
 	User        User
@@ -21,7 +21,9 @@ type WorkspaceMember struct {
 }
 
 type WorkspaceTag struct {
-	WorkspaceId int `json:"workspaceId"`
+	WorkspaceId int `json:"workspace_id"`
 	Workspace   Workspace
-	Tag         string `json:"tag"`
+	Tag         string    `json:"tag"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
