@@ -13,7 +13,10 @@ import (
 func AssignMemberToWorkspace(c *gin.Context) {
 	var req = structs.WorkspaceAssignMember{}
 	var workspace = models.Workspace{}
-	var members = []models.User{}
+	var workspace_member = models.WorkspaceMember{}
+	var members = []structs.Member{}
+
+	database.DB.First(&workspace)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -36,38 +39,36 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			return
 		}
 
-		members = append(members, user)
-
-		var workspace_member = models.WorkspaceMember{
-			WorkspaceId: int(req.WorkspaceId),
-			UserId:      int(req.UserId[key]),
+		var assigned_user = models.WorkspaceMember{
+			WorkspaceId: uint(req.WorkspaceId),
+			UserId:      uint(req.UserId[key]),
 		}
 
-		if err := database.DB.Where("workspace_id ?", workspace_member.WorkspaceId).Find(&workspace_member).Error; err != nil {
-			if helpers.IsDuplicateEntryError(err) {
-				c.JSON(http.StatusConflict, structs.ErrorResponse{
-					Success: false,
-					Message: "Duplicate entry error",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
-			} else {
-				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+		if err := database.DB.First(&workspace_member, models.WorkspaceMember{WorkspaceId: uint(req.WorkspaceId)}).Find(&workspace_member, models.WorkspaceMember{UserId: uint(req.UserId[key])}).Error; err != nil {
+			if err := database.DB.Create(&assigned_user).Error; err != nil {
+				c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
 					Success: false,
 					Message: "Failed to assign user",
 					Errors:  helpers.TranslateErrorMessage(err),
 				})
+				return
 			}
-			return
-		}
-
-		if err := database.DB.Create(&workspace_member).Error; err != nil {
-			c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
+		} else {
+			c.JSON(http.StatusConflict, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to assign user",
+				Message: "The User is already a member",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return
 		}
+
+		members = append(members, structs.Member{
+			Id:       user.Id,
+			Name:     user.Name,
+			Username: user.Username,
+			Email:    user.Email,
+			Role:     user.Role,
+		})
 	}
 
 	c.JSON(http.StatusCreated, structs.SuccessResponse{

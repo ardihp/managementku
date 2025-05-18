@@ -38,7 +38,7 @@ func CreateWorkspace(c *gin.Context) {
 	}
 
 	var workspace_member = []models.WorkspaceMember{}
-	var members = []models.User{}
+	var members = []structs.Member{}
 
 	if len(req.Members) >= 1 {
 		for key := range req.Members {
@@ -53,8 +53,14 @@ func CreateWorkspace(c *gin.Context) {
 				return
 			}
 
-			workspace_member = append(workspace_member, models.WorkspaceMember{WorkspaceId: int(workspace.Id), UserId: int(req.Members[key])})
-			members = append(members, user)
+			workspace_member = append(workspace_member, models.WorkspaceMember{WorkspaceId: uint(workspace.Id), UserId: uint(req.Members[key])})
+			members = append(members, structs.Member{
+				Id:       user.Id,
+				Name:     user.Name,
+				Username: user.Username,
+				Email:    user.Email,
+				Role:     user.Role,
+			})
 		}
 
 		if err := database.DB.Create(&workspace_member).Error; err != nil {
