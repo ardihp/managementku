@@ -1,15 +1,21 @@
 package structs
 
-import "kanban-board/backend-api/models"
+type Member struct {
+	Id       uint   `json:"id"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+}
 
 type WorkspaceResponse struct {
-	Id          uint          `json:"id"`
-	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Category    string        `json:"category"`
-	Members     []models.User `json:"members"`
-	CreatedAt   string        `json:"created_at"`
-	UpdatedAt   string        `json:"updated_at"`
+	Id          uint     `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Category    string   `json:"category"`
+	Members     []Member `json:"members"`
+	CreatedAt   string   `json:"created_at"`
+	UpdatedAt   string   `json:"updated_at"`
 }
 type WorkspaceCreateRequest struct {
 	Name        string `json:"name" binding:"required"`
