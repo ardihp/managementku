@@ -43,7 +43,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			UserId:      int(req.UserId[key]),
 		}
 
-		if err := database.DB.Create(&workspace_member).Error; err != nil {
+		if err := database.DB.Where("workspace_id ?", workspace_member.WorkspaceId).Find(&workspace_member).Error; err != nil {
 			if helpers.IsDuplicateEntryError(err) {
 				c.JSON(http.StatusConflict, structs.ErrorResponse{
 					Success: false,
@@ -51,12 +51,21 @@ func AssignMemberToWorkspace(c *gin.Context) {
 					Errors:  helpers.TranslateErrorMessage(err),
 				})
 			} else {
-				c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
+				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 					Success: false,
 					Message: "Failed to assign user",
 					Errors:  helpers.TranslateErrorMessage(err),
 				})
 			}
+			return
+		}
+
+		if err := database.DB.Create(&workspace_member).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to assign user",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
 			return
 		}
 	}
