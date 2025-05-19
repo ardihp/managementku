@@ -23,6 +23,7 @@ func SetupRouter() *gin.Engine {
 	router.POST("/api/login", authControllers.LoginUser)
 	router.POST("/api/workspace/create", middlewares.AuthMiddleware(), workspaceControllers.CreateWorkspace)
 	router.POST("/api/workspace/assign", middlewares.AuthMiddleware(), workspaceControllers.AssignMemberToWorkspace)
+	router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateWorkspaceStatus)
 
 	return router
 }
