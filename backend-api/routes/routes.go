@@ -19,8 +19,13 @@ func SetupRouter() *gin.Engine {
 		ExposeHeaders: []string{"Content-Length"},
 	}))
 
+	// Authentication
 	router.POST("/api/register", authControllers.RegisterUser)
 	router.POST("/api/login", authControllers.LoginUser)
+
+	// Workspace
+	router.GET("/api/workspace", middlewares.AuthMiddleware(), workspaceControllers.ListWorkspace)
+	router.GET("/api/workspace/:id", middlewares.AuthMiddleware(), workspaceControllers.ListWorkspaceByID)
 	router.POST("/api/workspace/create", middlewares.AuthMiddleware(), workspaceControllers.CreateWorkspace)
 	router.POST("/api/workspace/assign", middlewares.AuthMiddleware(), workspaceControllers.AssignMemberToWorkspace)
 	router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateWorkspaceStatus)
