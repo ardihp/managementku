@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UpdateWorkspaceStatus(c *gin.Context) {
+func UpdateStatusWorkspace(c *gin.Context) {
 	var req = structs.WorkspaceUpdateStatusRequest{}
 	var workspace = models.Workspace{}
 	var workspace_status = models.WorkspaceStatus{}
