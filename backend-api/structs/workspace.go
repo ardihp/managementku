@@ -8,6 +8,16 @@ type Member struct {
 	Role     string `json:"role"`
 }
 
+type WorkspaceStatus struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+type WorkspaceStatusResponse struct {
+	WorkspaceId uint              `json:"workspace_id"`
+	Status      []WorkspaceStatus `json:"status"`
+}
+
 type WorkspaceResponse struct {
 	Id          uint     `json:"id"`
 	Name        string   `json:"name"`
@@ -34,4 +44,9 @@ type WorkspaceUpdateRequest struct {
 type WorkspaceAssignMember struct {
 	WorkspaceId int   `json:"workspace_id" binding:"required"`
 	UserId      []int `json:"user_id" binding:"required"`
+}
+
+type WorkspaceCreateStatusRequest struct {
+	WorkspaceId int               `json:"workspace_id" binding:"required"`
+	Status      []WorkspaceStatus `json:"status"`
 }
