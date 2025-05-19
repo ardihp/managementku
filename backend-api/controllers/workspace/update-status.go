@@ -11,7 +11,7 @@ import (
 )
 
 func UpdateWorkspaceStatus(c *gin.Context) {
-	var req = structs.WorkspaceCreateStatusRequest{}
+	var req = structs.WorkspaceUpdateStatusRequest{}
 	var workspace = models.Workspace{}
 	var workspace_status = models.WorkspaceStatus{}
 

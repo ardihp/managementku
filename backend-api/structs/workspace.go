@@ -46,7 +46,7 @@ type WorkspaceAssignMember struct {
 	UserId      []int `json:"user_id" binding:"required"`
 }
 
-type WorkspaceCreateStatusRequest struct {
+type WorkspaceUpdateStatusRequest struct {
 	WorkspaceId int               `json:"workspace_id" binding:"required"`
 	Status      []WorkspaceStatus `json:"status"`
 }
