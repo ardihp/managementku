@@ -37,7 +37,7 @@ type WorkspaceCreateRequest struct {
 type WorkspaceUpdateRequest struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"required"`
-	Category    string `json:"category,omitempty"`
+	Category    string `json:"category" binding:"required"`
 	Members     []int  `json:"members"`
 }
 
