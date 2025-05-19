@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -16,8 +17,6 @@ func AssignMemberToWorkspace(c *gin.Context) {
 	var workspace_member = models.WorkspaceMember{}
 	var members = []structs.Member{}
 
-	database.DB.First(&workspace)
-
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
@@ -27,11 +26,22 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.First(&workspace, models.Workspace{Id: uint(req.WorkspaceId)}).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Workspace not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	var assigned_user = []models.WorkspaceMember{}
+
 	for key := range req.UserId {
 		var user = models.User{}
 
 		if err := database.DB.First(&user, req.UserId[key]).Error; err != nil {
-			c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
+			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 				Success: false,
 				Message: "User Not Found",
 				Errors:  helpers.TranslateErrorMessage(err),
@@ -39,24 +49,40 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			return
 		}
 
-		var assigned_user = models.WorkspaceMember{
-			WorkspaceId: uint(req.WorkspaceId),
-			UserId:      uint(req.UserId[key]),
-		}
-
 		if err := database.DB.First(&workspace_member, models.WorkspaceMember{WorkspaceId: uint(req.WorkspaceId)}).Find(&workspace_member, models.WorkspaceMember{UserId: uint(req.UserId[key])}).Error; err != nil {
-			if err := database.DB.Create(&assigned_user).Error; err != nil {
-				c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
-					Success: false,
-					Message: "Failed to assign user",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
-				return
-			}
+			assigned_user = append(assigned_user, models.WorkspaceMember{
+				WorkspaceId: uint(req.WorkspaceId),
+				UserId:      uint(req.UserId[key]),
+			})
 		} else {
 			c.JSON(http.StatusConflict, structs.ErrorResponse{
 				Success: false,
-				Message: "The User is already a member",
+				Message: fmt.Sprintf("User %s already in a member of workspace", user.Username),
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return
+		}
+	}
+
+	if err := database.DB.Create(&assigned_user).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to assign user",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	var id_member = []int{}
+	database.DB.Model(&workspace_member).Where("workspace_id = ?", req.WorkspaceId).Order("user_id").Pluck("user_id", &id_member)
+
+	for _, id := range id_member {
+		var user = models.User{}
+
+		if err := database.DB.First(&user, id).Error; err != nil {
+			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+				Success: false,
+				Message: "User Not Found",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return
