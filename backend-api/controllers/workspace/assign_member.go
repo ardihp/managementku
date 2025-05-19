@@ -49,7 +49,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			return
 		}
 
-		if err := database.DB.First(&workspace_member, models.WorkspaceMember{WorkspaceId: uint(req.WorkspaceId)}).Find(&workspace_member, models.WorkspaceMember{UserId: uint(req.UserId[key])}).Error; err != nil {
+		if err := database.DB.Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, req.UserId[key]).First(&workspace_member).Error; err != nil {
 			assigned_user = append(assigned_user, models.WorkspaceMember{
 				WorkspaceId: uint(req.WorkspaceId),
 				UserId:      uint(req.UserId[key]),
