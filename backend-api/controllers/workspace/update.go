@@ -6,6 +6,7 @@ import (
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +15,7 @@ func UpdateWorkspace(c *gin.Context) {
 	var req = structs.WorkspaceUpdateRequest{}
 	var workspace = models.Workspace{}
 	var id = c.Param("id")
-	// parseId, _ := strconv.Atoi(id)
+	parseId, _ := strconv.Atoi(id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -56,23 +57,26 @@ func UpdateWorkspace(c *gin.Context) {
 			}
 		}
 
-		// if len(req.Members) < len(workspace_member) {
-		// 	var id_member_exist = []int{}
-		// 	database.DB.Model(&workspace_member).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member_exist)
+		database.DB.Where("workspace_id = ?", parseId).Delete(&workspace_member)
 
-		// 	// database.DB.Where("workspace_id = ?", workspace.Id).Delete(&workspace_member, models.WorkspaceMember{UserId: data.UserId})
-		// } else {
-		// 	var id_member_exist = []int{}
-		// 	database.DB.Model(&workspace_member).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member_exist)
+		for _, id := range req.Members {
+			var assigned_user = models.WorkspaceMember{
+				WorkspaceId: uint(parseId),
+				UserId:      uint(id),
+			}
 
-		// 	for _, user_id := range req.Members {
+			if err := database.DB.Create(&assigned_user).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+					Success: false,
+					Message: "Failed to assign member",
+					Errors:  helpers.TranslateErrorMessage(err),
+				})
+				return
+			}
 
-		// 		if !slices.Contains(id_member_exist, user_id) {
-		// 			database.DB.Create(&models.WorkspaceMember{WorkspaceId: uint(parseId), UserId: uint(user_id)})
-		// 		}
-		// 		id_member = append(id_member, user_id)
-		// 	}
-		// }
+			id_member = append(id_member, id)
+		}
+
 	} else {
 		database.DB.Model(&workspace_member).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member)
 	}
