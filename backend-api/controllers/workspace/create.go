@@ -37,42 +37,6 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	var workspace_member = []models.WorkspaceMember{}
-	var members = []structs.Member{}
-
-	if len(req.Members) >= 1 {
-		for key := range req.Members {
-			var user = models.User{}
-
-			if err := database.DB.First(&user, req.Members[key]).Error; err != nil {
-				c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
-					Success: false,
-					Message: "User Not Found",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
-				return
-			}
-
-			workspace_member = append(workspace_member, models.WorkspaceMember{WorkspaceId: uint(workspace.Id), UserId: uint(req.Members[key])})
-			members = append(members, structs.Member{
-				Id:       user.Id,
-				Name:     user.Name,
-				Username: user.Username,
-				Email:    user.Email,
-				Role:     user.Role,
-			})
-		}
-
-		if err := database.DB.Create(&workspace_member).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to assign member to workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return
-		}
-	}
-
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
 		Message: "Workspace created successfully",
@@ -81,7 +45,6 @@ func CreateWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Category:    workspace.Category,
-			Members:     members,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
