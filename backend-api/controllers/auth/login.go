@@ -42,7 +42,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	token := helpers.GenerateToken(user.Username)
+	token := helpers.GenerateToken(user.Username, int(user.Id))
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
