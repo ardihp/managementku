@@ -29,7 +29,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 
-		claims := &jwt.RegisteredClaims{}
+		claims := &helpers.MyCustomClaims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
@@ -46,6 +46,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("username", claims.Subject)
+		c.Set("user_id", claims.UserId)
 
 		c.Next()
 	}
