@@ -64,9 +64,9 @@ func ListWorkspace(c *gin.Context) {
 
 func ListWorkspaceByID(c *gin.Context) {
 	var workspace = models.Workspace{}
-	var id = c.Param("id")
+	var workspace_id = c.Param("id")
 
-	if err := database.DB.First(&workspace, id).Error; err != nil {
+	if err := database.DB.First(&workspace, workspace_id).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -75,23 +75,24 @@ func ListWorkspaceByID(c *gin.Context) {
 		return
 	}
 
-	var workspace_member = models.WorkspaceMember{}
 	var members = []structs.Member{}
 	var id_member = []int{}
 
-	database.DB.Model(&workspace_member).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member)
+	database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member)
 
-	for _, id := range id_member {
+	for _, user_id := range id_member {
 		var user = models.User{}
+		var workspace_member = models.WorkspaceMember{}
 
-		database.DB.First(&user, id)
+		database.DB.First(&user, user_id)
+		database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).First(&workspace_member)
 
 		members = append(members, structs.Member{
 			Id:       user.Id,
 			Name:     user.Name,
 			Username: user.Username,
 			Email:    user.Email,
-			Role:     user.Role,
+			Role:     workspace_member.Role.Name,
 		})
 	}
 
