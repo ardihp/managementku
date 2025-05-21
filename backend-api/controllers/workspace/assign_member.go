@@ -14,7 +14,7 @@ import (
 func AssignMemberToWorkspace(c *gin.Context) {
 	var req = structs.WorkspaceAssignMember{}
 	var workspace = models.Workspace{}
-	var workspace_member = models.WorkspaceMember{}
+	var role = models.WorkspaceRole{}
 	var members = []structs.Member{}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -35,6 +35,15 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.First(&role, models.WorkspaceRole{Id: uint(req.RoleId)}).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Role not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
 	var assigned_user = []models.WorkspaceMember{}
 
 	for key := range req.UserId {
@@ -49,10 +58,11 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			return
 		}
 
-		if err := database.DB.Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, req.UserId[key]).First(&workspace_member).Error; err != nil {
+		if err := database.DB.Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, req.UserId[key]).First(&models.WorkspaceMember{}).Error; err != nil {
 			assigned_user = append(assigned_user, models.WorkspaceMember{
 				WorkspaceId: uint(req.WorkspaceId),
 				UserId:      uint(req.UserId[key]),
+				RoleId:      uint(req.RoleId),
 			})
 		} else {
 			c.JSON(http.StatusConflict, structs.ErrorResponse{
@@ -74,12 +84,15 @@ func AssignMemberToWorkspace(c *gin.Context) {
 	}
 
 	var id_member = []int{}
-	database.DB.Model(&workspace_member).Where("workspace_id = ?", req.WorkspaceId).Order("user_id").Pluck("user_id", &id_member)
+	database.DB.Model(&models.WorkspaceMember{}).Joins("Role").Where("workspace_id = ?", req.WorkspaceId).Order("user_id").Pluck("user_id", &id_member)
 
-	for _, id := range id_member {
+	for _, user_id := range id_member {
 		var user = models.User{}
+		var workspace_member = models.WorkspaceMember{}
 
-		if err := database.DB.First(&user, id).Error; err != nil {
+		database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, user_id).Find(&workspace_member)
+
+		if err := database.DB.First(&user, user_id).Error; err != nil {
 			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 				Success: false,
 				Message: "User Not Found",
@@ -93,7 +106,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			Name:     user.Name,
 			Username: user.Username,
 			Email:    user.Email,
-			Role:     user.Role,
+			Role:     workspace_member.Role.Name,
 		})
 	}
 

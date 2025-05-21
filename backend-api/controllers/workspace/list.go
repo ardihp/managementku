@@ -11,30 +11,36 @@ import (
 )
 
 func ListWorkspace(c *gin.Context) {
-	var list_workspace = []models.Workspace{}
+	var list_workspace = []int{}
+	var user_id = c.GetInt("user_id")
 
-	database.DB.Find(&list_workspace)
+	database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Pluck("workspace_id", &list_workspace)
 
 	var response = []structs.WorkspaceResponse{}
 
-	for _, workspace := range list_workspace {
-		var workspace_member = models.WorkspaceMember{}
+	for _, workspace_id := range list_workspace {
 		var members = []structs.Member{}
 		var id_member = []int{}
+		var workspace = models.Workspace{
+			Id: uint(workspace_id),
+		}
 
-		database.DB.Model(&workspace_member).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member)
+		database.DB.First(&workspace)
+		database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace_id).Order("user_id").Pluck("user_id", &id_member)
 
-		for _, id := range id_member {
+		for _, user_id := range id_member {
 			var user = models.User{}
+			var workspace_member = models.WorkspaceMember{}
 
-			database.DB.First(&user, id)
+			database.DB.First(&user, user_id)
+			database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).Find(&workspace_member)
 
 			members = append(members, structs.Member{
 				Id:       user.Id,
 				Name:     user.Name,
 				Username: user.Username,
 				Email:    user.Email,
-				Role:     user.Role,
+				Role:     workspace_member.Role.Name,
 			})
 		}
 
