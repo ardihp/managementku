@@ -3,12 +3,13 @@ package models
 import "time"
 
 type Workspace struct {
-	Id          uint      `json:"id" gorm:"primaryKey"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Category    string    `json:"category"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Id              uint   `json:"id" gorm:"primaryKey"`
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	WorkspaceTypeId uint   `json:"type_id"`
+	WorkspaceType   WorkspaceType
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
 
 type WorkspaceRole struct {
@@ -35,6 +36,14 @@ type WorkspaceTag struct {
 	Tag         string    `json:"tag"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type WorkspaceType struct {
+	Id        uint      `json:"id" gorm:"primaryKey"`
+	Name      string    `json:"name" gorm:"unique;not null"`
+	Color     string    `json:"color"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type WorkspaceStatus struct {
