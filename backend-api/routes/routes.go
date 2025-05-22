@@ -4,6 +4,7 @@ import (
 	authControllers "kanban-board/backend-api/controllers/auth"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
 	workspaceRoleControllers "kanban-board/backend-api/controllers/workspace/role"
+	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
 	"kanban-board/backend-api/middlewares"
 
 	"github.com/gin-contrib/cors"
@@ -31,11 +32,14 @@ func SetupRouter() *gin.Engine {
 	router.PUT("/api/workspace/update/:id", middlewares.AuthMiddleware(), workspaceControllers.UpdateWorkspace)
 	router.POST("/api/workspace/assign", middlewares.AuthMiddleware(), workspaceControllers.AssignMemberToWorkspace)
 
+	// Workspace Type
+	router.POST("/api/workspace/type/create", middlewares.AuthMiddleware(), workspaceTypeControllers.CreateWorkspaceType)
+
 	// Workspace Status
 	router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateStatusWorkspace)
 
 	// Workspace Role
-	router.POST("/api/workspace/role/create", middlewares.AuthMiddleware(), workspaceRoleControllers.CreateRole)
+	router.POST("/api/workspace/role/create", middlewares.AuthMiddleware(), workspaceRoleControllers.CreateWorkspaceRole)
 
 	return router
 }
