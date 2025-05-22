@@ -26,7 +26,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.First(&workspace, models.Workspace{Id: uint(req.WorkspaceId)}).Error; err != nil {
+	if err := database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, models.Workspace{Id: uint(req.WorkspaceId)}).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -34,6 +34,8 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		})
 		return
 	}
+
+	fmt.Println(workspace)
 
 	if err := database.DB.First(&role, models.WorkspaceRole{Id: uint(req.RoleId)}).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -117,7 +119,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			Id:          workspace.Id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Category:    workspace.Category,
+			Type:        workspace.WorkspaceType.Name,
 			Members:     members,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
