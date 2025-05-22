@@ -45,14 +45,9 @@ export default function SignInView() {
       role: "employee",
     };
 
-    const toastID = "sign-up";
-    toast("Loading...", { id: toastID });
     mutate(formData, {
-      onError: (error: any) => {
-        toast(error?.response?.data?.message, { id: toastID });
-      },
       onSuccess: (response) => {
-        toast(response?.message, { id: toastID });
+        toast(response?.message);
         Cookies.set("token", response?.data?.token);
         Cookies.set("user", JSON.stringify(response?.data));
         router.push(paths.dashboard.root);

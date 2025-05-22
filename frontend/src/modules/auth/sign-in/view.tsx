@@ -36,14 +36,9 @@ export default function SignInView() {
   const { mutate, isPending } = userSignIn();
 
   const onSubmit = (data: FormInputValue) => {
-    const toastID = "sign-in";
-    toast("Loading...", { id: toastID });
     mutate(data, {
-      onError: (error: any) => {
-        toast(error?.response?.data?.message, { id: toastID });
-      },
       onSuccess: (response) => {
-        toast(response?.message, { id: toastID });
+        toast(response?.message);
         Cookies.set("token", response?.data?.token);
         Cookies.set("user", JSON.stringify(response?.data));
         router.push(paths.dashboard.root);
