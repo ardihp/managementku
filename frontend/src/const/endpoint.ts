@@ -3,4 +3,7 @@ export const endpoint = {
     sign_in: "/login",
     sign_up: "/register",
   },
+  workspace: {
+    list: "/workspace",
+  },
 };
