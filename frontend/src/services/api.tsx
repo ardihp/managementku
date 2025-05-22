@@ -25,12 +25,12 @@ Api.interceptors.response.use(
     return response;
   },
   (error) => {
+    toast(error?.response?.data?.message, { id: "toast-error" });
+
     if (error.status === 401) {
       Cookies.remove("token");
       Cookies.remove("user");
-      toast("Your session is expired.");
       Router.push(paths.auth.sign_in);
-      return;
     }
 
     return Promise.reject(error);
