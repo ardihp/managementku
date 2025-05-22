@@ -22,10 +22,19 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.First(&models.WorkspaceType{}, req.WorkspaceTypeId).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Workspace type not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
 	workspace := models.Workspace{
-		Name:        req.Name,
-		Description: req.Description,
-		Category:    req.Category,
+		Name:            req.Name,
+		Description:     req.Description,
+		WorkspaceTypeId: uint(req.WorkspaceTypeId),
 	}
 
 	if err := database.DB.Create(&workspace).Error; err != nil {
@@ -37,6 +46,8 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
+	database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, &models.Workspace{WorkspaceTypeId: uint(req.WorkspaceTypeId)})
+
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
 		Message: "Workspace created successfully",
@@ -44,7 +55,8 @@ func CreateWorkspace(c *gin.Context) {
 			Id:          workspace.Id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Category:    workspace.Category,
+			Type:        workspace.WorkspaceType.Name,
+			Members:     []structs.Member{},
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
