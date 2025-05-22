@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateRole(c *gin.Context) {
+func CreateWorkspaceRole(c *gin.Context) {
 	req := structs.WorkspaceCreateRoleRequest{}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
