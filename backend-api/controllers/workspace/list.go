@@ -25,7 +25,7 @@ func ListWorkspace(c *gin.Context) {
 			Id: uint(workspace_id),
 		}
 
-		database.DB.First(&workspace)
+		database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace)
 		database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace_id).Order("user_id").Pluck("user_id", &id_member)
 
 		for _, user_id := range id_member {
@@ -48,7 +48,7 @@ func ListWorkspace(c *gin.Context) {
 			Id:          workspace.Id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Category:    workspace.Category,
+			Type:        workspace.WorkspaceType.Name,
 			Members:     members,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -66,7 +66,7 @@ func ListWorkspaceByID(c *gin.Context) {
 	var workspace = models.Workspace{}
 	var workspace_id = c.Param("id")
 
-	if err := database.DB.First(&workspace, workspace_id).Error; err != nil {
+	if err := database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, workspace_id).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -103,7 +103,7 @@ func ListWorkspaceByID(c *gin.Context) {
 			Id:          workspace.Id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Category:    workspace.Category,
+			Type:        workspace.WorkspaceType.Name,
 			Members:     members,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
