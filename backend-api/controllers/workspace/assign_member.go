@@ -16,6 +16,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 	var workspace = models.Workspace{}
 	var role = models.WorkspaceRole{}
 	var members = []structs.Member{}
+	var workspace_tags = []string{}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -35,8 +36,6 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(workspace)
-
 	if err := database.DB.First(&role, models.WorkspaceRole{Id: uint(req.RoleId)}).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
@@ -45,6 +44,8 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		})
 		return
 	}
+
+	database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", req.WorkspaceId).Pluck("tag", &workspace_tags)
 
 	var assigned_user = []models.WorkspaceMember{}
 
@@ -121,6 +122,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			Description: workspace.Description,
 			Type:        workspace.WorkspaceType.Name,
 			Members:     members,
+			Tags:        workspace_tags,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},

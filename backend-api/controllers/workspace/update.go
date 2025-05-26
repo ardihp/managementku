@@ -42,6 +42,28 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
+	var workspace_tags = []string{}
+	database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", id).Pluck("tag", &workspace_tags)
+
+	if len(workspace_tags) >= 1 {
+		workspace_tags = []string{}
+		database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceTag{})
+	}
+
+	for _, tag := range req.Tags {
+		var assigned_tag = models.WorkspaceTag{WorkspaceId: workspace.Id, Tag: tag}
+		if err := database.DB.Create(&assigned_tag).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to save workspace tag",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return
+		}
+
+		workspace_tags = append(workspace_tags, assigned_tag.Tag)
+	}
+
 	workspace.Name = req.Name
 	workspace.Description = req.Description
 	workspace.WorkspaceTypeId = uint(req.WorkspaceTypeId)
@@ -66,6 +88,7 @@ func UpdateWorkspace(c *gin.Context) {
 			Description: workspace.Description,
 			Type:        workspace.WorkspaceType.Name,
 			Members:     []structs.Member{},
+			Tags:        workspace_tags,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},

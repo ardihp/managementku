@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 )
 
 func CreateWorkspace(c *gin.Context) {
@@ -46,7 +47,30 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, &models.Workspace{WorkspaceTypeId: uint(req.WorkspaceTypeId)})
+	workspace_tags := []string{}
+
+	for _, tag := range req.Tags {
+		var assigned_tag = models.WorkspaceTag{WorkspaceId: workspace.Id, Tag: tag}
+		if err := database.DB.Create(&assigned_tag).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to add workspace tag",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return
+		}
+
+		workspace_tags = append(workspace_tags, assigned_tag.Tag)
+	}
+
+	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, &models.Workspace{WorkspaceTypeId: uint(req.WorkspaceTypeId)}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to read workspace type",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
 
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
@@ -57,6 +81,7 @@ func CreateWorkspace(c *gin.Context) {
 			Description: workspace.Description,
 			Type:        workspace.WorkspaceType.Name,
 			Members:     []structs.Member{},
+			Tags:        workspace_tags,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
