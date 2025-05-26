@@ -1,4 +1,4 @@
-package controller
+package controllers
 
 import (
 	"kanban-board/backend-api/database"
@@ -46,7 +46,7 @@ func CreateWorkspaceRole(c *gin.Context) {
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
 		Message: "Workspace role retreived successfully",
-		Data: structs.WorkspaceRoleReponse{
+		Data: structs.WorkspaceRoleResponse{
 			Id:        role.Id,
 			Name:      role.Name,
 			CreatedAt: role.CreatedAt.Format("2006-01-02 15:04:05"),

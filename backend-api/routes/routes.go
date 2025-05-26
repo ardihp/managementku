@@ -32,13 +32,15 @@ func SetupRouter() *gin.Engine {
 	router.PUT("/api/workspace/update/:id", middlewares.AuthMiddleware(), workspaceControllers.UpdateWorkspace)
 	router.POST("/api/workspace/assign", middlewares.AuthMiddleware(), workspaceControllers.AssignMemberToWorkspace)
 
-	// Workspace Type
-	router.POST("/api/workspace/type/create", middlewares.AuthMiddleware(), workspaceTypeControllers.CreateWorkspaceType)
-
 	// Workspace Status
 	router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateStatusWorkspace)
 
+	// Workspace Type
+	router.GET("/api/workspace/type", middlewares.AuthMiddleware(), workspaceTypeControllers.ListWorkspaceType)
+	router.POST("/api/workspace/type/create", middlewares.AuthMiddleware(), workspaceTypeControllers.CreateWorkspaceType)
+
 	// Workspace Role
+	router.GET("/api/workspace/role", middlewares.AuthMiddleware(), workspaceRoleControllers.ListWorkspaceRole)
 	router.POST("/api/workspace/role/create", middlewares.AuthMiddleware(), workspaceRoleControllers.CreateWorkspaceRole)
 
 	return router
