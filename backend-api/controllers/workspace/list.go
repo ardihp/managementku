@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -13,8 +14,24 @@ import (
 func ListWorkspace(c *gin.Context) {
 	var list_workspace = []int{}
 	var user_id = c.GetInt("user_id")
+	var user = models.User{Id: uint(user_id)}
 
-	database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Pluck("workspace_id", &list_workspace)
+	if err := database.DB.First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed get user info",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	if user.Role == "employee" {
+		database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Pluck("workspace_id", &list_workspace)
+	} else {
+		database.DB.Model(&models.Workspace{}).Pluck("id", &list_workspace)
+	}
+
+	fmt.Println(list_workspace)
 
 	var response = []structs.WorkspaceResponse{}
 
@@ -24,9 +41,11 @@ func ListWorkspace(c *gin.Context) {
 		var workspace = models.Workspace{
 			Id: uint(workspace_id),
 		}
+		var workspace_tags = []string{}
 
 		database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace)
 		database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace_id).Order("user_id").Pluck("user_id", &id_member)
+		database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", workspace_id).Pluck("tag", &workspace_tags)
 
 		for _, user_id := range id_member {
 			var user = models.User{}
@@ -50,6 +69,7 @@ func ListWorkspace(c *gin.Context) {
 			Description: workspace.Description,
 			Type:        workspace.WorkspaceType.Name,
 			Members:     members,
+			Tags:        workspace_tags,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		})
@@ -65,6 +85,7 @@ func ListWorkspace(c *gin.Context) {
 func ListWorkspaceByID(c *gin.Context) {
 	var workspace = models.Workspace{}
 	var workspace_id = c.Param("id")
+	var workspace_tags = []string{}
 
 	if err := database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, workspace_id).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -79,6 +100,7 @@ func ListWorkspaceByID(c *gin.Context) {
 	var id_member = []int{}
 
 	database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member)
+	database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", workspace_id).Pluck("tag", &workspace_tags)
 
 	for _, user_id := range id_member {
 		var user = models.User{}
@@ -105,6 +127,7 @@ func ListWorkspaceByID(c *gin.Context) {
 			Description: workspace.Description,
 			Type:        workspace.WorkspaceType.Name,
 			Members:     members,
+			Tags:        workspace_tags,
 			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},

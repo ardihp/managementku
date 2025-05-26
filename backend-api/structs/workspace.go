@@ -18,7 +18,7 @@ type WorkspaceStatusResponse struct {
 	Status      []WorkspaceStatus `json:"status"`
 }
 
-type WorkspaceRoleReponse struct {
+type WorkspaceRoleResponse struct {
 	Id        uint   `json:"id"`
 	Name      string `json:"name"`
 	CreatedAt string `json:"created_at"`
@@ -39,20 +39,23 @@ type WorkspaceResponse struct {
 	Description string   `json:"description"`
 	Type        string   `json:"type"`
 	Members     []Member `json:"members"`
+	Tags        []string `json:"tags"`
 	CreatedAt   string   `json:"created_at"`
 	UpdatedAt   string   `json:"updated_at"`
 }
 
 type WorkspaceCreateRequest struct {
-	Name            string `json:"name" binding:"required"`
-	Description     string `json:"description" binding:"required"`
-	WorkspaceTypeId int    `json:"type_id" binding:"required"`
+	Name            string   `json:"name" binding:"required"`
+	Description     string   `json:"description" binding:"required"`
+	WorkspaceTypeId int      `json:"type_id" binding:"required"`
+	Tags            []string `json:"tags" binding:"required"`
 }
 
 type WorkspaceUpdateRequest struct {
-	Name            string `json:"name" binding:"required"`
-	Description     string `json:"description" binding:"required"`
-	WorkspaceTypeId int    `json:"type_id" binding:"required"`
+	Name            string   `json:"name" binding:"required"`
+	Description     string   `json:"description" binding:"required"`
+	WorkspaceTypeId int      `json:"type_id" binding:"required"`
+	Tags            []string `json:"tags" binding:"required"`
 }
 
 type WorkspaceAssignMember struct {
