@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Geist, Quicksand } from "next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,13 +20,14 @@ const quicksand = Quicksand({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const queryClient = new QueryClient();
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <main className={cn(geistSans.variable, quicksand.variable, "font-sans")}>
       <QueryClientProvider client={queryClient}>
         <Component {...pageProps} />
         <Toaster />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </main>
   );
