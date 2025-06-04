@@ -24,17 +24,18 @@ import { Workspace, WorkspaceType } from "@/types/workspace";
 import { Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface FormInputValue {
+interface FormInputWorkspace {
   name: string;
   description: string;
   type_id: string;
-  tags?: string[];
+  tags: string[];
 }
 
 const schema = yup.object().shape({
   name: yup.string().required("Workspace name is required"),
   description: yup.string().required("Workspace description is required"),
   type_id: yup.string().required("Workspace type is required"),
+  tags: yup.array().required("Workspace tag is required"),
 });
 
 interface FormWorkspaceProps {
@@ -53,9 +54,7 @@ export default function FormWorkspace({
   const { data: listWorkspaceType, isLoading: loadingWorkspaceType } =
     getListWorkspaceType();
   const { mutate: create, isPending: loadingCreate } = createWorkspace();
-  const { mutate: update, isPending: loadingUpdate } = updateWorkspace(
-    selectedItem?.id || 0
-  );
+  const { mutate: update, isPending: loadingUpdate } = updateWorkspace();
   const isEdit = !!selectedItem;
 
   const {
@@ -65,7 +64,7 @@ export default function FormWorkspace({
     setValue,
     watch,
     reset,
-  } = useForm<FormInputValue>({
+  } = useForm<FormInputWorkspace>({
     resolver: yupResolver(schema),
   });
   useEffect(() => {
@@ -104,31 +103,27 @@ export default function FormWorkspace({
     }
   };
 
+  console.log(watch());
+
   const handleRemoveWorkspaceTag = (tag: string) => {
     const newTags = watch("tags")?.filter((t) => t !== tag) || [];
     setValue("tags", [...newTags]);
   };
 
-  const onSubmit = (data: FormInputValue) => {
+  const onSubmit = (data: FormInputWorkspace) => {
     const formData = { ...data, type_id: parseInt(data.type_id) };
 
+    console.log(data);
+
     if (isEdit) {
-      update(formData, {
-        onSuccess: () => {
-          setOpenDialog(false);
-          resetSelectedItem();
-          reset({});
-        },
-      });
+      update({ id: selectedItem.id, data: formData });
     } else {
-      create(formData, {
-        onSuccess: () => {
-          setOpenDialog(false);
-          resetSelectedItem();
-          reset({});
-        },
-      });
+      create(formData);
     }
+
+    setOpenDialog(false);
+    resetSelectedItem();
+    reset({});
   };
 
   return (
@@ -176,16 +171,26 @@ export default function FormWorkspace({
                 <SelectValue placeholder="Workspace Type" />
               </SelectTrigger>
               <SelectContent>
-                {listWorkspaceType?.data?.map(
-                  (type: WorkspaceType, key: number) => (
-                    <SelectItem
-                      key={key}
-                      value={type.id.toString()}
-                      className="capitalize hover:bg-zinc-50"
-                    >
-                      {type.name}
-                    </SelectItem>
+                {listWorkspaceType?.data?.length >= 1 ? (
+                  listWorkspaceType?.data?.map(
+                    (type: WorkspaceType, key: number) => (
+                      <SelectItem
+                        key={key}
+                        value={type.id.toString()}
+                        className="capitalize hover:bg-zinc-50"
+                      >
+                        {type.name}
+                      </SelectItem>
+                    )
                   )
+                ) : (
+                  <SelectItem
+                    value="-"
+                    className="capitalize hover:bg-zinc-50"
+                    disabled
+                  >
+                    There's no data
+                  </SelectItem>
                 )}
               </SelectContent>
             </Select>

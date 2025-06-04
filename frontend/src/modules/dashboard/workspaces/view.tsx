@@ -10,6 +10,7 @@ import { paths } from "@/const/routes";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormWorkspace from "./components/form";
 import WorkspaceAction from "./components/action";
+import { Archive } from "lucide-react";
 
 export default function WorkspacesView() {
   const [userDetail, setUserDetail] = useState<UserDetail | null>();
@@ -27,7 +28,7 @@ export default function WorkspacesView() {
 
   return (
     <LayoutPage>
-      <div className="flex flex-col">
+      <div className="flex flex-col h-full">
         <section className="flex items-center justify-between border-b border-zinc-200 p-8">
           <div className="h-9 flex flex-col">
             <p className="text-2xl text-foreground/40 font-light my-auto">
@@ -48,65 +49,75 @@ export default function WorkspacesView() {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-8 gap-6">
-          {loadingWorkspace
-            ? [...Array(5)].map((item, key) => (
-                <Skeleton key={key} className="w-full h-[177px]" />
-              ))
-            : listWorkspace?.data?.map((workspace: Workspace, key: number) => (
-                <div key={key} className="relative">
-                  <WorkspaceAction
-                    setSelectedItem={setSelectedItem}
-                    workspace={workspace}
-                  />
+        {loadingWorkspace ? (
+          <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-8 gap-6">
+            {[...Array(5)].map((item, key) => (
+              <Skeleton key={key} className="w-full h-[177px]" />
+            ))}
+          </section>
+        ) : listWorkspace?.data?.length >= 1 ? (
+          <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-8 gap-6">
+            {listWorkspace?.data?.map((workspace: Workspace, key: number) => (
+              <div key={key} className="relative">
+                <WorkspaceAction
+                  setSelectedItem={setSelectedItem}
+                  workspace={workspace}
+                />
 
-                  <Link href={`${paths.dashboard.workspace}/${workspace.id}`}>
-                    <div className="w-full border rounded-xl bg-white flex flex-col p-4 gap-2 min-h-[177px]">
-                      <div className="flex items-center gap-2">
-                        <ColorfulBadge
-                          text={workspace.type.name}
-                          color={workspace.type.color}
-                        />
+                <Link href={`${paths.dashboard.workspace}/${workspace.id}`}>
+                  <div className="w-full border rounded-xl bg-white flex flex-col p-4 gap-2 min-h-[177px]">
+                    <div className="flex items-center gap-2">
+                      <ColorfulBadge
+                        text={workspace.type.name}
+                        color={workspace.type.color}
+                      />
 
-                        {workspace.tags.map((tag, key) => (
-                          <ColorfulBadge key={key} text={tag} color="gray" />
-                        ))}
-                      </div>
-
-                      <p
-                        className="font-medium text-lg capitalize leading-[25px] line-clamp-2"
-                        title={workspace.name}
-                      >
-                        {workspace.name}
-                      </p>
-
-                      <p
-                        className="font-quicksand text-xs font-medium text-zinc-400 capitalize leading-[18px] line-clamp-2"
-                        title={workspace.description}
-                      >
-                        {workspace.description}
-                      </p>
-
-                      <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-3">
-                        {workspace.members.map((member, key) => (
-                          <Avatar
-                            key={key}
-                            title={member.username}
-                            className="size-8"
-                          >
-                            <AvatarFallback className="uppercase text-sm">
-                              {member.username
-                                ?.split(" ")
-                                ?.map((text) => text?.[0])}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
-                      </div>
+                      {workspace.tags.map((tag, key) => (
+                        <ColorfulBadge key={key} text={tag} color="gray" />
+                      ))}
                     </div>
-                  </Link>
-                </div>
-              ))}
-        </section>
+
+                    <p
+                      className="font-medium text-lg capitalize leading-[25px] line-clamp-2"
+                      title={workspace.name}
+                    >
+                      {workspace.name}
+                    </p>
+
+                    <p
+                      className="font-quicksand text-xs font-medium text-zinc-400 capitalize leading-[18px] line-clamp-2"
+                      title={workspace.description}
+                    >
+                      {workspace.description}
+                    </p>
+
+                    <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-3">
+                      {workspace.members.map((member, key) => (
+                        <Avatar
+                          key={key}
+                          title={member.username}
+                          className="size-8"
+                        >
+                          <AvatarFallback className="uppercase text-sm">
+                            {member.username
+                              ?.split(" ")
+                              ?.map((text) => text?.[0])}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </section>
+        ) : (
+          <div className="flex flex-col h-full gap-2 items-center justify-center">
+            <Archive className="size-10 stroke-[1.5px] text-zinc-700" />
+
+            <p className="text-zinc-700">There's no workspace available</p>
+          </div>
+        )}
       </div>
     </LayoutPage>
   );
