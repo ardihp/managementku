@@ -8,6 +8,7 @@ type Workspace struct {
 	Description     string `json:"description"`
 	WorkspaceTypeId uint   `json:"type_id"`
 	WorkspaceType   WorkspaceType
+	IsArchived      bool      `json:"is_archived" gorm:"default:false"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }

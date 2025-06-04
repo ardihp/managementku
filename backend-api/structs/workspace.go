@@ -14,6 +14,7 @@ type WorkspaceStatus struct {
 }
 
 type WorkspaceType struct {
+	Id    uint   `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
@@ -45,6 +46,7 @@ type WorkspaceResponse struct {
 	Type        WorkspaceType `json:"type"`
 	Members     []Member      `json:"members"`
 	Tags        []string      `json:"tags"`
+	IsArchived  bool          `json:"is_archived"`
 	CreatedAt   string        `json:"created_at"`
 	UpdatedAt   string        `json:"updated_at"`
 }

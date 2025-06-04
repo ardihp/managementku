@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -26,12 +25,10 @@ func ListWorkspace(c *gin.Context) {
 	}
 
 	if user.Role == "employee" {
-		database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Pluck("workspace_id", &list_workspace)
+		database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Order("created_at").Pluck("workspace_id", &list_workspace)
 	} else {
-		database.DB.Model(&models.Workspace{}).Pluck("id", &list_workspace)
+		database.DB.Model(&models.Workspace{}).Order("created_at").Pluck("id", &list_workspace)
 	}
-
-	fmt.Println(list_workspace)
 
 	var response = []structs.WorkspaceResponse{}
 
@@ -63,19 +60,23 @@ func ListWorkspace(c *gin.Context) {
 			})
 		}
 
-		response = append(response, structs.WorkspaceResponse{
-			Id:          workspace.Id,
-			Name:        workspace.Name,
-			Description: workspace.Description,
-			Type: structs.WorkspaceType{
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
-			},
-			Members:   members,
-			Tags:      workspace_tags,
-			CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
-		})
+		if !workspace.IsArchived {
+			response = append(response, structs.WorkspaceResponse{
+				Id:          workspace.Id,
+				Name:        workspace.Name,
+				Description: workspace.Description,
+				Type: structs.WorkspaceType{
+					Id:    workspace.WorkspaceType.Id,
+					Name:  workspace.WorkspaceType.Name,
+					Color: workspace.WorkspaceType.Color,
+				},
+				Members:   members,
+				Tags:      workspace_tags,
+				CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+			})
+		}
+
 	}
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
@@ -129,6 +130,7 @@ func ListWorkspaceByID(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
+				Id:    workspace.WorkspaceType.Id,
 				Name:  workspace.WorkspaceType.Name,
 				Color: workspace.WorkspaceType.Color,
 			},

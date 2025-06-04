@@ -66,7 +66,7 @@ func UpdateWorkspace(c *gin.Context) {
 
 	workspace.Name = req.Name
 	workspace.Description = req.Description
-	workspace.WorkspaceTypeId = uint(req.WorkspaceTypeId)
+	workspace.WorkspaceType.Id = uint(req.WorkspaceTypeId)
 
 	if err := database.DB.Save(&workspace).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -77,7 +77,7 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
-	database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, &models.Workspace{WorkspaceTypeId: uint(req.WorkspaceTypeId)})
+	database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace)
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
@@ -87,6 +87,7 @@ func UpdateWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
+				Id:    workspace.WorkspaceType.Id,
 				Name:  workspace.WorkspaceType.Name,
 				Color: workspace.WorkspaceType.Color,
 			},
