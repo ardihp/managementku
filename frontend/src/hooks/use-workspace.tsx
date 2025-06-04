@@ -1,5 +1,6 @@
 import { endpoint } from "@/const/endpoint";
 import Api from "@/services/api";
+import { UpdateWorkspace } from "@/types/hooks/workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -31,10 +32,16 @@ export const useWorkspace = () => {
     });
   };
 
-  const UpdateWorkspace = (id: number) => {
+  const UpdateWorkspace = () => {
     return useMutation({
       mutationKey: ["workspace/update"],
-      mutationFn: async (data: any) => {
+      mutationFn: async ({
+        id,
+        data,
+      }: {
+        id: number;
+        data: UpdateWorkspace;
+      }) => {
         const response = await Api.put(endpoint.workspace.update(id), data);
         return response.data;
       },
