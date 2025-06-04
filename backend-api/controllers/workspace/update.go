@@ -86,11 +86,14 @@ func UpdateWorkspace(c *gin.Context) {
 			Id:          workspace.Id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Type:        workspace.WorkspaceType.Name,
-			Members:     []structs.Member{},
-			Tags:        workspace_tags,
-			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+			Type: structs.WorkspaceType{
+				Name:  workspace.WorkspaceType.Name,
+				Color: workspace.WorkspaceType.Color,
+			},
+			Members:   []structs.Member{},
+			Tags:      workspace_tags,
+			CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
 	})
 }

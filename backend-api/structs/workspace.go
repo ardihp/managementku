@@ -13,6 +13,11 @@ type WorkspaceStatus struct {
 	Color string `json:"color"`
 }
 
+type WorkspaceType struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
 type WorkspaceStatusResponse struct {
 	WorkspaceId uint              `json:"workspace_id"`
 	Status      []WorkspaceStatus `json:"status"`
@@ -34,14 +39,14 @@ type WorkspaceTypeResponse struct {
 }
 
 type WorkspaceResponse struct {
-	Id          uint     `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Type        string   `json:"type"`
-	Members     []Member `json:"members"`
-	Tags        []string `json:"tags"`
-	CreatedAt   string   `json:"created_at"`
-	UpdatedAt   string   `json:"updated_at"`
+	Id          uint          `json:"id"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Type        WorkspaceType `json:"type"`
+	Members     []Member      `json:"members"`
+	Tags        []string      `json:"tags"`
+	CreatedAt   string        `json:"created_at"`
+	UpdatedAt   string        `json:"updated_at"`
 }
 
 type WorkspaceCreateRequest struct {
