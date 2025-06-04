@@ -6,11 +6,18 @@ export interface Member {
   role: string;
 }
 
+export interface WorkspaceType {
+  id: number;
+  name: string;
+  color: string;
+}
+
 export interface Workspace {
   id: number;
   name: string;
-  desription: string;
+  description: string;
   tags: string[];
+  type: WorkspaceType;
   members: Member[];
   created_at: string;
   updated_at: string;

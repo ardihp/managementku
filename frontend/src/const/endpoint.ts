@@ -5,5 +5,14 @@ export const endpoint = {
   },
   workspace: {
     list: "/workspace",
+    create: "/workspace/create",
+    update: (id: number) => `/workspace/update/${id}`,
+    archive: (id: number) => `/workspace/archive/${id}`,
+
+    type: {
+      list: "/workspace/type",
+      create: "/workspace/type",
+      delete: (id: number) => `/workspace/type/${id}`,
+    },
   },
 };
