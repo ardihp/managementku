@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -14,6 +15,9 @@ func ListWorkspace(c *gin.Context) {
 	var list_workspace = []int{}
 	var user_id = c.GetInt("user_id")
 	var user = models.User{Id: uint(user_id)}
+	var is_archived = c.Query("is_archived")
+
+	fmt.Println("is_archived:", is_archived)
 
 	if err := database.DB.First(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -27,8 +31,10 @@ func ListWorkspace(c *gin.Context) {
 	if user.Role == "employee" {
 		database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Order("created_at").Pluck("workspace_id", &list_workspace)
 	} else {
-		database.DB.Model(&models.Workspace{}).Order("created_at").Pluck("id", &list_workspace)
+		database.DB.Model(&models.Workspace{}).Where("is_archived = ?", is_archived == "true").Order("updated_at").Pluck("id", &list_workspace)
 	}
+
+	fmt.Println("list_workspace:", list_workspace)
 
 	var response = []structs.WorkspaceResponse{}
 
@@ -60,22 +66,21 @@ func ListWorkspace(c *gin.Context) {
 			})
 		}
 
-		if !workspace.IsArchived {
-			response = append(response, structs.WorkspaceResponse{
-				Id:          workspace.Id,
-				Name:        workspace.Name,
-				Description: workspace.Description,
-				Type: structs.WorkspaceType{
-					Id:    workspace.WorkspaceType.Id,
-					Name:  workspace.WorkspaceType.Name,
-					Color: workspace.WorkspaceType.Color,
-				},
-				Members:   members,
-				Tags:      workspace_tags,
-				CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
-			})
-		}
+		response = append(response, structs.WorkspaceResponse{
+			Id:          workspace.Id,
+			Name:        workspace.Name,
+			Description: workspace.Description,
+			Type: structs.WorkspaceType{
+				Id:    workspace.WorkspaceType.Id,
+				Name:  workspace.WorkspaceType.Name,
+				Color: workspace.WorkspaceType.Color,
+			},
+			Members:    members,
+			Tags:       workspace_tags,
+			IsArchived: workspace.IsArchived,
+			CreatedAt:  workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:  workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+		})
 
 	}
 
