@@ -1,4 +1,4 @@
-import { FolderOpen, Gauge, MessageSquareDot } from "lucide-react";
+import { Archive, FolderOpen, Gauge, MessageSquareDot } from "lucide-react";
 import { paths } from "./routes";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
@@ -24,5 +24,13 @@ export const sidebarItem: SidebarItem[] = [
     title: "Notifications",
     href: paths.dashboard.notification,
     icon: <MessageSquareDot className={cn("size-6")} />,
+  },
+];
+
+export const sidebarItem2: SidebarItem[] = [
+  {
+    title: "Archived",
+    href: paths.dashboard.archive,
+    icon: <Archive className={cn("size-6")} />,
   },
 ];

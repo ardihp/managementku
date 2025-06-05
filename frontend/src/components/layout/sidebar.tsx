@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "../ui/input";
-import { sidebarItem } from "@/const/sidebar-item";
+import { sidebarItem, sidebarItem2 } from "@/const/sidebar-item";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { paths } from "@/const/routes";
@@ -53,6 +53,29 @@ export default function Sidebar() {
         <p className="mb-3 opacity-40 text-sm font-medium px-3">Menu</p>
 
         {sidebarItem.map((item, index) => (
+          <Link
+            href={item.href}
+            key={index}
+            className={cn(
+              "flex items-center gap-4 p-3 rounded-lg bg-white border duration-200",
+              router.asPath === item.href ||
+                (router.asPath.includes(item.href) &&
+                  item.href !== paths.dashboard.root)
+                ? "shadow border-zinc-200 opacity-100"
+                : "border-transparent hover:bg-zinc-300/50 opacity-30"
+            )}
+          >
+            {item.icon}
+
+            <p className="font-medium">{item.title}</p>
+          </Link>
+        ))}
+      </div>
+
+      <hr className="border-zinc-200" />
+
+      <div className="flex flex-col gap-1">
+        {sidebarItem2.map((item, index) => (
           <Link
             href={item.href}
             key={index}
