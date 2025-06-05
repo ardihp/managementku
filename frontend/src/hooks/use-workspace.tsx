@@ -7,11 +7,17 @@ import { toast } from "sonner";
 export const useWorkspace = () => {
   const queryClient = useQueryClient();
 
-  const GetListWorkspace = () => {
+  const GetListWorkspace = ({
+    is_archived = false,
+  }: {
+    is_archived: boolean;
+  }) => {
     return useQuery({
-      queryKey: ["workspace/list"],
+      queryKey: ["workspace/list", is_archived],
       queryFn: async () => {
-        const response = await Api.get(endpoint.workspace.list);
+        const response = await Api.get(
+          `${endpoint.workspace.list}?is_archived=${is_archived}`
+        );
         return response.data;
       },
       staleTime: Infinity,
@@ -66,6 +72,34 @@ export const useWorkspace = () => {
     });
   };
 
+  const UnarchiveWorkspace = () => {
+    return useMutation({
+      mutationKey: ["workspace/unarchive"],
+      mutationFn: async (id: number) => {
+        const response = await Api.put(endpoint.workspace.unarchive(id));
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        toast.success("Workspace activated successfully");
+      },
+    });
+  };
+
+  const DeleteWorkspace = () => {
+    return useMutation({
+      mutationKey: ["workspace/delete"],
+      mutationFn: async (id: number) => {
+        const response = await Api.delete(endpoint.workspace.delete(id));
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        toast.success("Workspace deleted successfully");
+      },
+    });
+  };
+
   const GetListWorkspaceType = () => {
     return useQuery({
       queryKey: ["workspace/type/list"],
@@ -82,6 +116,8 @@ export const useWorkspace = () => {
     createWorkspace: CreateWorkspace,
     updateWorkspace: UpdateWorkspace,
     archiveWorkspace: ArchiveWorkspace,
+    unarchiveWorkspace: UnarchiveWorkspace,
+    deleteWorkspace: DeleteWorkspace,
 
     getListWorkspaceType: GetListWorkspaceType,
   };

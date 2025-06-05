@@ -103,8 +103,6 @@ export default function FormWorkspace({
     }
   };
 
-  console.log(watch());
-
   const handleRemoveWorkspaceTag = (tag: string) => {
     const newTags = watch("tags")?.filter((t) => t !== tag) || [];
     setValue("tags", [...newTags]);
@@ -112,8 +110,6 @@ export default function FormWorkspace({
 
   const onSubmit = (data: FormInputWorkspace) => {
     const formData = { ...data, type_id: parseInt(data.type_id) };
-
-    console.log(data);
 
     if (isEdit) {
       update({ id: selectedItem.id, data: formData });
@@ -123,7 +119,7 @@ export default function FormWorkspace({
 
     setOpenDialog(false);
     resetSelectedItem();
-    reset({});
+    reset({ name: "", description: "", type_id: "", tags: [] });
   };
 
   return (

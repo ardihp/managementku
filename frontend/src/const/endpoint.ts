@@ -8,6 +8,8 @@ export const endpoint = {
     create: "/workspace/create",
     update: (id: number) => `/workspace/update/${id}`,
     archive: (id: number) => `/workspace/archive/${id}`,
+    unarchive: (id: number) => `/workspace/unarchive/${id}`,
+    delete: (id: number) => `/workspace/delete/${id}`,
 
     type: {
       list: "/workspace/type",
