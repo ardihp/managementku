@@ -3,6 +3,7 @@ export const paths = {
     root: "/dashboard",
     workspace: "/dashboard/workspaces",
     notification: "/dashboard/notification",
+    archive: "/dashboard/archive",
   },
   auth: {
     sign_in: "/auth/sign-in",
