@@ -60,6 +60,7 @@ export default function SignInView() {
               placeholder="Input your username..."
               className="bg-transparent!"
               disabled={isPending}
+              autoFocus
               {...register("username")}
             />
             <small className="text-red-500">{errors.username?.message}</small>
