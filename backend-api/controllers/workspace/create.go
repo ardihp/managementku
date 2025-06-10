@@ -13,6 +13,7 @@ import (
 
 func CreateWorkspace(c *gin.Context) {
 	var req = structs.WorkspaceCreateRequest{}
+	var user_id = c.GetInt("user_id")
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -67,6 +68,56 @@ func CreateWorkspace(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Failed to read workspace type",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	var role = models.WorkspaceRole{}
+
+	if err := database.DB.First(&role, models.WorkspaceRole{Name: "Member"}).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Role not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	var assigned_user = models.WorkspaceMember{
+		WorkspaceId: workspace.Id,
+		RoleId:      role.Id,
+		UserId:      uint(user_id),
+	}
+
+	if err := database.DB.Create(&assigned_user).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to assign user",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	var workspace_status = []structs.WorkspaceStatus{
+		{Name: "To Do", Color: "gray"},
+		{Name: "In Progress", Color: "yellow"},
+		{Name: "Done", Color: "green"}}
+
+	var default_card = []models.WorkspaceStatus{}
+
+	for _, status := range workspace_status {
+		default_card = append(default_card, models.WorkspaceStatus{
+			WorkspaceId: workspace.Id,
+			Name:        status.Name,
+			Color:       status.Color,
+		})
+	}
+
+	if err := database.DB.Create(&default_card).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to create workspace status",
 			Errors:  helpers.TranslateErrorMessage(err),
 		})
 		return
