@@ -72,28 +72,32 @@ export default function Sidebar() {
         ))}
       </div>
 
-      <hr className="border-zinc-200" />
+      {userDetail?.role === "manager" && (
+        <>
+          <hr className="border-zinc-200" />
 
-      <div className="flex flex-col gap-1">
-        {sidebarItem2.map((item, index) => (
-          <Link
-            href={item.href}
-            key={index}
-            className={cn(
-              "flex items-center gap-4 p-3 rounded-lg bg-white border duration-200",
-              router.asPath === item.href ||
-                (router.asPath.includes(item.href) &&
-                  item.href !== paths.dashboard.root)
-                ? "shadow border-zinc-200 opacity-100"
-                : "border-transparent hover:bg-zinc-300/50 opacity-30"
-            )}
-          >
-            {item.icon}
+          <div className="flex flex-col gap-1">
+            {sidebarItem2.map((item, index) => (
+              <Link
+                href={item.href}
+                key={index}
+                className={cn(
+                  "flex items-center gap-4 p-3 rounded-lg bg-white border duration-200",
+                  router.asPath === item.href ||
+                    (router.asPath.includes(item.href) &&
+                      item.href !== paths.dashboard.root)
+                    ? "shadow border-zinc-200 opacity-100"
+                    : "border-transparent hover:bg-zinc-300/50 opacity-30"
+                )}
+              >
+                {item.icon}
 
-            <p className="font-medium">{item.title}</p>
-          </Link>
-        ))}
-      </div>
+                <p className="font-medium">{item.title}</p>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger className="mt-auto p-2 bg-white rounded-lg shadow border border-zinc-200 cursor-pointer">
