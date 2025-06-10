@@ -4,6 +4,7 @@ import (
 	authControllers "kanban-board/backend-api/controllers/auth"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
 	workspaceRoleControllers "kanban-board/backend-api/controllers/workspace/role"
+	workspaceStatusControllers "kanban-board/backend-api/controllers/workspace/status"
 	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
 	"kanban-board/backend-api/middlewares"
 
@@ -36,6 +37,7 @@ func SetupRouter() *gin.Engine {
 	router.DELETE("/api/workspace/delete/:id", middlewares.AuthMiddleware(), workspaceControllers.DeleteWorkspace)
 
 	// Workspace Status
+	router.GET("/api/workspace/:id/status", middlewares.AuthMiddleware(), workspaceStatusControllers.ListWorkspaceStatus)
 	router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateStatusWorkspace)
 
 	// Workspace Type

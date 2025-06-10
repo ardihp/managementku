@@ -61,9 +61,6 @@ func UpdateStatusWorkspace(c *gin.Context) {
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
 		Message: "Workspace status update successfully",
-		Data: structs.WorkspaceStatusResponse{
-			WorkspaceId: workspace.Id,
-			Status:      list_status,
-		},
+		Data:    list_status,
 	})
 }

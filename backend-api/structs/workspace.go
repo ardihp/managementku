@@ -19,11 +19,6 @@ type WorkspaceType struct {
 	Color string `json:"color"`
 }
 
-type WorkspaceStatusResponse struct {
-	WorkspaceId uint              `json:"workspace_id"`
-	Status      []WorkspaceStatus `json:"status"`
-}
-
 type WorkspaceRoleResponse struct {
 	Id        uint   `json:"id"`
 	Name      string `json:"name"`
