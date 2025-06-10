@@ -34,6 +34,13 @@ type WorkspaceTypeResponse struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type WorkspaceCardResponse struct {
+	Id          uint     `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Members     []Member `json:"members"`
+}
+
 type WorkspaceResponse struct {
 	Id          uint          `json:"id"`
 	Name        string        `json:"name"`
@@ -78,4 +85,18 @@ type WorkspaceCreateRoleRequest struct {
 type WorkspaceCreateTypeRequest struct {
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
+}
+
+type WorkspaceStatusCardResponse struct {
+	Name       string                  `json:"name"`
+	Color      string                  `json:"color"`
+	IsArchived bool                    `json:"is_archived"`
+	Cards      []WorkspaceCardResponse `json:"cards"`
+}
+
+type WorkspaceCreateCardRequest struct {
+	WorkspaceId int    `json:"workspace_id" binding:"required"`
+	Title       string `json:"title" binding:"required"`
+	Description string `json:"description"`
+	Status      string `json:"status" binding:"required"`
 }

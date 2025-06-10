@@ -3,9 +3,11 @@ package routes
 import (
 	authControllers "kanban-board/backend-api/controllers/auth"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
+	workspaceCardControllers "kanban-board/backend-api/controllers/workspace/card"
 	workspaceRoleControllers "kanban-board/backend-api/controllers/workspace/role"
 	workspaceStatusControllers "kanban-board/backend-api/controllers/workspace/status"
 	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
+
 	"kanban-board/backend-api/middlewares"
 
 	"github.com/gin-contrib/cors"
@@ -47,6 +49,9 @@ func SetupRouter() *gin.Engine {
 	// Workspace Role
 	router.GET("/api/workspace/role", middlewares.AuthMiddleware(), workspaceRoleControllers.ListWorkspaceRole)
 	router.POST("/api/workspace/role/create", middlewares.AuthMiddleware(), workspaceRoleControllers.CreateWorkspaceRole)
+
+	// Workspace Card
+	router.POST("/api/workspace/:id/card/create", middlewares.AuthMiddleware(), workspaceCardControllers.CreateWorkspaceCard)
 
 	return router
 }
