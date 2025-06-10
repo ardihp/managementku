@@ -10,7 +10,6 @@ interface ColorfulBadgeProps {
     | "orange"
     | "yellow"
     | "green"
-    | "green"
     | "blue"
     | "purple"
     | "pink"
