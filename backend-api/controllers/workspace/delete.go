@@ -24,7 +24,7 @@ func DeleteWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", id).Delete(&models.WorkspaceMember{}).Error; err != nil {
+	if err := database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceMember{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Failed to delete workspace",
@@ -33,7 +33,25 @@ func DeleteWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", id).Delete(&models.WorkspaceTag{}).Error; err != nil {
+	if err := database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceTag{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to delete workspace",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	if err := database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceStatus{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to delete workspace",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	if err := database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceCard{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Failed to delete workspace",
