@@ -52,6 +52,27 @@ type WorkspaceStatus struct {
 	Workspace   Workspace
 	Name        string    `json:"name"`
 	Color       string    `json:"color"`
+	IsArchived  bool      `json:"is_archived" gorm:"default:false"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type WorkspaceCard struct {
+	Id          uint `json:"id" gorm:"primaryKey"`
+	WorkspaceId int  `json:"workspaceId"`
+	Workspace   Workspace
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Status      string    `json:"status"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type WorkspaceCardMember struct {
+	CardId    int `json:"cardId"`
+	Card      WorkspaceCard
+	UserId    int `json:"userId"`
+	User      User
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
