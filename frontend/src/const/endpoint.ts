@@ -16,5 +16,9 @@ export const endpoint = {
       create: "/workspace/type",
       delete: (id: number) => `/workspace/type/${id}`,
     },
+
+    status: {
+      list: (id: number) => `/workspace/${id}/status`,
+    },
   },
 };

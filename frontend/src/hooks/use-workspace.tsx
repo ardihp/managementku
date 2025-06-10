@@ -1,7 +1,7 @@
 import { endpoint } from "@/const/endpoint";
 import Api from "@/services/api";
 import { UpdateWorkspace } from "@/types/hooks/workspace";
-import { Workspace } from "@/types/workspace";
+import { Workspace, WorkspaceStatus } from "@/types/workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -25,7 +25,7 @@ export const useWorkspace = () => {
     });
   };
 
-  const GetDetailWorkspace = ({ id }: { id: number }) => {
+  const GetDetailWorkspace = (id: number) => {
     return useQuery({
       queryKey: ["workspace/detail", id],
       queryFn: async () => {
@@ -126,6 +126,20 @@ export const useWorkspace = () => {
     });
   };
 
+  const GetListWorkspaceStatus = (id: number) => {
+    return useQuery({
+      queryKey: ["workspace/type/status", id],
+      queryFn: async () => {
+        const response: { data: { data: WorkspaceStatus[] } } = await Api.get(
+          endpoint.workspace.status.list(id)
+        );
+        return response.data.data;
+      },
+      staleTime: Infinity,
+      enabled: id !== 0,
+    });
+  };
+
   return {
     getListWorkspace: GetListWorkspace,
     getDetailWorkspace: GetDetailWorkspace,
@@ -136,5 +150,7 @@ export const useWorkspace = () => {
     deleteWorkspace: DeleteWorkspace,
 
     getListWorkspaceType: GetListWorkspaceType,
+
+    getListWorkspaceStatus: GetListWorkspaceStatus,
   };
 };

@@ -12,6 +12,11 @@ export interface WorkspaceType {
   color: string;
 }
 
+export interface WorkspaceStatus {
+  name: string;
+  color: string;
+}
+
 export interface Workspace {
   id: number;
   name: string;
