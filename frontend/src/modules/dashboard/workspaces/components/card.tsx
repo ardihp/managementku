@@ -52,7 +52,7 @@ export default function WorkspaceCard({
             {workspace.description}
           </p>
 
-          <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-3">
+          <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto">
             {workspace.members.map((member, key) => (
               <Avatar key={key} title={member.username} className="size-8">
                 <AvatarFallback className="uppercase text-sm">

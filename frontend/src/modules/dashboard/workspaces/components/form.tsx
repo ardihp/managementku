@@ -124,9 +124,9 @@ export default function FormWorkspace({
 
   return (
     <Dialog onOpenChange={setOpenDialog} open={openDialog}>
-      <DialogTrigger className="flex items-center gap-2 bg-primary py-2 px-3 rounded-md cursor-pointer">
+      <DialogTrigger className="flex items-center gap-2 bg-primary py-2 px-3 rounded-md cursor-pointer h-9">
         <Plus className="size-4 text-white" />
-        <p className="text-white text-sm">Add New</p>
+        <p className="text-white text-sm leading-none">Add New</p>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -208,7 +208,7 @@ export default function FormWorkspace({
               />
 
               <button
-                className="flex items-center justify-center bg-black h-full px-3 rounded-lg cursor-pointer"
+                className="flex items-center justify-center bg-zinc-700 h-full px-3 rounded-lg cursor-pointer"
                 form="workspace_tags"
               >
                 <p className="text-white text-sm">Add</p>
