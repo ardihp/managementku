@@ -126,12 +126,15 @@ export const useWorkspace = () => {
     });
   };
 
-  const GetListWorkspaceStatus = (id: number) => {
+  const GetListWorkspaceStatus = (
+    id: number,
+    is_archived: "true" | "false"
+  ) => {
     return useQuery({
       queryKey: ["workspace/type/status", id],
       queryFn: async () => {
         const response: { data: { data: WorkspaceStatus[] } } = await Api.get(
-          endpoint.workspace.status.list(id)
+          `${endpoint.workspace.status.list(id)}?is_archived=${is_archived}`
         );
         return response.data.data;
       },

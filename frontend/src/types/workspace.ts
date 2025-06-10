@@ -12,9 +12,19 @@ export interface WorkspaceType {
   color: string;
 }
 
+export interface WorkspaceCard {
+  id: number;
+  title: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface WorkspaceStatus {
   name: string;
   color: string;
+  is_archived: boolean;
+  cards: WorkspaceCard[];
 }
 
 export interface Workspace {
