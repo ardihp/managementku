@@ -69,7 +69,7 @@ export default function FormWorkspace({
   });
   useEffect(() => {
     if (!openDialog) {
-      reset({});
+      reset({ name: "", description: "", type_id: "", tags: [] });
       resetSelectedItem();
     }
   }, [openDialog]);
@@ -167,7 +167,8 @@ export default function FormWorkspace({
                 <SelectValue placeholder="Workspace Type" />
               </SelectTrigger>
               <SelectContent>
-                {listWorkspaceType?.data?.length >= 1 ? (
+                {!loadingWorkspaceType &&
+                listWorkspaceType?.data?.length >= 1 ? (
                   listWorkspaceType?.data?.map(
                     (type: WorkspaceType, key: number) => (
                       <SelectItem
