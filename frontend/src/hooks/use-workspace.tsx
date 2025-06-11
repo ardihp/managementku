@@ -8,11 +8,7 @@ import { toast } from "sonner";
 export const useWorkspace = () => {
   const queryClient = useQueryClient();
 
-  const GetListWorkspace = ({
-    is_archived = false,
-  }: {
-    is_archived: boolean;
-  }) => {
+  const GetListWorkspace = (is_archived: "false" | "true") => {
     return useQuery({
       queryKey: ["workspace/list", is_archived],
       queryFn: async () => {
@@ -126,15 +122,30 @@ export const useWorkspace = () => {
     });
   };
 
-  const GetListWorkspaceStatus = (
+  const GetListWorkspaceStatus = (is_archived: "true" | "false") => {
+    return useQuery({
+      queryKey: ["workspace/status/list", is_archived],
+      queryFn: async () => {
+        const response: { data: { data: WorkspaceStatus[] } } = await Api.get(
+          `${endpoint.workspace.status.list}?is_archived=${is_archived}`
+        );
+        return response.data.data;
+      },
+      staleTime: Infinity,
+    });
+  };
+
+  const GetListWorkspaceCardStatus = (
     id: number,
     is_archived: "true" | "false"
   ) => {
     return useQuery({
-      queryKey: ["workspace/type/status", id],
+      queryKey: ["workspace/card-status/list", id, is_archived],
       queryFn: async () => {
         const response: { data: { data: WorkspaceStatus[] } } = await Api.get(
-          `${endpoint.workspace.status.list(id)}?is_archived=${is_archived}`
+          `${endpoint.workspace.card_status.list(
+            id
+          )}?is_archived=${is_archived}`
         );
         return response.data.data;
       },
@@ -151,9 +162,10 @@ export const useWorkspace = () => {
     archiveWorkspace: ArchiveWorkspace,
     unarchiveWorkspace: UnarchiveWorkspace,
     deleteWorkspace: DeleteWorkspace,
+    getListWorkspaceStatus: GetListWorkspaceStatus,
 
     getListWorkspaceType: GetListWorkspaceType,
 
-    getListWorkspaceStatus: GetListWorkspaceStatus,
+    getListWorkspaceCardStatus: GetListWorkspaceCardStatus,
   };
 };

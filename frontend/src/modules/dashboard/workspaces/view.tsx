@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import LayoutPage from "@/components/layout";
 import { useAuth, UserDetail } from "@/hooks/auth/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { Workspace } from "@/types/workspace";
@@ -13,11 +12,14 @@ export default function WorkspacesView() {
   const [selectedItem, setSelectedItem] = useState<Workspace | null>(null);
 
   const { user } = useAuth();
-  const { getListWorkspace } = useWorkspace();
+  const { getListWorkspace, getListWorkspaceStatus } = useWorkspace();
 
-  const { data: listWorkspace, isLoading: loadingWorkspace } = getListWorkspace(
-    { is_archived: false }
-  );
+  const { data: listWorkspace, isLoading: loadingWorkspace } =
+    getListWorkspace("false");
+  const { data: listWorkspaceStatus, isLoading: loadingWorkspaceStatus } =
+    getListWorkspaceStatus("false");
+
+  console.log(listWorkspaceStatus);
 
   useEffect(() => {
     setUserDetail(user);
@@ -43,7 +45,7 @@ export default function WorkspacesView() {
         </div>
       </section>
 
-      {loadingWorkspace ? (
+      {loadingWorkspace || loadingWorkspaceStatus ? (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-8 gap-6">
           {[...Array(5)].map((item, key) => (
             <Skeleton key={key} className="w-full h-[177px]" />

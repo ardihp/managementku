@@ -12,10 +12,10 @@ import ColorfulBadge from "@/components/layout/colorful-badge";
 
 export default function DetailWorkspaceView() {
   const params = useParams();
-  const { getDetailWorkspace, getListWorkspaceStatus } = useWorkspace();
+  const { getDetailWorkspace, getListWorkspaceCardStatus } = useWorkspace();
   const { data: detailWorkspace, isLoading: loadingWorkspace } =
     getDetailWorkspace(Number(params?.id || 0));
-  const { data: workspaceStatus } = getListWorkspaceStatus(
+  const { data: workspaceStatus } = getListWorkspaceCardStatus(
     Number(params?.id || 0),
     "false"
   );

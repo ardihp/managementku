@@ -11,13 +11,18 @@ export const endpoint = {
     unarchive: (id: number) => `/workspace/unarchive/${id}`,
     delete: (id: number) => `/workspace/delete/${id}`,
 
+    status: {
+      list: "/workspace/status",
+      create: "/workspace/status/create",
+    },
+
     type: {
       list: "/workspace/type",
       create: "/workspace/type",
       delete: (id: number) => `/workspace/type/${id}`,
     },
 
-    status: {
+    card_status: {
       list: (id: number) => `/workspace/${id}/status`,
     },
   },
