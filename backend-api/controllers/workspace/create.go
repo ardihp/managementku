@@ -33,10 +33,20 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.First(&models.WorkspaceStatus{}, req.WorkspaceStatusId).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Workspace status not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
 	workspace := models.Workspace{
-		Name:            req.Name,
-		Description:     req.Description,
-		WorkspaceTypeId: uint(req.WorkspaceTypeId),
+		Name:              req.Name,
+		Description:       req.Description,
+		WorkspaceTypeId:   uint(req.WorkspaceTypeId),
+		WorkspaceStatusId: uint(req.WorkspaceStatusId),
 	}
 
 	if err := database.DB.Create(&workspace).Error; err != nil {
@@ -99,15 +109,15 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	var workspace_status = []structs.WorkspaceStatus{
+	var workspace_card_status = []structs.WorkspaceCardStatus{
 		{Name: "To Do", Color: "gray"},
 		{Name: "In Progress", Color: "yellow"},
 		{Name: "Done", Color: "green"}}
 
-	var default_card = []models.WorkspaceStatus{}
+	var default_card = []models.WorkspaceCardStatus{}
 
-	for _, status := range workspace_status {
-		default_card = append(default_card, models.WorkspaceStatus{
+	for _, status := range workspace_card_status {
+		default_card = append(default_card, models.WorkspaceCardStatus{
 			WorkspaceId: workspace.Id,
 			Name:        status.Name,
 			Color:       status.Color,
@@ -131,8 +141,15 @@ func CreateWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
+				Id:    workspace.WorkspaceType.Id,
 				Name:  workspace.WorkspaceType.Name,
 				Color: workspace.WorkspaceType.Color,
+			},
+			Status: structs.WorkspaceStatus{
+				Id:         workspace.WorkspaceStatus.Id,
+				Name:       workspace.WorkspaceStatus.Name,
+				Color:      workspace.WorkspaceStatus.Color,
+				IsArchived: workspace.WorkspaceStatus.IsArchived,
 			},
 			Members:   []structs.Member{},
 			Tags:      workspace_tags,

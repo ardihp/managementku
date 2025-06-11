@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -9,15 +8,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 )
 
 func ListWorkspace(c *gin.Context) {
-	var list_workspace = []int{}
 	var user_id = c.GetInt("user_id")
 	var user = models.User{Id: uint(user_id)}
-	var is_archived = c.Query("is_archived")
-
-	fmt.Println("is_archived:", is_archived)
+	var status_archived = c.Query("status_archived")
+	var workspace_archived = c.Query("workspace_archived")
 
 	if err := database.DB.First(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -28,66 +26,83 @@ func ListWorkspace(c *gin.Context) {
 		return
 	}
 
-	if user.Role == "employee" {
-		database.DB.Model(&models.WorkspaceMember{}).Where("user_id = ?", user_id).Order("created_at").Pluck("workspace_id", &list_workspace)
-	} else {
-		database.DB.Model(&models.Workspace{}).Where("is_archived = ?", is_archived == "true").Order("updated_at").Pluck("id", &list_workspace)
-	}
+	var workspace_status = []models.WorkspaceStatus{}
+	database.DB.Where("is_archived = ?", status_archived == "true").Find(&workspace_status)
 
-	fmt.Println("list_workspace:", list_workspace)
+	var list_workspace = []structs.WorkspaceByStatusResponse{}
 
-	var response = []structs.WorkspaceResponse{}
+	for _, status := range workspace_status {
+		var user_workspace = []int{}
 
-	for _, workspace_id := range list_workspace {
-		var members = []structs.Member{}
-		var id_member = []int{}
-		var workspace = models.Workspace{
-			Id: uint(workspace_id),
+		if user.Role == "employee" {
+			var list_workspace = []models.WorkspaceMember{}
+			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("user_id = ?", user_id).Order("created_at").Find(&list_workspace)
+
+		} else {
+			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND workspace_status_id = ?", workspace_archived == "true", status.Id).Order("updated_at").Pluck("id", &user_workspace)
 		}
-		var workspace_tags = []string{}
 
-		database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace)
-		database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace_id).Order("user_id").Pluck("user_id", &id_member)
-		database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", workspace_id).Pluck("tag", &workspace_tags)
+		var list_workspace_by_status = []structs.WorkspaceResponse{}
 
-		for _, user_id := range id_member {
-			var user = models.User{}
-			var workspace_member = models.WorkspaceMember{}
+		for _, workspace_id := range user_workspace {
+			var members = []structs.Member{}
+			var id_member = []int{}
+			var workspace = models.Workspace{
+				Id: uint(workspace_id),
+			}
+			var workspace_tags = []string{}
 
-			database.DB.First(&user, user_id)
-			database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).Find(&workspace_member)
+			database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace)
+			database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace_id).Order("user_id").Pluck("user_id", &id_member)
+			database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", workspace_id).Pluck("tag", &workspace_tags)
 
-			members = append(members, structs.Member{
-				Id:       user.Id,
-				Name:     user.Name,
-				Username: user.Username,
-				Email:    user.Email,
-				Role:     workspace_member.Role.Name,
+			for _, user_id := range id_member {
+				var user = models.User{}
+				var workspace_member = models.WorkspaceMember{}
+
+				database.DB.First(&user, user_id)
+				database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).Find(&workspace_member)
+
+				members = append(members, structs.Member{
+					Id:       user.Id,
+					Name:     user.Name,
+					Username: user.Username,
+					Email:    user.Email,
+					Role:     workspace_member.Role.Name,
+				})
+			}
+
+			list_workspace_by_status = append(list_workspace_by_status, structs.WorkspaceResponse{
+				Id:          workspace.Id,
+				Name:        workspace.Name,
+				Description: workspace.Description,
+				Type: structs.WorkspaceType{
+					Id:    workspace.WorkspaceType.Id,
+					Name:  workspace.WorkspaceType.Name,
+					Color: workspace.WorkspaceType.Color,
+				},
+				Status:     structs.WorkspaceStatus{},
+				Members:    members,
+				Tags:       workspace_tags,
+				IsArchived: workspace.IsArchived,
+				CreatedAt:  workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:  workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
 		}
 
-		response = append(response, structs.WorkspaceResponse{
-			Id:          workspace.Id,
-			Name:        workspace.Name,
-			Description: workspace.Description,
-			Type: structs.WorkspaceType{
-				Id:    workspace.WorkspaceType.Id,
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
-			},
-			Members:    members,
-			Tags:       workspace_tags,
-			IsArchived: workspace.IsArchived,
-			CreatedAt:  workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:  workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+		list_workspace = append(list_workspace, structs.WorkspaceByStatusResponse{
+			Id:         status.Id,
+			Name:       status.Name,
+			Color:      status.Color,
+			IsArchived: status.IsArchived,
+			Workspaces: list_workspace_by_status,
 		})
-
 	}
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
 		Message: "Workspace retrieved successfully",
-		Data:    response,
+		Data:    list_workspace,
 	})
 }
 

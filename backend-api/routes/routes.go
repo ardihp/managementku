@@ -4,6 +4,7 @@ import (
 	authControllers "kanban-board/backend-api/controllers/auth"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
 	workspaceCardControllers "kanban-board/backend-api/controllers/workspace/card"
+	workspaceCardStatusControllers "kanban-board/backend-api/controllers/workspace/card-status"
 	workspaceRoleControllers "kanban-board/backend-api/controllers/workspace/role"
 	workspaceStatusControllers "kanban-board/backend-api/controllers/workspace/status"
 	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
@@ -39,8 +40,8 @@ func SetupRouter() *gin.Engine {
 	router.DELETE("/api/workspace/delete/:id", middlewares.AuthMiddleware(), workspaceControllers.DeleteWorkspace)
 
 	// Workspace Status
-	router.GET("/api/workspace/:id/status", middlewares.AuthMiddleware(), workspaceStatusControllers.ListWorkspaceStatus)
-	router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateStatusWorkspace)
+	router.GET("/api/workspace/status", middlewares.AuthMiddleware(), workspaceStatusControllers.ListWorkspaceStatus)
+	router.POST("/api/workspace/status/create", middlewares.AuthMiddleware(), workspaceStatusControllers.CreateWorkspaceStatus)
 
 	// Workspace Type
 	router.GET("/api/workspace/type", middlewares.AuthMiddleware(), workspaceTypeControllers.ListWorkspaceType)
@@ -49,6 +50,10 @@ func SetupRouter() *gin.Engine {
 	// Workspace Role
 	router.GET("/api/workspace/role", middlewares.AuthMiddleware(), workspaceRoleControllers.ListWorkspaceRole)
 	router.POST("/api/workspace/role/create", middlewares.AuthMiddleware(), workspaceRoleControllers.CreateWorkspaceRole)
+
+	// Workspace Card Status
+	router.GET("/api/workspace/:id/status", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ListWorkspaceCardStatus)
+	// router.POST("/api/workspace/update/status", middlewares.AuthMiddleware(), workspaceControllers.UpdateStatusWorkspace)
 
 	// Workspace Card
 	router.POST("/api/workspace/:id/card/create", middlewares.AuthMiddleware(), workspaceCardControllers.CreateWorkspaceCard)

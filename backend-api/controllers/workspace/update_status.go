@@ -36,27 +36,27 @@ func UpdateStatusWorkspace(c *gin.Context) {
 	database.DB.Where("workspace_id = ?", req.WorkspaceId).Delete(&workspace_status)
 	var list_status = []structs.WorkspaceStatus{}
 
-	for key := range req.Status {
-		var assigned_status = models.WorkspaceStatus{
-			WorkspaceId: uint(req.WorkspaceId),
-			Name:        req.Status[key].Name,
-			Color:       req.Status[key].Color,
-		}
+	// for key := range req.Status {
+	// 	var assigned_status = models.WorkspaceStatus{
+	// 		WorkspaceId: uint(req.WorkspaceId),
+	// 		Name:        req.Status[key].Name,
+	// 		Color:       req.Status[key].Color,
+	// 	}
 
-		if err := database.DB.Create(&assigned_status).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return
-		}
+	// 	if err := database.DB.Create(&assigned_status).Error; err != nil {
+	// 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+	// 			Success: false,
+	// 			Message: "Failed to update status",
+	// 			Errors:  helpers.TranslateErrorMessage(err),
+	// 		})
+	// 		return
+	// 	}
 
-		list_status = append(list_status, structs.WorkspaceStatus{
-			Name:  req.Status[key].Name,
-			Color: req.Status[key].Color,
-		})
-	}
+	// 	list_status = append(list_status, structs.WorkspaceStatus{
+	// 		Name:  req.Status[key].Name,
+	// 		Color: req.Status[key].Color,
+	// 	})
+	// }
 
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
