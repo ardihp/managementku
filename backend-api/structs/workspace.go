@@ -9,14 +9,23 @@ type Member struct {
 }
 
 type WorkspaceStatus struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	Id         uint   `json:"id"`
+	Name       string `json:"name"`
+	Color      string `json:"color"`
+	IsArchived bool   `json:"is_archived"`
 }
 
 type WorkspaceType struct {
 	Id    uint   `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
+}
+
+type WorkspaceCardStatus struct {
+	Id         uint   `json:"id"`
+	Name       string `json:"name"`
+	Color      string `json:"color"`
+	IsArchived bool   `json:"is_archived"`
 }
 
 type WorkspaceRoleResponse struct {
@@ -42,22 +51,32 @@ type WorkspaceCardResponse struct {
 }
 
 type WorkspaceResponse struct {
-	Id          uint          `json:"id"`
-	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Type        WorkspaceType `json:"type"`
-	Members     []Member      `json:"members"`
-	Tags        []string      `json:"tags"`
-	IsArchived  bool          `json:"is_archived"`
-	CreatedAt   string        `json:"created_at"`
-	UpdatedAt   string        `json:"updated_at"`
+	Id          uint            `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Type        WorkspaceType   `json:"type"`
+	Status      WorkspaceStatus `json:"status,omitempty"`
+	Members     []Member        `json:"members"`
+	Tags        []string        `json:"tags"`
+	IsArchived  bool            `json:"is_archived"`
+	CreatedAt   string          `json:"created_at"`
+	UpdatedAt   string          `json:"updated_at"`
+}
+
+type WorkspaceByStatusResponse struct {
+	Id         uint                `json:"id"`
+	Name       string              `json:"name"`
+	Color      string              `json:"color"`
+	Workspaces []WorkspaceResponse `json:"workspaces"`
+	IsArchived bool                `json:"is_archived"`
 }
 
 type WorkspaceCreateRequest struct {
-	Name            string   `json:"name" binding:"required"`
-	Description     string   `json:"description" binding:"required"`
-	WorkspaceTypeId int      `json:"type_id" binding:"required"`
-	Tags            []string `json:"tags" binding:"required"`
+	Name              string   `json:"name" binding:"required"`
+	Description       string   `json:"description" binding:"required"`
+	WorkspaceTypeId   int      `json:"type_id" binding:"required"`
+	WorkspaceStatusId int      `json:"status_id" binding:"required"`
+	Tags              []string `json:"tags" binding:"required"`
 }
 
 type WorkspaceUpdateRequest struct {
@@ -87,7 +106,7 @@ type WorkspaceCreateTypeRequest struct {
 	Color string `json:"color" binding:"required"`
 }
 
-type WorkspaceStatusCardResponse struct {
+type WorkspaceCardStatusCardResponse struct {
 	Name       string                  `json:"name"`
 	Color      string                  `json:"color"`
 	IsArchived bool                    `json:"is_archived"`
@@ -99,4 +118,9 @@ type WorkspaceCreateCardRequest struct {
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description"`
 	Status      string `json:"status" binding:"required"`
+}
+
+type WorkspaceCreateStatusRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Color string `json:"color" binding:"required"`
 }
