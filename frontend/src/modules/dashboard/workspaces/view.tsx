@@ -81,7 +81,6 @@ export default function WorkspacesView() {
 
                 {userDetail?.role === "manager" && (
                   <FormWorkspace
-                    selectedItem={selectedItem}
                     resetSelectedItem={() => setSelectedItem(null)}
                     defaultStatus={status.id.toString()}
                     buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors"

@@ -29,6 +29,10 @@ export default function WorkspaceCard({
         <div className="w-full border rounded-xl bg-white flex flex-col p-4 gap-2 min-h-[177px]">
           <div className="flex items-center gap-2">
             <ColorfulBadge
+              text={workspace.status.name}
+              color={workspace.status.color}
+            />
+            <ColorfulBadge
               text={workspace.type.name}
               color={workspace.type.color}
             />

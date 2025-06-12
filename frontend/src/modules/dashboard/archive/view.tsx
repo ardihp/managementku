@@ -7,10 +7,9 @@ import { Workspace } from "@/types/workspace";
 import { Archive } from "lucide-react";
 
 export default function ArchiveViewF() {
-  const { getListWorkspace } = useWorkspace();
-  const { data: listWorkspace, isLoading: loadingWorkspace } = getListWorkspace(
-    { is_archived: true }
-  );
+  const { getListArchivedWorkspace } = useWorkspace();
+  const { data: listWorkspace, isLoading: loadingWorkspace } =
+    getListArchivedWorkspace();
 
   return (
     <div className="flex flex-col h-full">
@@ -29,9 +28,9 @@ export default function ArchiveViewF() {
             <Skeleton key={key} className="w-full h-[177px]" />
           ))}
         </section>
-      ) : listWorkspace?.data?.length >= 1 ? (
+      ) : listWorkspace?.length >= 1 ? (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-8 gap-6">
-          {listWorkspace?.data?.map((workspace: Workspace, key: number) => (
+          {listWorkspace?.map((workspace: Workspace, key: number) => (
             <WorkspaceCard key={key} workspace={workspace} isArchived={true} />
           ))}
         </section>
