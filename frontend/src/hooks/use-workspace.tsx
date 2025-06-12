@@ -8,14 +8,20 @@ import { toast } from "sonner";
 export const useWorkspace = () => {
   const queryClient = useQueryClient();
 
-  const GetListWorkspace = (is_archived: "false" | "true") => {
+  const GetListWorkspace = ({
+    workspace_archived = "false",
+    status_archived = "false",
+  }: {
+    workspace_archived: "false" | "true";
+    status_archived: "false" | "true";
+  }) => {
     return useQuery({
-      queryKey: ["workspace/list", is_archived],
+      queryKey: ["workspace/list", workspace_archived, status_archived],
       queryFn: async () => {
         const response = await Api.get(
-          `${endpoint.workspace.list}?is_archived=${is_archived}`
+          `${endpoint.workspace.list}?workspace_archived=${workspace_archived}&status_archived=${status_archived}`
         );
-        return response.data;
+        return response.data.data;
       },
       staleTime: Infinity,
     });
@@ -116,7 +122,7 @@ export const useWorkspace = () => {
       queryKey: ["workspace/type/list"],
       queryFn: async () => {
         const response = await Api.get(endpoint.workspace.type.list);
-        return response.data;
+        return response.data.data;
       },
       staleTime: Infinity,
     });
@@ -126,7 +132,7 @@ export const useWorkspace = () => {
     return useQuery({
       queryKey: ["workspace/status/list", is_archived],
       queryFn: async () => {
-        const response: { data: { data: WorkspaceStatus[] } } = await Api.get(
+        const response = await Api.get(
           `${endpoint.workspace.status.list}?is_archived=${is_archived}`
         );
         return response.data.data;
@@ -142,7 +148,7 @@ export const useWorkspace = () => {
     return useQuery({
       queryKey: ["workspace/card-status/list", id, is_archived],
       queryFn: async () => {
-        const response: { data: { data: WorkspaceStatus[] } } = await Api.get(
+        const response = await Api.get(
           `${endpoint.workspace.card_status.list(
             id
           )}?is_archived=${is_archived}`
