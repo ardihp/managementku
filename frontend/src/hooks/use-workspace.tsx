@@ -84,6 +84,9 @@ export const useWorkspace = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace/archived/list"],
+        });
         toast.success("Workspace archived successfully");
       },
     });
@@ -98,6 +101,9 @@ export const useWorkspace = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace/archived/list"],
+        });
         toast.success("Workspace activated successfully");
       },
     });
@@ -112,6 +118,9 @@ export const useWorkspace = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace/archived/list"],
+        });
         toast.success("Workspace deleted successfully");
       },
     });
@@ -160,6 +169,17 @@ export const useWorkspace = () => {
     });
   };
 
+  const GetListArchivedWorkspace = () => {
+    return useQuery({
+      queryKey: ["workspace/archived/list"],
+      queryFn: async () => {
+        const response = await Api.get(endpoint.workspace.list_archived);
+        return response.data.data;
+      },
+      staleTime: Infinity,
+    });
+  };
+
   return {
     getListWorkspace: GetListWorkspace,
     getDetailWorkspace: GetDetailWorkspace,
@@ -169,6 +189,7 @@ export const useWorkspace = () => {
     unarchiveWorkspace: UnarchiveWorkspace,
     deleteWorkspace: DeleteWorkspace,
     getListWorkspaceStatus: GetListWorkspaceStatus,
+    getListArchivedWorkspace: GetListArchivedWorkspace,
 
     getListWorkspaceType: GetListWorkspaceType,
 
