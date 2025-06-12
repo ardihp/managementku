@@ -20,7 +20,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useWorkspace } from "@/hooks/use-workspace";
-import { Workspace, WorkspaceType } from "@/types/workspace";
+import { Workspace, WorkspaceStatus, WorkspaceType } from "@/types/workspace";
 import { Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,31 +28,45 @@ interface FormInputWorkspace {
   name: string;
   description: string;
   type_id: string;
-  tags: string[];
+  status_id: string;
+  tags?: string[];
 }
 
 const schema = yup.object().shape({
   name: yup.string().required("Workspace name is required"),
   description: yup.string().required("Workspace description is required"),
   type_id: yup.string().required("Workspace type is required"),
-  tags: yup.array().required("Workspace tag is required"),
+  status_id: yup.string().required("Workspace status is required"),
 });
 
 interface FormWorkspaceProps {
   selectedItem?: Workspace | null;
   resetSelectedItem?: () => void;
+  buttonClassName?: string;
+  defaultStatus?: string;
+  children: React.ReactNode;
 }
 
 export default function FormWorkspace({
   selectedItem,
   resetSelectedItem = () => {},
+  buttonClassName,
+  defaultStatus,
+  children,
 }: FormWorkspaceProps) {
   const [openDialog, setOpenDialog] = useState(false);
 
-  const { getListWorkspaceType, createWorkspace, updateWorkspace } =
-    useWorkspace();
+  const {
+    getListWorkspaceType,
+    getListWorkspaceStatus,
+    createWorkspace,
+    updateWorkspace,
+  } = useWorkspace();
   const { data: listWorkspaceType, isLoading: loadingWorkspaceType } =
     getListWorkspaceType();
+  const { data: listWorkspaceStatus, isLoading: loadingWorkspaceStatus } =
+    getListWorkspaceStatus("false");
+
   const { mutate: create, isPending: loadingCreate } = createWorkspace();
   const { mutate: update, isPending: loadingUpdate } = updateWorkspace();
   const isEdit = !!selectedItem;
@@ -64,12 +78,20 @@ export default function FormWorkspace({
     setValue,
     watch,
     reset,
+    clearErrors,
   } = useForm<FormInputWorkspace>({
     resolver: yupResolver(schema),
   });
+
   useEffect(() => {
     if (!openDialog) {
-      reset({ name: "", description: "", type_id: "", tags: [] });
+      reset({
+        name: "",
+        description: "",
+        type_id: "",
+        status_id: defaultStatus || "",
+        tags: [],
+      });
       resetSelectedItem();
     }
   }, [openDialog]);
@@ -82,6 +104,7 @@ export default function FormWorkspace({
         name: selectedItem.name || "",
         description: selectedItem.description || "",
         type_id: selectedItem.type.id.toString() || "",
+        status_id: selectedItem.status.id.toString() || "",
         tags: selectedItem.tags || [],
       });
     }
@@ -109,7 +132,11 @@ export default function FormWorkspace({
   };
 
   const onSubmit = (data: FormInputWorkspace) => {
-    const formData = { ...data, type_id: parseInt(data.type_id) };
+    const formData = {
+      ...data,
+      type_id: parseInt(data.type_id),
+      status_id: parseInt(data.status_id),
+    };
 
     if (isEdit) {
       update({ id: selectedItem.id, data: formData });
@@ -119,15 +146,12 @@ export default function FormWorkspace({
 
     setOpenDialog(false);
     resetSelectedItem();
-    reset({ name: "", description: "", type_id: "", tags: [] });
+    reset({ name: "", description: "", type_id: "", status_id: "", tags: [] });
   };
 
   return (
     <Dialog onOpenChange={setOpenDialog} open={openDialog}>
-      <DialogTrigger className="flex items-center gap-2 bg-primary py-2 px-3 rounded-md cursor-pointer h-9">
-        <Plus className="size-4 text-white" />
-        <p className="text-white text-sm leading-none">Add New</p>
-      </DialogTrigger>
+      <DialogTrigger className={buttonClassName}>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{isEdit ? "Update" : "New"} Workspace</DialogTitle>
@@ -154,33 +178,21 @@ export default function FormWorkspace({
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="username" className="text-sm">
-              Type
-            </label>
+            <label className="text-sm">Type</label>
             <Select
               value={watch("type_id")}
-              onValueChange={(value) => setValue("type_id", value)}
+              onValueChange={(value) => {
+                setValue("type_id", value);
+                clearErrors("type_id");
+              }}
               {...register("type_id")}
               disabled={loadingWorkspaceType || loadingCreate || loadingUpdate}
             >
-              <SelectTrigger className="w-full !bg-transparent">
+              <SelectTrigger id="type" className="w-full !bg-transparent">
                 <SelectValue placeholder="Workspace Type" />
               </SelectTrigger>
               <SelectContent>
-                {!loadingWorkspaceType &&
-                listWorkspaceType?.data?.length >= 1 ? (
-                  listWorkspaceType?.data?.map(
-                    (type: WorkspaceType, key: number) => (
-                      <SelectItem
-                        key={key}
-                        value={type.id.toString()}
-                        className="capitalize hover:bg-zinc-50"
-                      >
-                        {type.name}
-                      </SelectItem>
-                    )
-                  )
-                ) : (
+                {loadingWorkspaceType || listWorkspaceType?.length < 1 ? (
                   <SelectItem
                     value="-"
                     className="capitalize hover:bg-zinc-50"
@@ -188,10 +200,65 @@ export default function FormWorkspace({
                   >
                     There's no data
                   </SelectItem>
+                ) : (
+                  listWorkspaceType?.map((type: WorkspaceType, key: number) => (
+                    <SelectItem
+                      key={key}
+                      value={type.id.toString()}
+                      className="capitalize hover:bg-zinc-50"
+                    >
+                      {type.name}
+                    </SelectItem>
+                  ))
                 )}
               </SelectContent>
             </Select>
             <small className="text-red-500">{errors.type_id?.message}</small>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-sm">Status</label>
+            <Select
+              value={watch("status_id")}
+              onValueChange={(value) => {
+                setValue("status_id", value);
+                clearErrors("status_id");
+              }}
+              disabled={
+                loadingWorkspaceStatus ||
+                loadingCreate ||
+                loadingUpdate ||
+                !!defaultStatus
+              }
+            >
+              <SelectTrigger id="status" className="w-full !bg-transparent">
+                <SelectValue placeholder="Workspace Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {loadingWorkspaceStatus || listWorkspaceStatus?.length < 1 ? (
+                  <SelectItem
+                    value="-"
+                    className="capitalize hover:bg-zinc-50"
+                    disabled
+                  >
+                    There's no data
+                  </SelectItem>
+                ) : (
+                  listWorkspaceStatus?.map(
+                    (status: WorkspaceStatus, key: number) => (
+                      <SelectItem
+                        key={key}
+                        value={status.id.toString()}
+                        className="capitalize hover:bg-zinc-50"
+                      >
+                        {status.name}
+                      </SelectItem>
+                    )
+                  )
+                )}
+              </SelectContent>
+            </Select>
+            <small className="text-red-500">{errors.status_id?.message}</small>
           </div>
 
           <div className="flex flex-col gap-2">
