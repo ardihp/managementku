@@ -76,14 +76,15 @@ type WorkspaceCreateRequest struct {
 	Description       string   `json:"description" binding:"required"`
 	WorkspaceTypeId   int      `json:"type_id" binding:"required"`
 	WorkspaceStatusId int      `json:"status_id" binding:"required"`
-	Tags              []string `json:"tags" binding:"required"`
+	Tags              []string `json:"tags,omitempty"`
 }
 
 type WorkspaceUpdateRequest struct {
-	Name            string   `json:"name" binding:"required"`
-	Description     string   `json:"description" binding:"required"`
-	WorkspaceTypeId int      `json:"type_id" binding:"required"`
-	Tags            []string `json:"tags" binding:"required"`
+	Name              string   `json:"name" binding:"required"`
+	Description       string   `json:"description" binding:"required"`
+	WorkspaceTypeId   int      `json:"type_id" binding:"required"`
+	WorkspaceStatusId int      `json:"status_id" binding:"required"`
+	Tags              []string `json:"tags,omitempty"`
 }
 
 type WorkspaceAssignMember struct {
