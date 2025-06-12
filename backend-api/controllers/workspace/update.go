@@ -42,6 +42,15 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.First(&models.WorkspaceStatus{}, req.WorkspaceStatusId).Error; err != nil {
+		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+			Success: false,
+			Message: "Workspace status not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
 	var workspace_tags = []string{}
 	database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", id).Pluck("tag", &workspace_tags)
 
@@ -67,6 +76,7 @@ func UpdateWorkspace(c *gin.Context) {
 	workspace.Name = req.Name
 	workspace.Description = req.Description
 	workspace.WorkspaceType.Id = uint(req.WorkspaceTypeId)
+	workspace.WorkspaceStatus.Id = uint(req.WorkspaceStatusId)
 
 	if err := database.DB.Save(&workspace).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{

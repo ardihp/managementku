@@ -81,7 +81,12 @@ func ListWorkspace(c *gin.Context) {
 					Name:  workspace.WorkspaceType.Name,
 					Color: workspace.WorkspaceType.Color,
 				},
-				Status:     structs.WorkspaceStatus{},
+				Status: structs.WorkspaceStatus{
+					Id:         workspace.WorkspaceStatus.Id,
+					Name:       workspace.WorkspaceStatus.Name,
+					Color:      workspace.WorkspaceStatus.Color,
+					IsArchived: workspace.WorkspaceStatus.IsArchived,
+				},
 				Members:    members,
 				Tags:       workspace_tags,
 				IsArchived: workspace.IsArchived,
