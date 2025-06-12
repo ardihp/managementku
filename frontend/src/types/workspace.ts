@@ -20,10 +20,18 @@ export interface WorkspaceCard {
   updated_at: string;
 }
 
+export interface WorkspaceByStatus extends WorkspaceStatus {
+  workspaces: Workspace[];
+}
+
 export interface WorkspaceStatus {
+  id: number;
   name: string;
   color: string;
   is_archived: boolean;
+}
+
+export interface WorkspaceCardByStatus extends WorkspaceStatus {
   cards: WorkspaceCard[];
 }
 
@@ -33,7 +41,9 @@ export interface Workspace {
   description: string;
   tags: string[];
   type: WorkspaceType;
+  status: WorkspaceStatus;
   members: Member[];
+  is_archived: boolean;
   created_at: string;
   updated_at: string;
 }
