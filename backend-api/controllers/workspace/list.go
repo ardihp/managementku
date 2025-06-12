@@ -166,3 +166,92 @@ func ListWorkspaceByID(c *gin.Context) {
 		},
 	})
 }
+
+func ListArchivedWorkspace(c *gin.Context) {
+	var user_id = c.GetInt("user_id")
+	var user = models.User{Id: uint(user_id)}
+
+	if err := database.DB.First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed get user info",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	if user.Role != "manager" {
+		c.JSON(http.StatusForbidden, structs.ErrorResponse{
+			Success: false,
+			Message: "You are not allowed to access this resource",
+			Errors:  map[string]string{},
+		})
+		return
+	}
+
+	var workspaces = []models.Workspace{}
+
+	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).Where("is_archived = ?", true).Order("updated_at").Find(&workspaces).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to retreive archived workspace",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	var list_workspace = []structs.WorkspaceResponse{}
+
+	for _, workspace := range workspaces {
+		var id_member = []int{}
+		var workspace_tags = []string{}
+
+		database.DB.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace.Id).Order("user_id").Pluck("user_id", &id_member)
+		database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", workspace.Id).Pluck("tag", &workspace_tags)
+
+		var members = []structs.Member{}
+
+		for _, user_id := range id_member {
+			var user = models.User{}
+			var workspace_member = models.WorkspaceMember{}
+
+			database.DB.First(&user, user_id)
+			database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace.Id, user_id).Find(&workspace_member)
+
+			members = append(members, structs.Member{
+				Id:       user.Id,
+				Name:     user.Name,
+				Username: user.Username,
+				Email:    user.Email,
+				Role:     workspace_member.Role.Name,
+			})
+		}
+
+		list_workspace = append(list_workspace, structs.WorkspaceResponse{
+			Id:          workspace.Id,
+			Name:        workspace.Name,
+			Description: workspace.Description,
+			Type: structs.WorkspaceType{
+				Id:    workspace.WorkspaceType.Id,
+				Name:  workspace.WorkspaceType.Name,
+				Color: workspace.WorkspaceType.Color,
+			},
+			Status: structs.WorkspaceStatus{
+				Id:    workspace.WorkspaceStatus.Id,
+				Name:  workspace.WorkspaceStatus.Name,
+				Color: workspace.WorkspaceStatus.Color,
+			},
+			Tags:       workspace_tags,
+			Members:    members,
+			IsArchived: workspace.IsArchived,
+			CreatedAt:  workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:  workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	c.JSON(http.StatusOK, structs.SuccessResponse{
+		Success: true,
+		Message: "Archived workspace retrieved successfully",
+		Data:    list_workspace,
+	})
+}
