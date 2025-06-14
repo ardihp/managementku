@@ -4,6 +4,7 @@ import "time"
 
 type Workspace struct {
 	Id                uint   `json:"id" gorm:"primaryKey"`
+	Order             int    `json:"order" gorm:"not null"`
 	Name              string `json:"name"`
 	Description       string `json:"description"`
 	WorkspaceTypeId   uint   `json:"type_id"`
