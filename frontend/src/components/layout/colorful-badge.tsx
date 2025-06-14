@@ -70,7 +70,7 @@ export default function ColorfulBadge({
     >
       <p
         className={cn(
-          "text-[10px] font-quicksand uppercase font-bold",
+          "text-[10px] font-quicksand uppercase font-bold truncate",
           colorset.text
         )}
       >
