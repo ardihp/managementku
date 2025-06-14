@@ -11,6 +11,7 @@ export const endpoint = {
     unarchive: (id: number) => `/workspace/unarchive/${id}`,
     delete: (id: number) => `/workspace/delete/${id}`,
     list_archived: "/workspace/archived",
+    update_order: "/workspace/update-order",
 
     status: {
       list: "/workspace/status",

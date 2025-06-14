@@ -1,6 +1,6 @@
 import { endpoint } from "@/const/endpoint";
 import Api from "@/services/api";
-import { UpdateWorkspace } from "@/types/hooks/workspace";
+import { UpdateWorkspace, UpdateWorkspaceOrder } from "@/types/hooks/workspace";
 import { Workspace, WorkspaceStatus } from "@/types/workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -71,6 +71,16 @@ export const useWorkspace = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Workspace updated successfully");
+      },
+    });
+  };
+
+  const UpdateWorkspaceOrder = () => {
+    return useMutation({
+      mutationKey: ["worspace/update-order"],
+      mutationFn: async (data: UpdateWorkspaceOrder) => {
+        const response = await Api.post(endpoint.workspace.update_order, data);
+        return response.data;
       },
     });
   };
@@ -185,6 +195,7 @@ export const useWorkspace = () => {
     getDetailWorkspace: GetDetailWorkspace,
     createWorkspace: CreateWorkspace,
     updateWorkspace: UpdateWorkspace,
+    updateWorkspaceOrder: UpdateWorkspaceOrder,
     archiveWorkspace: ArchiveWorkspace,
     unarchiveWorkspace: UnarchiveWorkspace,
     deleteWorkspace: DeleteWorkspace,
