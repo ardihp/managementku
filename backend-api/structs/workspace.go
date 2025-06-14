@@ -125,3 +125,12 @@ type WorkspaceCreateStatusRequest struct {
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
 }
+
+type WorkspaceOrderStatus struct {
+	WorkspaceStatusId int   `json:"status_id"`
+	WorkspaceId       []int `json:"workspace_id"`
+}
+
+type WorkspaceUpdateOrderRequest struct {
+	OrderStatus []WorkspaceOrderStatus `json:"order_status"`
+}
