@@ -42,7 +42,7 @@ func DeleteWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceStatus{}).Error; err != nil {
+	if err := database.DB.Where("workspace_id = ?", id).Delete(&models.WorkspaceCardStatus{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Failed to delete workspace",

@@ -33,6 +33,9 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
+	workspace.Name = req.Name
+	workspace.Description = req.Description
+
 	if err := database.DB.First(&models.WorkspaceType{}, req.WorkspaceTypeId).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
@@ -41,6 +44,7 @@ func UpdateWorkspace(c *gin.Context) {
 		})
 		return
 	}
+	workspace.WorkspaceType.Id = uint(req.WorkspaceTypeId)
 
 	if err := database.DB.First(&models.WorkspaceStatus{}, req.WorkspaceStatusId).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -50,6 +54,7 @@ func UpdateWorkspace(c *gin.Context) {
 		})
 		return
 	}
+	workspace.WorkspaceStatus.Id = uint(req.WorkspaceStatusId)
 
 	var workspace_tags = []string{}
 	database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", id).Pluck("tag", &workspace_tags)
@@ -72,11 +77,6 @@ func UpdateWorkspace(c *gin.Context) {
 
 		workspace_tags = append(workspace_tags, assigned_tag.Tag)
 	}
-
-	workspace.Name = req.Name
-	workspace.Description = req.Description
-	workspace.WorkspaceType.Id = uint(req.WorkspaceTypeId)
-	workspace.WorkspaceStatus.Id = uint(req.WorkspaceStatusId)
 
 	if err := database.DB.Save(&workspace).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{

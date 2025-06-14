@@ -42,11 +42,14 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
+	result := database.DB.Model(&models.Workspace{})
+
 	workspace := models.Workspace{
 		Name:              req.Name,
 		Description:       req.Description,
 		WorkspaceTypeId:   uint(req.WorkspaceTypeId),
 		WorkspaceStatusId: uint(req.WorkspaceStatusId),
+		Order:             int(result.RowsAffected),
 	}
 
 	if err := database.DB.Create(&workspace).Error; err != nil {

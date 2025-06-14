@@ -37,9 +37,8 @@ func ListWorkspace(c *gin.Context) {
 		if user.Role == "employee" {
 			var list_workspace = []models.WorkspaceMember{}
 			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("user_id = ?", user_id).Order("created_at").Find(&list_workspace)
-
 		} else {
-			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND workspace_status_id = ?", workspace_archived == "true", status.Id).Order("updated_at").Pluck("id", &user_workspace)
+			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND workspace_status_id = ?", workspace_archived == "true", status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Pluck("id", &user_workspace)
 		}
 
 		var list_workspace_by_status = []structs.WorkspaceResponse{}
