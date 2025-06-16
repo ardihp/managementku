@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 )
 
 func UpdateWorkspace(c *gin.Context) {
@@ -87,7 +88,7 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
-	database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace)
+	database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace)
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
@@ -101,10 +102,16 @@ func UpdateWorkspace(c *gin.Context) {
 				Name:  workspace.WorkspaceType.Name,
 				Color: workspace.WorkspaceType.Color,
 			},
-			Members:   []structs.Member{},
-			Tags:      workspace_tags,
-			CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+			Status: structs.WorkspaceStatus{
+				Id:    workspace.WorkspaceStatus.Id,
+				Name:  workspace.WorkspaceStatus.Name,
+				Color: workspace.WorkspaceStatus.Color,
+			},
+			Members:    []structs.Member{},
+			Tags:       workspace_tags,
+			IsArchived: workspace.IsArchived,
+			CreatedAt:  workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:  workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
 	})
 }
