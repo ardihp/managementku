@@ -14,8 +14,6 @@ import (
 func ListWorkspace(c *gin.Context) {
 	var user_id = c.GetInt("user_id")
 	var user = models.User{Id: uint(user_id)}
-	var status_archived = c.Query("status_archived")
-	var workspace_archived = c.Query("workspace_archived")
 
 	if err := database.DB.First(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -27,7 +25,7 @@ func ListWorkspace(c *gin.Context) {
 	}
 
 	var workspace_status = []models.WorkspaceStatus{}
-	database.DB.Where("is_archived = ?", status_archived == "true").Find(&workspace_status)
+	database.DB.Where("is_archived = ?", false).Find(&workspace_status)
 
 	var list_workspace = []structs.WorkspaceByStatusResponse{}
 
@@ -38,7 +36,7 @@ func ListWorkspace(c *gin.Context) {
 			var list_workspace = []models.WorkspaceMember{}
 			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("user_id = ?", user_id).Order("created_at").Find(&list_workspace)
 		} else {
-			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND workspace_status_id = ?", workspace_archived == "true", status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Pluck("id", &user_workspace)
+			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND workspace_status_id = ?", false, status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Pluck("id", &user_workspace)
 		}
 
 		var list_workspace_by_status = []structs.WorkspaceResponse{}
