@@ -113,9 +113,9 @@ func CreateWorkspace(c *gin.Context) {
 	}
 
 	var workspace_card_status = []structs.WorkspaceCardStatus{
-		{Name: "To Do", Color: "gray"},
-		{Name: "In Progress", Color: "yellow"},
-		{Name: "Done", Color: "green"}}
+		{Name: "Backlog", Color: "gray", Order: 1},
+		{Name: "In Progress", Color: "yellow", Order: 2},
+		{Name: "Completed", Color: "green", Order: 3}}
 
 	var default_card = []models.WorkspaceCardStatus{}
 
@@ -124,6 +124,7 @@ func CreateWorkspace(c *gin.Context) {
 			WorkspaceId: workspace.Id,
 			Name:        status.Name,
 			Color:       status.Color,
+			Order:       status.Order,
 		})
 	}
 
