@@ -34,7 +34,7 @@ const WorkspaceCard = ({
           <div className="flex items-center gap-2 overflow-auto">
             <ColorfulBadge
               content={
-                workspace.status.name === "To Do"
+                workspace.status.name === "Backlog"
                   ? "💼"
                   : workspace.status.name === "In Progress"
                   ? "🔨"
@@ -102,7 +102,7 @@ const WorkspaceCard = ({
                 <div className="flex items-center gap-2 overflow-auto">
                   <ColorfulBadge
                     content={
-                      workspace.status.name === "To Do"
+                      workspace.status.name === "Backlog"
                         ? "💼"
                         : workspace.status.name === "In Progress"
                         ? "🔨"
