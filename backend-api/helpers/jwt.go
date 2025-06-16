@@ -15,7 +15,7 @@ type MyCustomClaims struct {
 }
 
 func GenerateToken(username string, user_id int) string {
-	exparationTime := time.Now().Add(60 * time.Minute)
+	exparationTime := time.Now().Add(60 * 24 * time.Minute)
 
 	claims := MyCustomClaims{
 		user_id,
