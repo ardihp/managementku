@@ -122,7 +122,10 @@ export default function WorkspacesView() {
       source.droppableId.id !== destination.droppableId.id ||
       source.index !== destination.index
     ) {
-      updateOrder({ order_status: statusWorkspace });
+      updateOrder(
+        { order_status: statusWorkspace },
+        { onError: () => setListWorkspaceByStatus(listWorkspaceByStatus) }
+      );
     }
   };
 
@@ -151,9 +154,18 @@ export default function WorkspacesView() {
       </section>
 
       {loadingWorkspace ? (
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-8 gap-6">
-          {[...Array(5)].map((item, key) => (
-            <Skeleton key={key} className="w-full h-[177px]" />
+        <section className="flex p-8 gap-6">
+          {[...Array(3)].map((item, key) => (
+            <div key={key} className="flex flex-col gap-4">
+              <Skeleton className="w-full min-w-[300px] max-w-[300px] h-[45px] rounded-xl" />
+
+              {[...Array(key + 1)].map((item, key2) => (
+                <Skeleton
+                  key={key2}
+                  className="w-full min-w-[300px] max-w-[300px] h-[177px] rounded-xl"
+                />
+              ))}
+            </div>
           ))}
         </section>
       ) : listWorkspaceByStatus?.length >= 1 ? (
