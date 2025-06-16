@@ -43,11 +43,14 @@ func CreateWorkspaceCard(c *gin.Context) {
 		return
 	}
 
+	result := database.DB.Model(&models.WorkspaceCard{}).Where("status_id = ?", req.StatusId)
+
 	var card = models.WorkspaceCard{
 		WorkspaceId: uint(workspaceId),
 		StatusId:    uint(req.StatusId),
 		Title:       req.Title,
 		Description: req.Description,
+		Order:       int(result.RowsAffected),
 	}
 
 	if err := database.DB.Create(&card).Error; err != nil {

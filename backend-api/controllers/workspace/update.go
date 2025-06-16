@@ -25,7 +25,7 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, id).Error; err != nil {
+	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, id).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -37,7 +37,7 @@ func UpdateWorkspace(c *gin.Context) {
 	workspace.Name = req.Name
 	workspace.Description = req.Description
 
-	if err := database.DB.First(&models.WorkspaceType{}, req.WorkspaceTypeId).Error; err != nil {
+	if err := database.DB.First(&models.WorkspaceType{}, req.TypeId).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace type not found",
@@ -45,9 +45,9 @@ func UpdateWorkspace(c *gin.Context) {
 		})
 		return
 	}
-	workspace.WorkspaceType.Id = uint(req.WorkspaceTypeId)
+	workspace.Type.Id = uint(req.TypeId)
 
-	if err := database.DB.First(&models.WorkspaceStatus{}, req.WorkspaceStatusId).Error; err != nil {
+	if err := database.DB.First(&models.WorkspaceStatus{}, req.StatusId).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace status not found",
@@ -55,7 +55,7 @@ func UpdateWorkspace(c *gin.Context) {
 		})
 		return
 	}
-	workspace.WorkspaceStatus.Id = uint(req.WorkspaceStatusId)
+	workspace.Status.Id = uint(req.StatusId)
 
 	var workspace_tags = []string{}
 	database.DB.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", id).Pluck("tag", &workspace_tags)
@@ -98,14 +98,14 @@ func UpdateWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
-				Id:    workspace.WorkspaceType.Id,
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
+				Id:    workspace.Type.Id,
+				Name:  workspace.Type.Name,
+				Color: workspace.Type.Color,
 			},
 			Status: structs.WorkspaceStatus{
-				Id:    workspace.WorkspaceStatus.Id,
-				Name:  workspace.WorkspaceStatus.Name,
-				Color: workspace.WorkspaceStatus.Color,
+				Id:    workspace.Status.Id,
+				Name:  workspace.Status.Name,
+				Color: workspace.Status.Color,
 			},
 			Members:    []structs.Member{},
 			Tags:       workspace_tags,

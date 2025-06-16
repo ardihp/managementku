@@ -73,19 +73,19 @@ type WorkspaceByStatusResponse struct {
 }
 
 type WorkspaceCreateRequest struct {
-	Name              string   `json:"name" binding:"required"`
-	Description       string   `json:"description" binding:"required"`
-	WorkspaceTypeId   int      `json:"type_id" binding:"required"`
-	WorkspaceStatusId int      `json:"status_id" binding:"required"`
-	Tags              []string `json:"tags,omitempty"`
+	Name        string   `json:"name" binding:"required"`
+	Description string   `json:"description" binding:"required"`
+	TypeId      int      `json:"type_id" binding:"required"`
+	StatusId    int      `json:"status_id" binding:"required"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 type WorkspaceUpdateRequest struct {
-	Name              string   `json:"name" binding:"required"`
-	Description       string   `json:"description" binding:"required"`
-	WorkspaceTypeId   int      `json:"type_id" binding:"required"`
-	WorkspaceStatusId int      `json:"status_id" binding:"required"`
-	Tags              []string `json:"tags,omitempty"`
+	Name        string   `json:"name" binding:"required"`
+	Description string   `json:"description" binding:"required"`
+	TypeId      int      `json:"type_id" binding:"required"`
+	StatusId    int      `json:"status_id" binding:"required"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 type WorkspaceAssignMember struct {
@@ -128,8 +128,8 @@ type WorkspaceCreateStatusRequest struct {
 }
 
 type WorkspaceOrderStatus struct {
-	WorkspaceStatusId int   `json:"status_id"`
-	WorkspaceId       []int `json:"workspace_id"`
+	StatusId    int   `json:"status_id"`
+	WorkspaceId []int `json:"workspace_id"`
 }
 
 type WorkspaceUpdateOrderRequest struct {

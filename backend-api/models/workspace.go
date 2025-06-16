@@ -3,17 +3,17 @@ package models
 import "time"
 
 type Workspace struct {
-	Id                uint   `json:"id" gorm:"primaryKey"`
-	Order             int    `json:"order" gorm:"not null"`
-	Name              string `json:"name"`
-	Description       string `json:"description"`
-	WorkspaceTypeId   uint   `json:"type_id"`
-	WorkspaceType     WorkspaceType
-	WorkspaceStatusId uint `json:"status_id"`
-	WorkspaceStatus   WorkspaceStatus
-	IsArchived        bool      `json:"is_archived" gorm:"default:false"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	Id          uint   `json:"id" gorm:"primaryKey"`
+	Order       int    `json:"order" gorm:"not null"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	TypeId      uint   `json:"type_id"`
+	Type        WorkspaceType
+	StatusId    uint `json:"status_id"`
+	Status      WorkspaceStatus
+	IsArchived  bool      `json:"is_archived" gorm:"default:false"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type WorkspaceRole struct {
@@ -73,6 +73,7 @@ type WorkspaceCardStatus struct {
 
 type WorkspaceCard struct {
 	Id          uint `json:"id" gorm:"primaryKey"`
+	Order       int  `json:"order" gorm:"not null"`
 	WorkspaceId uint `json:"workspace_id"`
 	Workspace   Workspace
 	StatusId    uint `json:"status_id"`

@@ -36,7 +36,7 @@ func ListWorkspace(c *gin.Context) {
 			var list_workspace = []models.WorkspaceMember{}
 			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("user_id = ?", user_id).Order("created_at").Find(&list_workspace)
 		} else {
-			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND workspace_status_id = ?", false, status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Pluck("id", &user_workspace)
+			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND status_id = ?", false, status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Pluck("id", &user_workspace)
 		}
 
 		var list_workspace_by_status = []structs.WorkspaceResponse{}
@@ -58,7 +58,7 @@ func ListWorkspace(c *gin.Context) {
 				var workspace_member = models.WorkspaceMember{}
 
 				database.DB.First(&user, user_id)
-				database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).Find(&workspace_member)
+				database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).Find(&workspace_member)
 
 				members = append(members, structs.Member{
 					Id:       user.Id,
@@ -74,15 +74,15 @@ func ListWorkspace(c *gin.Context) {
 				Name:        workspace.Name,
 				Description: workspace.Description,
 				Type: structs.WorkspaceType{
-					Id:    workspace.WorkspaceType.Id,
-					Name:  workspace.WorkspaceType.Name,
-					Color: workspace.WorkspaceType.Color,
+					Id:    workspace.Type.Id,
+					Name:  workspace.Type.Name,
+					Color: workspace.Type.Color,
 				},
 				Status: structs.WorkspaceStatus{
-					Id:         workspace.WorkspaceStatus.Id,
-					Name:       workspace.WorkspaceStatus.Name,
-					Color:      workspace.WorkspaceStatus.Color,
-					IsArchived: workspace.WorkspaceStatus.IsArchived,
+					Id:         workspace.Status.Id,
+					Name:       workspace.Status.Name,
+					Color:      workspace.Status.Color,
+					IsArchived: workspace.Status.IsArchived,
 				},
 				Members:    members,
 				Tags:       workspace_tags,
@@ -113,7 +113,7 @@ func ListWorkspaceByID(c *gin.Context) {
 	var workspace_id = c.Param("id")
 	var workspace_tags = []string{}
 
-	if err := database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, workspace_id).Error; err != nil {
+	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, workspace_id).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -133,7 +133,7 @@ func ListWorkspaceByID(c *gin.Context) {
 		var workspace_member = models.WorkspaceMember{}
 
 		database.DB.First(&user, user_id)
-		database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).First(&workspace_member)
+		database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("workspace_id = ? AND user_id = ?", workspace_id, user_id).First(&workspace_member)
 
 		members = append(members, structs.Member{
 			Id:       user.Id,
@@ -152,9 +152,9 @@ func ListWorkspaceByID(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
-				Id:    workspace.WorkspaceType.Id,
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
+				Id:    workspace.Type.Id,
+				Name:  workspace.Type.Name,
+				Color: workspace.Type.Color,
 			},
 			Members:   members,
 			Tags:      workspace_tags,
@@ -213,7 +213,7 @@ func ListArchivedWorkspace(c *gin.Context) {
 			var workspace_member = models.WorkspaceMember{}
 
 			database.DB.First(&user, user_id)
-			database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", workspace.Id, user_id).Find(&workspace_member)
+			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("workspace_id = ? AND user_id = ?", workspace.Id, user_id).Find(&workspace_member)
 
 			members = append(members, structs.Member{
 				Id:       user.Id,
@@ -229,14 +229,14 @@ func ListArchivedWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
-				Id:    workspace.WorkspaceType.Id,
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
+				Id:    workspace.Type.Id,
+				Name:  workspace.Type.Name,
+				Color: workspace.Type.Color,
 			},
 			Status: structs.WorkspaceStatus{
-				Id:    workspace.WorkspaceStatus.Id,
-				Name:  workspace.WorkspaceStatus.Name,
-				Color: workspace.WorkspaceStatus.Color,
+				Id:    workspace.Status.Id,
+				Name:  workspace.Status.Name,
+				Color: workspace.Status.Color,
 			},
 			Tags:       workspace_tags,
 			Members:    members,

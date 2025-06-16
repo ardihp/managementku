@@ -43,7 +43,7 @@ func ListWorkspaceCard(c *gin.Context) {
 		for _, card := range workspace_card_by_status {
 			var members = []models.WorkspaceCardMember{}
 
-			if err := database.DB.Where("card_id = ?", card.Id).Preload("User").Find(&members).Error; err != nil {
+			if err := database.DB.Where("card_id = ?", card.Id).Preload(clause.Associations).Find(&members).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 					Success: false,
 					Message: "Failed to retrieve workspace status",

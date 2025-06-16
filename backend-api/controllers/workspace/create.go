@@ -24,7 +24,7 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.First(&models.WorkspaceType{}, req.WorkspaceTypeId).Error; err != nil {
+	if err := database.DB.First(&models.WorkspaceType{}, req.TypeId).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace type not found",
@@ -33,7 +33,7 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.First(&models.WorkspaceStatus{}, req.WorkspaceStatusId).Error; err != nil {
+	if err := database.DB.First(&models.WorkspaceStatus{}, req.StatusId).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace status not found",
@@ -42,14 +42,14 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	result := database.DB.Model(&models.Workspace{})
+	result := database.DB.Model(&models.Workspace{}).Where("status_id = ?", req.StatusId)
 
 	workspace := models.Workspace{
-		Name:              req.Name,
-		Description:       req.Description,
-		WorkspaceTypeId:   uint(req.WorkspaceTypeId),
-		WorkspaceStatusId: uint(req.WorkspaceStatusId),
-		Order:             int(result.RowsAffected),
+		Name:        req.Name,
+		Description: req.Description,
+		TypeId:      uint(req.TypeId),
+		StatusId:    uint(req.StatusId),
+		Order:       int(result.RowsAffected),
 	}
 
 	if err := database.DB.Create(&workspace).Error; err != nil {
@@ -77,7 +77,7 @@ func CreateWorkspace(c *gin.Context) {
 		workspace_tags = append(workspace_tags, assigned_tag.Tag)
 	}
 
-	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, &models.Workspace{WorkspaceTypeId: uint(req.WorkspaceTypeId)}).Error; err != nil {
+	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, &models.Workspace{TypeId: uint(req.TypeId)}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Failed to read workspace type",
@@ -145,15 +145,15 @@ func CreateWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
-				Id:    workspace.WorkspaceType.Id,
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
+				Id:    workspace.Type.Id,
+				Name:  workspace.Type.Name,
+				Color: workspace.Type.Color,
 			},
 			Status: structs.WorkspaceStatus{
-				Id:         workspace.WorkspaceStatus.Id,
-				Name:       workspace.WorkspaceStatus.Name,
-				Color:      workspace.WorkspaceStatus.Color,
-				IsArchived: workspace.WorkspaceStatus.IsArchived,
+				Id:         workspace.Status.Id,
+				Name:       workspace.Status.Name,
+				Color:      workspace.Status.Color,
+				IsArchived: workspace.Status.IsArchived,
 			},
 			Members:   []structs.Member{},
 			Tags:      workspace_tags,

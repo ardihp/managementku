@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 )
 
 func AssignMemberToWorkspace(c *gin.Context) {
@@ -27,7 +28,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Model(&models.Workspace{}).Preload("WorkspaceType").First(&workspace, models.Workspace{Id: uint(req.WorkspaceId)}).Error; err != nil {
+	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, models.Workspace{Id: uint(req.WorkspaceId)}).Error; err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -93,7 +94,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		var user = models.User{}
 		var workspace_member = models.WorkspaceMember{}
 
-		database.DB.Model(&models.WorkspaceMember{}).Preload("Role").Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, user_id).Find(&workspace_member)
+		database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, user_id).Find(&workspace_member)
 
 		if err := database.DB.First(&user, user_id).Error; err != nil {
 			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -121,8 +122,8 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			Name:        workspace.Name,
 			Description: workspace.Description,
 			Type: structs.WorkspaceType{
-				Name:  workspace.WorkspaceType.Name,
-				Color: workspace.WorkspaceType.Color,
+				Name:  workspace.Type.Name,
+				Color: workspace.Type.Color,
 			},
 			Members:   members,
 			Tags:      workspace_tags,

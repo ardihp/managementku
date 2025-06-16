@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -25,12 +24,10 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 
 	for _, order := range req.OrderStatus {
 		for index, workspace := range order.WorkspaceId {
-			fmt.Println(order.WorkspaceStatusId, workspace)
-
 			var new_workspace = models.Workspace{Id: uint(workspace)}
 			database.DB.First(&new_workspace)
 
-			new_workspace.WorkspaceStatus.Id = uint(order.WorkspaceStatusId)
+			new_workspace.Status.Id = uint(order.StatusId)
 			new_workspace.Order = index
 
 			if err := database.DB.Save(&new_workspace).Error; err != nil {
