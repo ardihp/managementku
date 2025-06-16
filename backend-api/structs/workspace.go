@@ -127,11 +127,24 @@ type WorkspaceCreateStatusRequest struct {
 	Color string `json:"color" binding:"required"`
 }
 
-type WorkspaceOrderStatus struct {
-	StatusId    int   `json:"status_id"`
-	WorkspaceId []int `json:"workspace_id"`
+type WorkspaceOrder struct {
+	StatusId    int   `json:"status_id" binding:"required"`
+	WorkspaceId []int `json:"workspace_id" binding:"required"`
 }
 
 type WorkspaceUpdateOrderRequest struct {
-	OrderStatus []WorkspaceOrderStatus `json:"order_status"`
+	OrderStatus []WorkspaceOrder `json:"order_status" binding:"required"`
+}
+
+type WorkspaceCardUpdateOrderStatusRequest struct {
+	OrderStatus []int `json:"order_status" binding:"required"`
+}
+
+type WorkspaceCardOrder struct {
+	StatusId int   `json:"status_id" binding:"required"`
+	CardId   []int `json:"card_id" binding:"required"`
+}
+
+type WorkspaceCardUpdateOrderRequest struct {
+	OrderStatus []WorkspaceCardOrder `json:"order_status" binding:"required"`
 }
