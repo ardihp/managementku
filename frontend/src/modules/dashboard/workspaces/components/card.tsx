@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 interface WorkspaceCardProps {
   setSelectedItem?: (workspace: Workspace) => void;
+  customClassName?: string;
   workspace: Workspace;
   index?: number;
   isArchived: boolean;
@@ -19,6 +20,7 @@ const WorkspaceCard = ({
   workspace,
   index = 0,
   setSelectedItem,
+  customClassName,
   isArchived = false,
 }: WorkspaceCardProps) => {
   return isArchived ? (
@@ -84,8 +86,9 @@ const WorkspaceCard = ({
         return (
           <div
             className={cn(
-              "relative opacity-100 mb-4 group",
-              isDragging && "opacity-85"
+              "relative opacity-100 group",
+              isDragging && "opacity-85",
+              customClassName
             )}
             ref={innerRef}
             {...draggableProps}

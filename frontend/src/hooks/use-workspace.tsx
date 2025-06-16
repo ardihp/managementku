@@ -154,25 +154,6 @@ export const useWorkspace = () => {
     });
   };
 
-  const GetListWorkspaceCardStatus = (
-    id: number,
-    is_archived: "true" | "false"
-  ) => {
-    return useQuery({
-      queryKey: ["workspace/card-status/list", id, is_archived],
-      queryFn: async () => {
-        const response = await Api.get(
-          `${endpoint.workspace.card_status.list(
-            id
-          )}?is_archived=${is_archived}`
-        );
-        return response.data.data;
-      },
-      staleTime: Infinity,
-      enabled: id !== 0,
-    });
-  };
-
   const GetListArchivedWorkspace = () => {
     return useQuery({
       queryKey: ["workspace/archived/list"],
@@ -195,9 +176,6 @@ export const useWorkspace = () => {
     deleteWorkspace: DeleteWorkspace,
     getListWorkspaceStatus: GetListWorkspaceStatus,
     getListArchivedWorkspace: GetListArchivedWorkspace,
-
     getListWorkspaceType: GetListWorkspaceType,
-
-    getListWorkspaceCardStatus: GetListWorkspaceCardStatus,
   };
 };

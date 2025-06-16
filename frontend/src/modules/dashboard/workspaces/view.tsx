@@ -158,14 +158,14 @@ export default function WorkspacesView() {
         </section>
       ) : listWorkspaceByStatus?.length >= 1 ? (
         <DragDropContext onDragEnd={handleDragEnd}>
-          <section className="flex p-8 gap-6 overflow-auto h-full">
+          <section className="flex p-8 gap-6">
             {listWorkspaceByStatus?.map(
               (status: WorkspaceByStatus, key: number) => (
                 <div
-                  className="flex flex-col gap-4 w-full min-w-[300px] max-w-[300px]"
                   key={key}
+                  className="flex flex-col w-full min-w-[300px] max-w-[300px] h-auto"
                 >
-                  <div className="flex items-center justify-between gap-2 rounded-lg bg-white border opacity-100 py-2 px-4">
+                  <div className="flex items-center justify-between gap-2 rounded-xl bg-white border opacity-100 py-2 px-4 mb-2">
                     <p className="font-medium">{status.name}</p>
 
                     <ColorfulBadge
@@ -186,33 +186,36 @@ export default function WorkspacesView() {
                     ) => {
                       return (
                         <div
-                          className="flex flex-col h-full"
-                          {...droppableProps}
+                          className="h-full"
                           ref={innerRef}
+                          {...droppableProps}
                         >
-                          {status.workspaces.map(
-                            (workspace: Workspace, cardKey) => (
-                              <WorkspaceCard
-                                key={workspace.id}
-                                index={cardKey}
-                                workspace={workspace}
-                                setSelectedItem={setSelectedItem}
-                                isArchived={workspace.is_archived}
-                              />
-                            )
-                          )}
+                          <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(100vh_-_308px)]">
+                            {status.workspaces.map(
+                              (workspace: Workspace, cardKey) => (
+                                <WorkspaceCard
+                                  key={workspace.id}
+                                  index={cardKey}
+                                  workspace={workspace}
+                                  setSelectedItem={setSelectedItem}
+                                  isArchived={workspace.is_archived}
+                                  customClassName="my-2"
+                                />
+                              )
+                            )}
 
-                          <div
-                            className={cn(isDraggingOver ? "flex" : "hidden")}
-                          >
-                            {placeholder}
+                            <div
+                              className={cn(isDraggingOver ? "flex" : "hidden")}
+                            >
+                              {placeholder}
+                            </div>
                           </div>
 
                           {userDetail?.role === "manager" && (
                             <FormWorkspace
                               resetSelectedItem={() => setSelectedItem(null)}
                               defaultStatus={status.id.toString()}
-                              buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors"
+                              buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors w-full mt-2"
                             >
                               <Plus className="size-4" />
                               <p className="text-sm">Add New</p>
