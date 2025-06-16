@@ -33,16 +33,22 @@ const WorkspaceCard = ({
         <div className="w-full border rounded-xl bg-white flex flex-col p-4 gap-2 min-h-[177px]">
           <div className="flex items-center gap-2 overflow-auto">
             <ColorfulBadge
-              text={workspace.status.name}
+              content={
+                workspace.status.name === "To Do"
+                  ? "💼"
+                  : workspace.status.name === "In Progress"
+                  ? "🔨"
+                  : "🏁"
+              }
               color={workspace.status.color}
             />
             <ColorfulBadge
-              text={workspace.type.name}
+              content={workspace.type.name}
               color={workspace.type.color}
             />
 
             {workspace.tags.map((tag, key) => (
-              <ColorfulBadge key={key} text={tag} color="gray" />
+              <ColorfulBadge key={key} content={tag} color="gray" />
             ))}
           </div>
 
@@ -95,16 +101,22 @@ const WorkspaceCard = ({
               <div className="w-full border rounded-xl bg-white group-hover:bg-zinc-50/50 flex flex-col p-4 gap-2 min-h-[177px] duration-200">
                 <div className="flex items-center gap-2 overflow-auto">
                   <ColorfulBadge
-                    text={workspace.status.name}
+                    content={
+                      workspace.status.name === "To Do"
+                        ? "💼"
+                        : workspace.status.name === "In Progress"
+                        ? "🔨"
+                        : "🏁"
+                    }
                     color={workspace.status.color}
                   />
                   <ColorfulBadge
-                    text={workspace.type.name}
+                    content={workspace.type.name}
                     color={workspace.type.color}
                   />
 
                   {workspace.tags.map((tag, key) => (
-                    <ColorfulBadge key={key} text={tag} color="gray" />
+                    <ColorfulBadge key={key} content={tag} color="gray" />
                   ))}
                 </div>
 

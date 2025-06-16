@@ -14,7 +14,7 @@ import ColorfulBadge from "@/components/layout/colorful-badge";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { OrderStatusItem, UpdateWorkspaceOrder } from "@/types/hooks/workspace";
 import confetti from "canvas-confetti";
-import { cn } from "@/lib/utils";
+import { cn, handleConffeti } from "@/lib/utils";
 
 export default function WorkspacesView() {
   const [userDetail, setUserDetail] = useState<UserDetail | null>();
@@ -26,12 +26,14 @@ export default function WorkspacesView() {
   const { user } = useAuth();
   const { getListWorkspace, updateWorkspaceOrder } = useWorkspace();
 
-  const { data: listWorkspace, isLoading: loadingWorkspace } = getListWorkspace(
-    {
-      workspace_archived: "false",
-      status_archived: "false",
-    }
-  );
+  const {
+    data: listWorkspace,
+    isLoading: loadingWorkspace,
+    isFetching: fetchWorkspace,
+  } = getListWorkspace({
+    workspace_archived: "false",
+    status_archived: "false",
+  });
   const { mutate: updateOrder } = updateWorkspaceOrder();
 
   useEffect(() => {
@@ -39,40 +41,10 @@ export default function WorkspacesView() {
   }, []);
 
   useEffect(() => {
-    if (!loadingWorkspace) {
+    if (!loadingWorkspace && !fetchWorkspace) {
       setListWorkspaceByStatus(listWorkspace);
     }
-  }, [loadingWorkspace]);
-
-  const handleConffeti = () => {
-    const end = Date.now() + 0.5 * 1000; // 0.5 seconds
-    const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
-
-    const frame = () => {
-      if (Date.now() > end) return;
-
-      confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 65,
-        startVelocity: 50,
-        origin: { x: 0, y: 0.5 },
-        colors: colors,
-      });
-      confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 65,
-        startVelocity: 50,
-        origin: { x: 1, y: 0.5 },
-        colors: colors,
-      });
-
-      requestAnimationFrame(frame);
-    };
-
-    frame();
-  };
+  }, [loadingWorkspace, fetchWorkspace]);
 
   const handleDragEnd = (item: any) => {
     if (!item.destination) return;
@@ -200,8 +172,8 @@ export default function WorkspacesView() {
                     <p className="font-medium">{status.name}</p>
 
                     <ColorfulBadge
+                      content={status.workspaces.length.toString()}
                       color={status.color}
-                      text={status.workspaces.length.toString()}
                     />
                   </div>
 

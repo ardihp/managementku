@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 
 interface ColorfulBadgeProps {
-  text: string;
+  content: string | ReactNode;
   color?:
     | "default"
     | "gray"
@@ -18,7 +18,7 @@ interface ColorfulBadgeProps {
 }
 
 export default function ColorfulBadge({
-  text,
+  content,
   color = "default",
 }: ColorfulBadgeProps) {
   const [colorset, setColorset] = useState({
@@ -74,7 +74,7 @@ export default function ColorfulBadge({
           colorset.text
         )}
       >
-        {text}
+        {content}
       </p>
     </div>
   );

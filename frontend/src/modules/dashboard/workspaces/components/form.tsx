@@ -22,7 +22,7 @@ import * as yup from "yup";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { Workspace, WorkspaceStatus, WorkspaceType } from "@/types/workspace";
 import { Plus, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, handleConffeti } from "@/lib/utils";
 
 interface FormInputWorkspace {
   name: string;
@@ -139,7 +139,14 @@ export default function FormWorkspace({
     };
 
     if (isEdit) {
-      update({ id: selectedItem.id, data: formData });
+      update(
+        { id: selectedItem.id, data: formData },
+        {
+          onSuccess(response) {
+            if (response.data.status.name === "Completed") handleConffeti();
+          },
+        }
+      );
     } else {
       create(formData);
     }
