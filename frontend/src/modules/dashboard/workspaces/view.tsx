@@ -30,10 +30,7 @@ export default function WorkspacesView() {
     data: listWorkspace,
     isLoading: loadingWorkspace,
     isFetching: fetchWorkspace,
-  } = getListWorkspace({
-    workspace_archived: "false",
-    status_archived: "false",
-  });
+  } = getListWorkspace();
   const { mutate: updateOrder } = updateWorkspaceOrder();
 
   useEffect(() => {

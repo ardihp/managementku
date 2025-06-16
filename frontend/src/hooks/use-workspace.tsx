@@ -8,19 +8,11 @@ import { toast } from "sonner";
 export const useWorkspace = () => {
   const queryClient = useQueryClient();
 
-  const GetListWorkspace = ({
-    workspace_archived = "false",
-    status_archived = "false",
-  }: {
-    workspace_archived: "false" | "true";
-    status_archived: "false" | "true";
-  }) => {
+  const GetListWorkspace = () => {
     return useQuery({
-      queryKey: ["workspace/list", workspace_archived, status_archived],
+      queryKey: ["workspace/list"],
       queryFn: async () => {
-        const response = await Api.get(
-          `${endpoint.workspace.list}?workspace_archived=${workspace_archived}&status_archived=${status_archived}`
-        );
+        const response = await Api.get(endpoint.workspace.list);
         return response.data.data;
       },
       staleTime: Infinity,
