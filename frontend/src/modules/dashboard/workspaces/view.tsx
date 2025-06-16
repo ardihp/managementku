@@ -13,6 +13,8 @@ import WorkspaceCard from "./components/card";
 import ColorfulBadge from "@/components/layout/colorful-badge";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { OrderStatusItem, UpdateWorkspaceOrder } from "@/types/hooks/workspace";
+import confetti from "canvas-confetti";
+import { cn } from "@/lib/utils";
 
 export default function WorkspacesView() {
   const [userDetail, setUserDetail] = useState<UserDetail | null>();
@@ -41,6 +43,36 @@ export default function WorkspacesView() {
       setListWorkspaceByStatus(listWorkspace);
     }
   }, [loadingWorkspace]);
+
+  const handleConffeti = () => {
+    const end = Date.now() + 0.5 * 1000; // 0.5 seconds
+    const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
+
+    const frame = () => {
+      if (Date.now() > end) return;
+
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 65,
+        startVelocity: 50,
+        origin: { x: 0, y: 0.5 },
+        colors: colors,
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 65,
+        startVelocity: 50,
+        origin: { x: 1, y: 0.5 },
+        colors: colors,
+      });
+
+      requestAnimationFrame(frame);
+    };
+
+    frame();
+  };
 
   const handleDragEnd = (item: any) => {
     if (!item.destination) return;
@@ -94,7 +126,10 @@ export default function WorkspacesView() {
         )!.workspaces
       );
 
-      destinationWorkspace.splice(destination.index, 0, draggableItem);
+      destinationWorkspace.splice(destination.index, 0, {
+        ...draggableItem,
+        status: destination.droppableId,
+      });
 
       statusWorkspace.push({
         status_id: destination.droppableId.id,
@@ -111,6 +146,8 @@ export default function WorkspacesView() {
         }),
       ]);
     }
+
+    if (destination.droppableId.name === "Completed") handleConffeti();
 
     if (
       source.droppableId.id !== destination.droppableId.id ||
@@ -168,39 +205,53 @@ export default function WorkspacesView() {
                     />
                   </div>
 
-                  <Droppable droppableId={JSON.stringify(status)}>
-                    {({ droppableProps, innerRef, placeholder }) => (
-                      <div
-                        className="flex flex-col gap-4"
-                        {...droppableProps}
-                        ref={innerRef}
-                      >
-                        {status.workspaces.map(
-                          (workspace: Workspace, cardKey) => (
-                            <WorkspaceCard
-                              key={workspace.id}
-                              index={cardKey}
-                              workspace={workspace}
-                              setSelectedItem={setSelectedItem}
-                              isArchived={workspace.is_archived}
-                            />
-                          )
-                        )}
+                  <Droppable
+                    droppableId={JSON.stringify({
+                      ...status,
+                      workspaces: undefined,
+                    })}
+                  >
+                    {(
+                      { droppableProps, innerRef, placeholder },
+                      { isDraggingOver }
+                    ) => {
+                      return (
+                        <div
+                          className="flex flex-col h-full"
+                          {...droppableProps}
+                          ref={innerRef}
+                        >
+                          {status.workspaces.map(
+                            (workspace: Workspace, cardKey) => (
+                              <WorkspaceCard
+                                key={workspace.id}
+                                index={cardKey}
+                                workspace={workspace}
+                                setSelectedItem={setSelectedItem}
+                                isArchived={workspace.is_archived}
+                              />
+                            )
+                          )}
 
-                        {placeholder}
-
-                        {userDetail?.role === "manager" && (
-                          <FormWorkspace
-                            resetSelectedItem={() => setSelectedItem(null)}
-                            defaultStatus={status.id.toString()}
-                            buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors"
+                          <div
+                            className={cn(isDraggingOver ? "flex" : "hidden")}
                           >
-                            <Plus className="size-4" />
-                            <p className="text-sm">Add New</p>
-                          </FormWorkspace>
-                        )}
-                      </div>
-                    )}
+                            {placeholder}
+                          </div>
+
+                          {userDetail?.role === "manager" && (
+                            <FormWorkspace
+                              resetSelectedItem={() => setSelectedItem(null)}
+                              defaultStatus={status.id.toString()}
+                              buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors"
+                            >
+                              <Plus className="size-4" />
+                              <p className="text-sm">Add New</p>
+                            </FormWorkspace>
+                          )}
+                        </div>
+                      );
+                    }}
                   </Droppable>
                 </div>
               )

@@ -82,6 +82,8 @@ export const useWorkspace = () => {
         const response = await Api.post(endpoint.workspace.update_order, data);
         return response.data;
       },
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] }),
     });
   };
 
