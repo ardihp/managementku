@@ -14,7 +14,7 @@ import (
 func CreateWorkspaceCard(c *gin.Context) {
 	var req = structs.WorkspaceCreateCardRequest{}
 	var id = c.Param("id")
-	parseId, _ := strconv.Atoi(id)
+	workspaceId, _ := strconv.Atoi(id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, structs.ErrorResponse{
@@ -25,11 +25,29 @@ func CreateWorkspaceCard(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.Where("id = ?", workspaceId).First(&models.Workspace{}).Error; err != nil {
+		c.JSON(http.StatusNotFound, structs.ErrorResponse{
+			Success: false,
+			Message: "Workspace not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	if err := database.DB.Where("id = ? AND workspace_id = ? AND is_archived = ?", req.StatusId, workspaceId, false).First(&models.WorkspaceCardStatus{}).Error; err != nil {
+		c.JSON(http.StatusNotFound, structs.ErrorResponse{
+			Success: false,
+			Message: "Status card not found",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
 	var card = models.WorkspaceCard{
-		WorkspaceId: parseId,
+		WorkspaceId: uint(workspaceId),
+		StatusId:    uint(req.StatusId),
 		Title:       req.Title,
 		Description: req.Description,
-		Status:      req.Status,
 	}
 
 	if err := database.DB.Create(&card).Error; err != nil {

@@ -8,14 +8,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 )
 
-func ListWorkspaceCardStatus(c *gin.Context) {
+func ListWorkspaceCard(c *gin.Context) {
 	var id = c.Param("id")
-	var is_archived = c.Query("is_archived")
-	var workspace = []models.WorkspaceStatus{}
+	var workspace_cards = []models.WorkspaceCardStatus{}
 
-	if err := database.DB.Where("workspace_id = ? && is_archived = ?", id, is_archived == "true").Find(&workspace).Error; err != nil {
+	if err := database.DB.Where("workspace_id = ? AND is_archived = ?", id, false).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Find(&workspace_cards).Error; err != nil {
 		c.JSON(http.StatusNotFound, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -24,12 +24,12 @@ func ListWorkspaceCardStatus(c *gin.Context) {
 		return
 	}
 
-	var workspace_status = []structs.WorkspaceCardStatusCardResponse{}
+	var list_workspace_cards = []structs.WorkspaceCardByStatusResponse{}
 
-	for _, status := range workspace {
-		var workspace_status_card = []models.WorkspaceCard{}
+	for _, status := range workspace_cards {
+		var workspace_card_by_status = []models.WorkspaceCard{}
 
-		if err := database.DB.Where("workspace_id = ? && status = ?", id, status.Name).Find(&workspace_status_card).Error; err != nil {
+		if err := database.DB.Where("workspace_id = ? && status_id = ?", id, status.Id).Find(&workspace_card_by_status).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
 				Message: "Failed to retrieve workspace status",
@@ -38,12 +38,12 @@ func ListWorkspaceCardStatus(c *gin.Context) {
 			return
 		}
 
-		var list_workspace_status_card = []structs.WorkspaceCardResponse{}
+		var list_workspace_card_by_status = []structs.WorkspaceCardResponse{}
 
-		for _, card := range workspace_status_card {
-			var members = []models.WorkspaceMember{}
+		for _, card := range workspace_card_by_status {
+			var members = []models.WorkspaceCardMember{}
 
-			if err := database.DB.Where("workspace_id = ?", id).Preload("User").Find(&members).Error; err != nil {
+			if err := database.DB.Where("card_id = ?", card.Id).Preload("User").Find(&members).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 					Success: false,
 					Message: "Failed to retrieve workspace status",
@@ -63,7 +63,7 @@ func ListWorkspaceCardStatus(c *gin.Context) {
 				})
 			}
 
-			list_workspace_status_card = append(list_workspace_status_card, structs.WorkspaceCardResponse{
+			list_workspace_card_by_status = append(list_workspace_card_by_status, structs.WorkspaceCardResponse{
 				Id:          card.Id,
 				Title:       card.Title,
 				Description: card.Description,
@@ -71,17 +71,18 @@ func ListWorkspaceCardStatus(c *gin.Context) {
 			})
 		}
 
-		workspace_status = append(workspace_status, structs.WorkspaceCardStatusCardResponse{
+		list_workspace_cards = append(list_workspace_cards, structs.WorkspaceCardByStatusResponse{
+			Id:         int(status.Id),
 			Name:       status.Name,
 			Color:      status.Color,
 			IsArchived: status.IsArchived,
-			Cards:      list_workspace_status_card,
+			Cards:      list_workspace_card_by_status,
 		})
 	}
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
 		Message: "Success retrieve workspace status",
-		Data:    workspace_status,
+		Data:    list_workspace_cards,
 	})
 }
