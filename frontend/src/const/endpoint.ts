@@ -24,8 +24,11 @@ export const endpoint = {
       delete: (id: number) => `/workspace/type/${id}`,
     },
 
-    card_status: {
-      list: (id: number) => `/workspace/${id}/status`,
+    card: {
+      list: (id: number) => `/workspace/${id}/card`,
+      create: (id: number) => `/workspace/${id}/card/create`,
+      status_order: (id: number) => `/workspace/${id}/card/status-order`,
+      update_order: (id: number) => `/workspace/${id}/card/update-order`,
     },
   },
 };
