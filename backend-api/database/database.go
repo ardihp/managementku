@@ -32,7 +32,7 @@ func InitDB() {
 	fmt.Println("Database connected successfully!")
 
 	err = DB.AutoMigrate(&models.User{}, &models.WorkspaceType{}, &models.Workspace{},
-		&models.WorkspaceMember{}, &models.WorkspaceRole{}, &models.WorkspaceTag{},
+		&models.WorkspaceMember{}, &models.WorkspaceTag{},
 		&models.WorkspaceStatus{}, &models.WorkspaceCard{}, &models.WorkspaceCardStatus{},
 		&models.WorkspaceCardMember{})
 

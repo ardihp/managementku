@@ -86,21 +86,10 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	var role = models.WorkspaceRole{}
-
-	if err := database.DB.First(&role, models.WorkspaceRole{Name: "Member"}).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Role not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
-		return
-	}
-
 	var assigned_user = models.WorkspaceMember{
 		WorkspaceId: workspace.Id,
-		RoleId:      role.Id,
 		UserId:      uint(user_id),
+		Role:        "admin",
 	}
 
 	if err := database.DB.Create(&assigned_user).Error; err != nil {

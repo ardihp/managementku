@@ -35,6 +35,12 @@ func ListWorkspace(c *gin.Context) {
 		if user.Role == "employee" {
 			var list_workspace = []models.WorkspaceMember{}
 			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("user_id = ?", user_id).Order("created_at").Find(&list_workspace)
+
+			for _, list := range list_workspace {
+				if list.Workspace.StatusId == status.Id {
+					user_workspace = append(user_workspace, int(list.WorkspaceId))
+				}
+			}
 		} else {
 			database.DB.Model(&models.Workspace{}).Where("is_archived = ? AND status_id = ?", false, status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Pluck("id", &user_workspace)
 		}
@@ -65,7 +71,7 @@ func ListWorkspace(c *gin.Context) {
 					Name:     user.Name,
 					Username: user.Username,
 					Email:    user.Email,
-					Role:     workspace_member.Role.Name,
+					Role:     workspace_member.Role,
 				})
 			}
 
@@ -140,7 +146,7 @@ func ListWorkspaceByID(c *gin.Context) {
 			Name:     user.Name,
 			Username: user.Username,
 			Email:    user.Email,
-			Role:     workspace_member.Role.Name,
+			Role:     workspace_member.Role,
 		})
 	}
 
@@ -220,7 +226,7 @@ func ListArchivedWorkspace(c *gin.Context) {
 				Name:     user.Name,
 				Username: user.Username,
 				Email:    user.Email,
-				Role:     workspace_member.Role.Name,
+				Role:     workspace_member.Role,
 			})
 		}
 

@@ -90,7 +90,6 @@ type WorkspaceUpdateRequest struct {
 
 type WorkspaceAssignMember struct {
 	WorkspaceId int   `json:"workspace_id" binding:"required"`
-	RoleId      int   `json:"role_id" binding:"required"`
 	UserId      []int `json:"user_id" binding:"required"`
 }
 
