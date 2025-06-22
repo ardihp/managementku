@@ -14,3 +14,8 @@ export interface OrderStatusItem {
 export interface UpdateWorkspaceOrder {
   order_status: OrderStatusItem[];
 }
+
+export interface AssignWorkspaceMemberRequest {
+  workspace_id: number;
+  user_id: number[];
+}

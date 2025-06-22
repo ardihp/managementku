@@ -1,6 +1,10 @@
 import { endpoint } from "@/const/endpoint";
 import Api from "@/services/api";
-import { UpdateWorkspace, UpdateWorkspaceOrder } from "@/types/hooks/workspace";
+import {
+  AssignWorkspaceMemberRequest,
+  UpdateWorkspace,
+  UpdateWorkspaceOrder,
+} from "@/types/hooks/workspace";
 import { Workspace, WorkspaceStatus } from "@/types/workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -76,6 +80,19 @@ export const useWorkspace = () => {
       },
       onSuccess: () =>
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] }),
+    });
+  };
+
+  const AssignWorkspaceMember = () => {
+    return useMutation({
+      mutationKey: ["workspace/assign"],
+      mutationFn: async (data: AssignWorkspaceMemberRequest) => {
+        const response = await Api.post(endpoint.workspace.assign_member, data);
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+      },
     });
   };
 
@@ -171,9 +188,11 @@ export const useWorkspace = () => {
     createWorkspace: CreateWorkspace,
     updateWorkspace: UpdateWorkspace,
     updateWorkspaceOrder: UpdateWorkspaceOrder,
+    assignWorkspaceMember: AssignWorkspaceMember,
     archiveWorkspace: ArchiveWorkspace,
     unarchiveWorkspace: UnarchiveWorkspace,
     deleteWorkspace: DeleteWorkspace,
+
     getListWorkspaceStatus: GetListWorkspaceStatus,
     getListArchivedWorkspace: GetListArchivedWorkspace,
     getListWorkspaceType: GetListWorkspaceType,

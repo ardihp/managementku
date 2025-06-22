@@ -12,6 +12,11 @@ export interface WorkspaceType {
   color: string;
 }
 
+export interface WorkspaceRole {
+  id: number;
+  name: string;
+}
+
 export interface WorkspaceByStatus extends WorkspaceStatus {
   workspaces: Workspace[];
 }
