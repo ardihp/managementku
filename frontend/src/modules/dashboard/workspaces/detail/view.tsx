@@ -43,9 +43,9 @@ export default function DetailWorkspaceView() {
   const { mutate: updateStatusOrder } = updateWorkspaceCardStatusOrder();
   const { mutate: updateCardOrder } = updateWorkspaceCardOrder();
 
-  const isMember =
+  const isAdmin =
     detailWorkspace?.members.find((member) => member.id === user?.id)?.role ===
-    "Member";
+    "admin";
 
   useEffect(() => {
     if (!loadingWorkspaceCard && !fetchWorkspaceCard) {
@@ -239,7 +239,7 @@ export default function DetailWorkspaceView() {
                           key={status.id}
                           status={status}
                           index={key}
-                          isMember={isMember}
+                          isAdmin={isAdmin}
                           workspaceId={Number(params?.id || 0)}
                           setSelectedItem={setSelectedItem}
                         />

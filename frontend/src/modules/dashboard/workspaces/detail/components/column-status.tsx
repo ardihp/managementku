@@ -10,7 +10,7 @@ import TaskCard from "./card";
 interface ColumnStatusProps {
   status: WorkspaceCardByStatus;
   index: number;
-  isMember: boolean;
+  isAdmin: boolean;
   workspaceId: number;
   setSelectedItem: (item: null) => void;
 }
@@ -18,7 +18,7 @@ interface ColumnStatusProps {
 export default function ColumnStatus({
   status,
   index,
-  isMember,
+  isAdmin,
   workspaceId,
   setSelectedItem,
 }: ColumnStatusProps) {
@@ -79,7 +79,7 @@ export default function ColumnStatus({
                       </div>
                     </div>
 
-                    {isMember && (
+                    {isAdmin && (
                       <FormWorkspaceCard
                         resetSelectedItem={() => setSelectedItem(null)}
                         defaultStatus={status.id.toString()}

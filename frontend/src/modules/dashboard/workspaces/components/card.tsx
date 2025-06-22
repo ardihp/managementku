@@ -7,6 +7,7 @@ import ColorfulBadge from "@/components/layout/colorful-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Draggable } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/auth/use-auth";
 
 interface WorkspaceCardProps {
   setSelectedItem?: (workspace: Workspace) => void;
@@ -23,6 +24,8 @@ const WorkspaceCard = ({
   customClassName,
   isArchived = false,
 }: WorkspaceCardProps) => {
+  const { user } = useAuth();
+
   return isArchived ? (
     <div className="relative">
       <WorkspaceAction
@@ -94,11 +97,13 @@ const WorkspaceCard = ({
             {...draggableProps}
             {...dragHandleProps}
           >
-            <WorkspaceAction
-              setSelectedItem={setSelectedItem}
-              workspace={workspace}
-              isArchived={isArchived}
-            />
+            {user!.role === "manager" && (
+              <WorkspaceAction
+                setSelectedItem={setSelectedItem}
+                workspace={workspace}
+                isArchived={isArchived}
+              />
+            )}
 
             <Link href={`${paths.dashboard.workspace}/${workspace.id}`}>
               <div className="w-full border rounded-xl bg-white group-hover:bg-zinc-50/50 flex flex-col p-4 gap-2 min-h-[177px] duration-200">
