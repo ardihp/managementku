@@ -12,6 +12,7 @@ export const endpoint = {
     delete: (id: number) => `/workspace/delete/${id}`,
     list_archived: "/workspace/archived",
     update_order: "/workspace/update-order",
+    assign_member: "/workspace/assign",
 
     status: {
       list: "/workspace/status",
@@ -30,5 +31,8 @@ export const endpoint = {
       status_order: (id: number) => `/workspace/${id}/card/status-order`,
       update_order: (id: number) => `/workspace/${id}/card/update-order`,
     },
+  },
+  user: {
+    list_employee: "/employee",
   },
 };
