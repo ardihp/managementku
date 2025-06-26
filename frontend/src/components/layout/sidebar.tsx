@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "../ui/input";
-import { sidebarItem, sidebarItem2 } from "@/const/sidebar-item";
+import { sidebarItem, sidebarItemManager } from "@/const/sidebar-item";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { paths } from "@/const/routes";
@@ -77,7 +77,7 @@ export default function Sidebar() {
           <hr className="border-zinc-200" />
 
           <div className="flex flex-col gap-1">
-            {sidebarItem2.map((item, index) => (
+            {sidebarItemManager.map((item, index) => (
               <Link
                 href={item.href}
                 key={index}
