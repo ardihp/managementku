@@ -4,6 +4,7 @@ export const paths = {
     workspace: "/dashboard/workspaces",
     notification: "/dashboard/notification",
     archive: "/dashboard/archive",
+    type: "/dashboard/type",
   },
   auth: {
     sign_in: "/auth/sign-in",

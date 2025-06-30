@@ -1,20 +1,10 @@
+import { colorsType } from "@/const";
 import { cn } from "@/lib/utils";
 import React, { ReactNode, useEffect, useState } from "react";
 
 interface ColorfulBadgeProps {
   content: string | ReactNode;
-  color?:
-    | "default"
-    | "gray"
-    | "brown"
-    | "orange"
-    | "yellow"
-    | "green"
-    | "blue"
-    | "purple"
-    | "pink"
-    | "red"
-    | string;
+  color?: colorsType;
 }
 
 export default function ColorfulBadge({

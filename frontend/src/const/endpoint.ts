@@ -21,8 +21,9 @@ export const endpoint = {
 
     type: {
       list: "/workspace/type",
-      create: "/workspace/type",
-      delete: (id: number) => `/workspace/type/${id}`,
+      create: "/workspace/type/create",
+      update: "/workspace/type/update",
+      delete: "/workspace/type/delete",
     },
 
     card: {

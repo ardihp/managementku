@@ -1,4 +1,10 @@
-import { Archive, FolderOpen, Gauge, MessageSquareDot } from "lucide-react";
+import {
+  Archive,
+  FolderOpen,
+  Gauge,
+  MessageSquareDot,
+  StretchHorizontal,
+} from "lucide-react";
 import { paths } from "./routes";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
@@ -27,10 +33,15 @@ export const sidebarItem: SidebarItem[] = [
   },
 ];
 
-export const sidebarItem2: SidebarItem[] = [
+export const sidebarItemManager: SidebarItem[] = [
   {
     title: "Archived",
     href: paths.dashboard.archive,
     icon: <Archive className={cn("size-6")} />,
+  },
+  {
+    title: "Workspace Types",
+    href: paths.dashboard.type,
+    icon: <StretchHorizontal className={cn("size-6")} />,
   },
 ];
