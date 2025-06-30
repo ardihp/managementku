@@ -1,3 +1,5 @@
+import { colorsType } from "@/const";
+
 export interface Member {
   id: number;
   name: string;
@@ -9,7 +11,7 @@ export interface Member {
 export interface WorkspaceType {
   id: number;
   name: string;
-  color: string;
+  color: colorsType;
 }
 
 export interface WorkspaceRole {
@@ -24,7 +26,7 @@ export interface WorkspaceByStatus extends WorkspaceStatus {
 export interface WorkspaceStatus {
   id: number;
   name: string;
-  color: string;
+  color: colorsType;
   is_archived: boolean;
 }
 export interface Workspace {

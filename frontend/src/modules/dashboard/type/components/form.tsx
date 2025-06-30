@@ -82,8 +82,8 @@ export default function FormWorkspaceType({
       } else {
         await createType(data);
       }
-    } catch (error) {
-      toast.error(error as string);
+    } catch (error: any) {
+      console.log(error);
     }
 
     onOpenChange();
