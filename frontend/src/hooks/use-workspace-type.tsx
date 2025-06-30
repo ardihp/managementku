@@ -26,7 +26,7 @@ export const useWorkspaceType = () => {
       mutationKey: ["workspace-type/create"],
       mutationFn: async (data: CreateWorkspaceTypeParams) => {
         const response = await Api.post(endpoint.workspace.type.create, data);
-        return response.data.data;
+        return response.data;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace-type/list"] });
@@ -39,7 +39,7 @@ export const useWorkspaceType = () => {
     return useMutation({
       mutationKey: ["workspace-type/update"],
       mutationFn: async (data: UpdateWorkspaceTypeParams) => {
-        const response = await Api.post(endpoint.workspace.type.update, data);
+        const response = await Api.put(endpoint.workspace.type.update, data);
         return response.data.data;
       },
       onSuccess: () => {
@@ -52,8 +52,8 @@ export const useWorkspaceType = () => {
   const DeleteWorkspaceType = () => {
     return useMutation({
       mutationKey: ["workspace-type/delete"],
-      mutationFn: async (id) => {
-        const response = await Api.post(endpoint.workspace.type.update, { id });
+      mutationFn: async (id: number) => {
+        const response = await Api.delete(endpoint.workspace.type.delete(id));
         return response.data.data;
       },
       onSuccess: () => {

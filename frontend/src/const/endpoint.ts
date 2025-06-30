@@ -23,7 +23,7 @@ export const endpoint = {
       list: "/workspace/type",
       create: "/workspace/type/create",
       update: "/workspace/type/update",
-      delete: "/workspace/type/delete",
+      delete: (id: number) => `/workspace/type/delete/${id}`,
     },
 
     card: {
