@@ -50,6 +50,8 @@ func SetupRouter() *gin.Engine {
 	// Workspace Type
 	router.GET("/api/workspace/type", middlewares.AuthMiddleware(), workspaceTypeControllers.ListWorkspaceType)
 	router.POST("/api/workspace/type/create", middlewares.AuthMiddleware(), workspaceTypeControllers.CreateWorkspaceType)
+	router.PUT("/api/workspace/type/update", middlewares.AuthMiddleware(), workspaceTypeControllers.UpdateWorkspaceType)
+	router.DELETE("/api/workspace/type/delete/:id", middlewares.AuthMiddleware(), workspaceTypeControllers.DeleteWorkspaceType)
 
 	// Workspace Card
 	router.GET("/api/workspace/:id/card", middlewares.AuthMiddleware(), workspaceCardControllers.ListWorkspaceCard)
