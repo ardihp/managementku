@@ -14,45 +14,31 @@ import { WorkspaceType } from "@/types/workspace";
 import React from "react";
 
 interface DialogConfirmationProps {
+  title: string;
+  description: string;
   open: boolean;
   onOpenChange: () => void;
-  type: WorkspaceType;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isPending: boolean;
 }
 
 export default function DialogConfirmation({
+  title,
+  description,
   open,
   onOpenChange,
-  type,
+  onSubmit,
+  isPending,
 }: DialogConfirmationProps) {
-  const { deleteWorkspaceType } = useWorkspaceType();
-  const { mutateAsync: deleteType, isPending } = deleteWorkspaceType();
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      await deleteType(type.id);
-    } catch (error) {
-      console.error(error);
-    }
-
-    onOpenChange();
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            Confirm delete type <strong>"{type.name}"</strong>?
-          </DialogTitle>
-          <DialogDescription>
-            Are you sure you want to permanently delete this user? This action
-            cannot be undone.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSubmit}>
           <DialogFooter>
             <DialogClose asChild>
               <Button

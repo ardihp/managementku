@@ -11,9 +11,10 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreVertical } from "lucide-react";
 import { useState } from "react";
-import DialogConfirmation from "./dialog-confirmation";
+import DialogConfirmation from "../../../../components/layout/dialog-confirmation";
 import { colorsType } from "@/const";
 import FormWorkspaceType from "./form";
+import { useWorkspaceType } from "@/hooks/use-workspace-type";
 
 export interface WorkspaceType {
   id: number;
@@ -38,14 +39,33 @@ export const columns: ColumnDef<WorkspaceType>[] = [
         edit: false,
       });
 
+      const { deleteWorkspaceType } = useWorkspaceType();
+      const { mutateAsync: deleteType, isPending } = deleteWorkspaceType();
+
+      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        try {
+          await deleteType(row.original.id);
+        } catch (error) {
+          console.error(error);
+        }
+
+        setOpenDialog((prevVal) => ({ ...prevVal, confirmation: false }));
+      };
+
       return (
         <>
           <DialogConfirmation
+            title="Confirm delete type"
+            description="Are you sure you want to permanently delete this type? This action
+            cannot be undone."
             open={openDialog.confirmation}
             onOpenChange={() =>
               setOpenDialog((prevVal) => ({ ...prevVal, confirmation: false }))
             }
-            type={row.original}
+            onSubmit={handleSubmit}
+            isPending={isPending}
           />
 
           <FormWorkspaceType
