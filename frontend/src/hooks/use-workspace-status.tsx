@@ -22,6 +22,17 @@ export const useWorkspaceStatus = () => {
     });
   };
 
+  const GetListArchivedWorkspaceStatus = () => {
+    return useQuery({
+      queryKey: ["workspace-status/list-archived"],
+      queryFn: async () => {
+        const response = await Api.get(endpoint.workspace.status.list_archived);
+        return response.data.data;
+      },
+      staleTime: Infinity,
+    });
+  };
+
   const CreateWorkspaceStatus = () => {
     return useMutation({
       mutationKey: ["workspace-status/create"],
@@ -77,6 +88,9 @@ export const useWorkspaceStatus = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace-status/list"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-status/list-archived"],
+        });
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Workspace status archived successfully");
       },
@@ -92,18 +106,41 @@ export const useWorkspaceStatus = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace-status/list"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-status/list-archived"],
+        });
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Workspace status activated successfully");
       },
     });
   };
 
+  const DeleteWorkspaceStatus = () => {
+    return useMutation({
+      mutationKey: ["workspace-status/delete"],
+      mutationFn: async (id: number) => {
+        const response = await Api.delete(endpoint.workspace.status.delete(id));
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["workspace-status/list"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-status/list-archived"],
+        });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        toast.success("Workspace status deleted successfully");
+      },
+    });
+  };
+
   return {
     getListWorkspaceStatus: GetListWorkspaceStatus,
+    getListArchivedWorkspaceStatus: GetListArchivedWorkspaceStatus,
     createWorkspaceStatus: CreateWorkspaceStatus,
     updateWorkspaceStatus: UpdateWorkspaceStatus,
     updateWorkspaceStatusOrder: UpdateWorkspaceStatusOrder,
     archiveWorkspaceStatus: ArchiveWorkspaceStatus,
-    unarchiveWorkspaceStatus: UnarchiveWorkspaceStatus
+    unarchiveWorkspaceStatus: UnarchiveWorkspaceStatus,
+    deleteWorkspaceStatus: DeleteWorkspaceStatus,
   };
 };
