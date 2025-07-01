@@ -93,10 +93,10 @@ export default function FormWorkspaceType({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Update" : "Create"} Workspace Type
-          </DialogTitle>
-          <DialogDescription></DialogDescription>
+          <DialogTitle>{isEdit ? "Update" : "New"} Workspace Type</DialogTitle>
+          <DialogDescription>
+            {isEdit ? "Update" : "Create"} Workspace Type Form
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">

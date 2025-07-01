@@ -23,6 +23,7 @@ import { useWorkspace } from "@/hooks/use-workspace";
 import { Workspace, WorkspaceStatus, WorkspaceType } from "@/types/workspace";
 import { Plus, X } from "lucide-react";
 import { cn, handleConffeti } from "@/lib/utils";
+import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 
 interface FormInputWorkspace {
   name: string;
@@ -56,16 +57,14 @@ export default function FormWorkspace({
 }: FormWorkspaceProps) {
   const [openDialog, setOpenDialog] = useState(false);
 
-  const {
-    getListWorkspaceType,
-    getListWorkspaceStatus,
-    createWorkspace,
-    updateWorkspace,
-  } = useWorkspace();
+  const { getListWorkspaceType, createWorkspace, updateWorkspace } =
+    useWorkspace();
+  const { getListWorkspaceStatus } = useWorkspaceStatus();
+
   const { data: listWorkspaceType, isLoading: loadingWorkspaceType } =
     getListWorkspaceType();
   const { data: listWorkspaceStatus, isLoading: loadingWorkspaceStatus } =
-    getListWorkspaceStatus("false");
+    getListWorkspaceStatus();
 
   const { mutate: create, isPending: loadingCreate } = createWorkspace();
   const { mutate: update, isPending: loadingUpdate } = updateWorkspace();
@@ -167,7 +166,7 @@ export default function FormWorkspace({
           </DialogDescription>
         </DialogHeader>
 
-        <form id="workspace_tags" onSubmit={handleAddWorkspaceTag} />
+        <form id="workspace_tags" onSubmit={handleAddWorkspaceTag} hidden />
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
           <div className="flex flex-col gap-2">
