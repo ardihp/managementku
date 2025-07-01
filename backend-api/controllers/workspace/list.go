@@ -25,7 +25,7 @@ func ListWorkspace(c *gin.Context) {
 	}
 
 	var workspace_status = []models.WorkspaceStatus{}
-	database.DB.Where("is_archived = ?", false).Find(&workspace_status)
+	database.DB.Where("is_archived = ?", false).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_status)
 
 	var list_workspace = []structs.WorkspaceByStatusResponse{}
 
