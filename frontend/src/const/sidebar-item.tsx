@@ -35,11 +35,6 @@ export const sidebarItem: SidebarItem[] = [
 
 export const sidebarItemManager: SidebarItem[] = [
   {
-    title: "Archived",
-    href: paths.dashboard.archive,
-    icon: <Archive className={cn("size-6")} />,
-  },
-  {
     title: "Workspace Types",
     href: paths.dashboard.type,
     icon: <StretchHorizontal className={cn("size-6")} />,
