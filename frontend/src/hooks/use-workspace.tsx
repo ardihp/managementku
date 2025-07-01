@@ -5,7 +5,7 @@ import {
   UpdateWorkspace,
   UpdateWorkspaceOrder,
 } from "@/types/hooks/workspace";
-import { Workspace, WorkspaceStatus } from "@/types/workspace";
+import { Workspace } from "@/types/workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -158,19 +158,6 @@ export const useWorkspace = () => {
     });
   };
 
-  const GetListWorkspaceStatus = (is_archived: "true" | "false") => {
-    return useQuery({
-      queryKey: ["workspace/status/list", is_archived],
-      queryFn: async () => {
-        const response = await Api.get(
-          `${endpoint.workspace.status.list}?is_archived=${is_archived}`
-        );
-        return response.data.data;
-      },
-      staleTime: Infinity,
-    });
-  };
-
   const GetListArchivedWorkspace = () => {
     return useQuery({
       queryKey: ["workspace/archived/list"],
@@ -193,7 +180,6 @@ export const useWorkspace = () => {
     unarchiveWorkspace: UnarchiveWorkspace,
     deleteWorkspace: DeleteWorkspace,
 
-    getListWorkspaceStatus: GetListWorkspaceStatus,
     getListArchivedWorkspace: GetListArchivedWorkspace,
     getListWorkspaceType: GetListWorkspaceType,
   };

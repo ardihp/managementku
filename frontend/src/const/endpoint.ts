@@ -17,6 +17,10 @@ export const endpoint = {
     status: {
       list: "/workspace/status",
       create: "/workspace/status/create",
+      update: "/workspace/status/update",
+      update_order: "/workspace/status/update-order",
+      archive: (id: number) => `/workspace/status/archive/${id}`,
+      unarchive: (id: number) => `/workspace/status/unarchive/${id}`,
     },
 
     type: {
