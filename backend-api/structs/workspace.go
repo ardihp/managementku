@@ -10,6 +10,7 @@ type Member struct {
 
 type WorkspaceStatus struct {
 	Id         uint   `json:"id"`
+	Order      int    `json:"order"`
 	Name       string `json:"name"`
 	Color      string `json:"color"`
 	IsArchived bool   `json:"is_archived"`
@@ -93,11 +94,6 @@ type WorkspaceAssignMember struct {
 	UserId      []int `json:"user_id" binding:"required"`
 }
 
-type WorkspaceUpdateStatusRequest struct {
-	WorkspaceId int               `json:"workspace_id" binding:"required"`
-	Status      []WorkspaceStatus `json:"status"`
-}
-
 type WorkspaceCreateRoleRequest struct {
 	Name string `json:"name" binding:"required"`
 }
@@ -111,6 +107,10 @@ type WorkspaceUpdateTypeRequest struct {
 	Id    int    `json:"id" binding:"required"`
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
+}
+
+type WorkspaceUpdateTypeOrderRequest struct {
+	OrderStatus []int `json:"order_status" binding:"required"`
 }
 
 type WorkspaceCardByStatusResponse struct {
@@ -128,6 +128,12 @@ type WorkspaceCreateCardRequest struct {
 }
 
 type WorkspaceCreateStatusRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Color string `json:"color" binding:"required"`
+}
+
+type WorkspaceUpdateStatusRequest struct {
+	Id    int    `json:"id" binding:"required"`
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
 }

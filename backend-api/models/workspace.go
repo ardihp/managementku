@@ -44,6 +44,7 @@ type WorkspaceType struct {
 
 type WorkspaceStatus struct {
 	Id         uint      `json:"id" gorm:"primaryKey"`
+	Order      int       `json:"order" gorm:"not null"`
 	Name       string    `json:"name"`
 	Color      string    `json:"color"`
 	IsArchived bool      `json:"is_archived" gorm:"default:false"`

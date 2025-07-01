@@ -22,16 +22,19 @@ func CreateWorkspaceStatus(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("name = ?", req.Name).First(&models.WorkspaceStatus{}).Error; err == nil {
+	if result := database.DB.Where("name = ?", req.Name).Find(&models.WorkspaceStatus{}); result.RowsAffected >= 1 {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace status already exists",
-			Errors:  helpers.TranslateErrorMessage(err),
 		})
 		return
 	}
 
+	list_workspace_status := []models.WorkspaceStatus{}
+	database.DB.Find(&list_workspace_status)
+
 	var workspace_status = models.WorkspaceStatus{
+		Order: len(list_workspace_status) + 1,
 		Name:  req.Name,
 		Color: req.Color,
 	}
@@ -50,6 +53,7 @@ func CreateWorkspaceStatus(c *gin.Context) {
 		Message: "Success to retreive workspace status",
 		Data: structs.WorkspaceStatus{
 			Id:         workspace_status.Id,
+			Order:      workspace_status.Order,
 			Name:       workspace_status.Name,
 			Color:      workspace_status.Color,
 			IsArchived: workspace_status.IsArchived,
