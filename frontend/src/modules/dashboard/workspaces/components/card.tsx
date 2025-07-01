@@ -8,9 +8,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Draggable } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth/use-auth";
+import { BriefcaseBusiness } from "lucide-react";
 
 interface WorkspaceCardProps {
-  setSelectedItem?: (workspace: Workspace) => void;
+  setSelectedWorkspace?: (workspace: Workspace) => void;
   customClassName?: string;
   workspace: Workspace;
   index?: number;
@@ -20,7 +21,7 @@ interface WorkspaceCardProps {
 const WorkspaceCard = ({
   workspace,
   index = 0,
-  setSelectedItem,
+  setSelectedWorkspace,
   customClassName,
   isArchived = false,
 }: WorkspaceCardProps) => {
@@ -29,7 +30,7 @@ const WorkspaceCard = ({
   return isArchived ? (
     <div className="relative">
       <WorkspaceAction
-        setSelectedItem={setSelectedItem}
+        setSelectedWorkspace={setSelectedWorkspace}
         workspace={workspace}
         isArchived={isArchived}
       />
@@ -42,8 +43,8 @@ const WorkspaceCard = ({
                 workspace.status.name === "Backlog"
                   ? "💼"
                   : workspace.status.name === "In Progress"
-                  ? "🔨"
-                  : "🏁"
+                    ? "🔨"
+                    : "🏁"
               }
               color={workspace.status.color}
             />
@@ -99,7 +100,7 @@ const WorkspaceCard = ({
           >
             {user!.role === "manager" && (
               <WorkspaceAction
-                setSelectedItem={setSelectedItem}
+                setSelectedWorkspace={setSelectedWorkspace}
                 workspace={workspace}
                 isArchived={isArchived}
               />
@@ -109,13 +110,7 @@ const WorkspaceCard = ({
               <div className="w-full border rounded-xl bg-white group-hover:bg-zinc-50/50 flex flex-col p-4 gap-2 min-h-[177px] duration-200">
                 <div className="flex items-center gap-2 overflow-auto">
                   <ColorfulBadge
-                    content={
-                      workspace.status.name === "Backlog"
-                        ? "💼"
-                        : workspace.status.name === "In Progress"
-                        ? "🔨"
-                        : "🏁"
-                    }
+                    content={'🛠️'}
                     color={workspace.status.color}
                   />
                   <ColorfulBadge

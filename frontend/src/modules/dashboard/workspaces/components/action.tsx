@@ -17,13 +17,13 @@ import { Workspace } from "@/types/workspace";
 import AssignMember from "./assign-member";
 
 interface WorkspaceActionProps {
-  setSelectedItem?: (item: any) => void;
+  setSelectedWorkspace?: (item: any) => void;
   workspace: Workspace;
   isArchived: boolean;
 }
 
 export default function WorkspaceAction({
-  setSelectedItem = () => {},
+  setSelectedWorkspace = () => { },
   workspace,
   isArchived = false,
 }: WorkspaceActionProps) {
@@ -94,7 +94,7 @@ export default function WorkspaceAction({
             <>
               <div
                 className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
-                onClick={() => setSelectedItem(workspace)}
+                onClick={() => setSelectedWorkspace(workspace)}
               >
                 <Pencil className="size-4" />
                 <p className="text-sm">Update</p>

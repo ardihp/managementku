@@ -41,16 +41,16 @@ const schema = yup.object().shape({
 });
 
 interface FormWorkspaceProps {
-  selectedItem?: Workspace | null;
-  resetSelectedItem?: () => void;
+  selectedWorkspace?: Workspace | null;
+  resetSelectedWorkspace?: () => void;
   buttonClassName?: string;
   defaultStatus?: string;
   children: React.ReactNode;
 }
 
 export default function FormWorkspace({
-  selectedItem,
-  resetSelectedItem = () => {},
+  selectedWorkspace,
+  resetSelectedWorkspace = () => {},
   buttonClassName,
   defaultStatus,
   children,
@@ -68,7 +68,7 @@ export default function FormWorkspace({
 
   const { mutate: create, isPending: loadingCreate } = createWorkspace();
   const { mutate: update, isPending: loadingUpdate } = updateWorkspace();
-  const isEdit = !!selectedItem;
+  const isEdit = !!selectedWorkspace;
 
   const {
     register,
@@ -91,7 +91,7 @@ export default function FormWorkspace({
         status_id: defaultStatus || "",
         tags: [],
       });
-      resetSelectedItem();
+      resetSelectedWorkspace();
     }
   }, [openDialog]);
 
@@ -100,14 +100,14 @@ export default function FormWorkspace({
 
     if (isEdit) {
       reset({
-        name: selectedItem.name || "",
-        description: selectedItem.description || "",
-        type_id: selectedItem.type.id.toString() || "",
-        status_id: selectedItem.status.id.toString() || "",
-        tags: selectedItem.tags || [],
+        name: selectedWorkspace.name || "",
+        description: selectedWorkspace.description || "",
+        type_id: selectedWorkspace.type.id.toString() || "",
+        status_id: selectedWorkspace.status.id.toString() || "",
+        tags: selectedWorkspace.tags || [],
       });
     }
-  }, [selectedItem]);
+  }, [selectedWorkspace]);
 
   const handleAddWorkspaceTag = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -139,7 +139,7 @@ export default function FormWorkspace({
 
     if (isEdit) {
       update(
-        { id: selectedItem.id, data: formData },
+        { id: selectedWorkspace.id, data: formData },
         {
           onSuccess(response) {
             if (response.data.status.name === "Completed") handleConffeti();
@@ -151,7 +151,7 @@ export default function FormWorkspace({
     }
 
     setOpenDialog(false);
-    resetSelectedItem();
+    resetSelectedWorkspace();
     reset({ name: "", description: "", type_id: "", status_id: "", tags: [] });
   };
 
