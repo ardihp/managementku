@@ -15,7 +15,7 @@ func ListWorkspaceCard(c *gin.Context) {
 	var id = c.Param("id")
 	var workspace_cards = []models.WorkspaceCardStatus{}
 
-	if err := database.DB.Where("workspace_id = ? AND is_archived = ?", id, false).Find(&workspace_cards).Error; err != nil {
+	if err := database.DB.Where("workspace_id = ? AND is_archived = ?", id, false).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_cards).Error; err != nil {
 		c.JSON(http.StatusNotFound, structs.ErrorResponse{
 			Success: false,
 			Message: "Workspace not found",
@@ -29,7 +29,7 @@ func ListWorkspaceCard(c *gin.Context) {
 	for _, status := range workspace_cards {
 		var workspace_card_by_status = []models.WorkspaceCard{}
 
-		if err := database.DB.Where("workspace_id = ? AND status_id = ?", id, status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Find(&workspace_card_by_status).Error; err != nil {
+		if err := database.DB.Where("workspace_id = ? AND status_id = ?", id, status.Id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_card_by_status).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
 				Message: "Failed to retrieve workspace status",

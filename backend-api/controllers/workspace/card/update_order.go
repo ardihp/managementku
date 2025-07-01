@@ -23,15 +23,6 @@ func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("id = ?", workspace_id).First(&models.Workspace{}).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
-		return
-	}
-
 	for index, id := range req.OrderStatus {
 		var new_workspace_card_status = models.WorkspaceCardStatus{}
 
