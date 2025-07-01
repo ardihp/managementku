@@ -44,6 +44,7 @@ export const useWorkspaceType = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace-type/list"] });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Workspace type updated successfully");
       },
     });
