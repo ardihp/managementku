@@ -58,6 +58,7 @@ export default function ColumnStatus({
               <ActionStatus
                 onClickUpdate={() => setSelectedStatus(status)}
                 status={status}
+                isArchived={status.is_archived}
               />
             </div>
 
@@ -77,14 +78,29 @@ export default function ColumnStatus({
                     <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(100vh_-_308px)]">
                       {status.workspaces.map(
                         (workspace: Workspace, cardKey) => (
-                          <WorkspaceCard
+                          <Draggable
                             key={workspace.id}
+                            draggableId={workspace.id.toString()}
                             index={cardKey}
-                            workspace={workspace}
-                            setSelectedWorkspace={setSelectedWorkspace}
-                            isArchived={workspace.is_archived}
-                            customClassName="my-2"
-                          />
+                          >
+                            {(
+                              { dragHandleProps, draggableProps, innerRef },
+                              { isDragging }
+                            ) => {
+                              return (
+                                <WorkspaceCard
+                                  workspace={workspace}
+                                  setSelectedWorkspace={setSelectedWorkspace}
+                                  isArchived={workspace.is_archived}
+                                  customClassName="my-2"
+                                  isDragging={isDragging}
+                                  ref={innerRef}
+                                  {...dragHandleProps}
+                                  {...draggableProps}
+                                />
+                              );
+                            }}
+                          </Draggable>
                         )
                       )}
 

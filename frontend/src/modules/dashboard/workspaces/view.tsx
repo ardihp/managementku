@@ -15,6 +15,8 @@ import { cn, handleConffeti } from "@/lib/utils";
 import ColumnStatus from "./components/column-status";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import FormWorkspaceStatus from "./components/form-status";
+import { Button } from "@/components/ui/button";
+import ArchivedItems from "./components/archived-items";
 
 export default function WorkspacesView() {
   const [userDetail, setUserDetail] = useState<UserDetail | null>();
@@ -27,6 +29,7 @@ export default function WorkspacesView() {
   const [openDialog, setOpenDialog] = useState({
     workspace: false,
     status: false,
+    archived: false,
   });
   const [listWorkspaceByStatus, setListWorkspaceByStatus] = useState<
     WorkspaceByStatus[]
@@ -44,8 +47,6 @@ export default function WorkspacesView() {
 
   const { mutate: updateOrder } = updateWorkspaceOrder();
   const { mutate: updateStatusOrder } = updateWorkspaceStatusOrder();
-
-  console.log(loadingWorkspace, fetchWorkspace);
 
   useEffect(() => {
     setUserDetail(user);
@@ -189,6 +190,15 @@ export default function WorkspacesView() {
         status={selectedStatus}
       />
 
+      {openDialog.archived && (
+        <ArchivedItems
+          open={openDialog.archived}
+          onOpenChange={() =>
+            setOpenDialog((prevVal) => ({ ...prevVal, archived: false }))
+          }
+        />
+      )}
+
       <div className="flex flex-col h-full">
         <section className="flex items-center justify-between border-b border-zinc-200 p-8">
           <div className="h-9 flex flex-col">
@@ -200,8 +210,18 @@ export default function WorkspacesView() {
             </p>
           </div>
 
-          <div className="flex">
-            {userDetail?.role === "manager" && (
+          {userDetail?.role === "manager" && (
+            <div className="flex items-center gap-4">
+              <Button
+                className="cursor-pointer"
+                onClick={() =>
+                  setOpenDialog((prevVal) => ({ ...prevVal, archived: true }))
+                }
+              >
+                <Archive className="size-4" />
+                <p className="leading-none">Archived Items</p>
+              </Button>
+
               <FormWorkspace
                 selectedWorkspace={selectedWorkspace}
                 resetSelectedWorkspace={() => setSelectedWorkspace(null)}
@@ -210,8 +230,8 @@ export default function WorkspacesView() {
                 <Plus className="size-4 text-white" />
                 <p className="text-white text-sm leading-none">Add New</p>
               </FormWorkspace>
-            )}
-          </div>
+            </div>
+          )}
         </section>
 
         {loadingWorkspace ? (

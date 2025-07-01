@@ -6,69 +6,112 @@ import {
 } from "@/components/ui/popover";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import { WorkspaceStatus } from "@/types/workspace";
-import { Archive, Ellipsis, Pencil } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  Ellipsis,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import React, { useState } from "react";
 
 interface ActionStatusProps {
-  onClickUpdate: () => void;
+  onClickUpdate?: () => void;
   status: WorkspaceStatus;
+  isArchived: boolean;
 }
 
 export default function ActionStatus({
-  onClickUpdate,
+  onClickUpdate = () => {},
   status,
+  isArchived = false,
 }: ActionStatusProps) {
   const [openPopover, setOpenPopover] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const { archiveWorkspaceStatus } = useWorkspaceStatus();
-  const { mutateAsync: archive, isPending } = archiveWorkspaceStatus();
+  const {
+    archiveWorkspaceStatus,
+    unarchiveWorkspaceStatus,
+    deleteWorkspaceStatus,
+  } = useWorkspaceStatus();
+  const { mutateAsync: archive } = archiveWorkspaceStatus();
+  const { mutateAsync: unarchive } = unarchiveWorkspaceStatus();
+  const { mutateAsync: deleteStatus, isPending: loadingDelete } =
+    deleteWorkspaceStatus();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleArchive = async () => {
     try {
       await archive(status.id);
     } catch (error) {
       console.error(error);
     }
 
-    setOpenDialog(false);
+    setOpenPopover(false);
+  };
+
+  const handleUnarchive = async () => {
+    try {
+      await unarchive(status.id);
+    } catch (error) {
+      console.error(error);
+    }
+
+    setOpenPopover(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteStatus(status.id);
+    } catch (error) {
+      console.error(error);
+    }
+
+    setOpenPopover(false);
   };
 
   return (
-    <>
-      <DialogConfirmation
-        title={"Confirm archive status"}
-        description="Are you sure you want to archive this status? This action
-            cannot be undone."
-        open={openDialog}
-        onOpenChange={() => setOpenDialog(false)}
-        isPending={isPending}
-        onSubmit={handleSubmit}
-      />
+    <Popover open={openPopover} onOpenChange={setOpenPopover}>
+      <PopoverTrigger className="size-8 flex items-center justify-center cursor-pointer">
+        <Ellipsis className="size-4 text-zinc-500" />
+      </PopoverTrigger>
+      <PopoverContent className="w-fit flex flex-col p-1">
+        {isArchived ? (
+          <>
+            <div
+              className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+              onClick={handleUnarchive}
+            >
+              <ArchiveRestore className="size-4" />
+              <p className="text-sm">Restore</p>
+            </div>
 
-      <Popover open={openPopover} onOpenChange={setOpenPopover}>
-        <PopoverTrigger className="size-8 flex items-center justify-center cursor-pointer">
-          <Ellipsis className="size-4 text-zinc-500" />
-        </PopoverTrigger>
-        <PopoverContent className="w-fit flex flex-col p-1">
-          <div
-            className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
-            onClick={onClickUpdate}
-          >
-            <Pencil className="size-4" />
-            <p className="text-sm">Update</p>
-          </div>
-          <div
-            className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
-            onClick={() => setOpenDialog(true)}
-          >
-            <Archive className="size-4" />
-            <p className="text-sm">Archive</p>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </>
+            <div
+              className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+              onClick={handleDelete}
+            >
+              <Trash2 className="size-4" />
+              <p className="text-sm">Delete</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+              onClick={onClickUpdate}
+            >
+              <Pencil className="size-4" />
+              <p className="text-sm">Update</p>
+            </div>
+            <div
+              className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+              onClick={handleArchive}
+            >
+              <Archive className="size-4" />
+              <p className="text-sm">Archive</p>
+            </div>
+          </>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
