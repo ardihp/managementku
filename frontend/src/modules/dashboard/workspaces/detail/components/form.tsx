@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,9 +13,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useWorkspace } from "@/hooks/use-workspace";
-import { Workspace, WorkspaceStatus, WorkspaceType } from "@/types/workspace";
-import { Plus, X } from "lucide-react";
-import { cn, handleConffeti } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { WorkspaceCard } from "@/types/workspace-card";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 
@@ -54,10 +45,8 @@ export default function FormWorkspaceCard({
 }: FormWorkspaceProps) {
   const [openDialog, setOpenDialog] = useState(false);
 
-  const { getListWorkspaceStatus, updateWorkspace } = useWorkspace();
+  const { updateWorkspace } = useWorkspace();
   const { createWorkspaceCard } = useWorkspaceCard();
-  const { data: listWorkspaceStatus, isLoading: loadingWorkspaceStatus } =
-    getListWorkspaceStatus("false");
 
   const { mutate: create, isPending: loadingCreate } = createWorkspaceCard();
   const { mutate: update, isPending: loadingUpdate } = updateWorkspace();
