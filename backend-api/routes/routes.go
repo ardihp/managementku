@@ -2,6 +2,7 @@ package routes
 
 import (
 	authControllers "kanban-board/backend-api/controllers/auth"
+	socketControllers "kanban-board/backend-api/controllers/socket"
 	userControllers "kanban-board/backend-api/controllers/user"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
 	workspaceCardControllers "kanban-board/backend-api/controllers/workspace/card"
@@ -23,6 +24,9 @@ func SetupRouter() *gin.Engine {
 		AllowHeaders:  []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders: []string{"Content-Length"},
 	}))
+
+	//Web Socket
+	router.GET("/ws", socketControllers.InitSocket)
 
 	// Authentication
 	router.POST("/api/register", authControllers.RegisterUser)
