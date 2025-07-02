@@ -1,10 +1,4 @@
-import {
-  Archive,
-  FolderOpen,
-  Gauge,
-  MessageSquareDot,
-  StretchHorizontal,
-} from "lucide-react";
+import { FolderOpen, Gauge, StretchHorizontal } from "lucide-react";
 import { paths } from "./routes";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
@@ -25,11 +19,6 @@ export const sidebarItem: SidebarItem[] = [
     title: "Workspaces",
     href: paths.dashboard.workspace,
     icon: <FolderOpen className={cn("size-6")} />,
-  },
-  {
-    title: "Notifications",
-    href: paths.dashboard.notification,
-    icon: <MessageSquareDot className={cn("size-6")} />,
   },
 ];
 

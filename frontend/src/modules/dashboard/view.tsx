@@ -1,19 +1,42 @@
 import { colorsCode } from "@/const";
+import { SocketContext } from "@/context/socket";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { cn } from "@/lib/utils";
 import { WorkspaceByStatus } from "@/types/workspace";
-import { Folder, FolderOpen } from "lucide-react";
-import React from "react";
+import { FolderOpen } from "lucide-react";
+import React, { useContext, useEffect } from "react";
 
 export default function DashboardView() {
   const { getListWorkspace } = useWorkspace();
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onopen = () => {
+        console.log("connected");
+      };
+
+      socket.onmessage = (event) => {
+        console.log("message received: ", JSON.parse(event.data || "{}"));
+      };
+
+      socket.onclose = () => {
+        console.log("connection close");
+      };
+    }
+  });
 
   const { data: workspaces, isLoading: ladingWorkspace } = getListWorkspace();
 
   return (
     <div className="flex flex-col h-full">
       <section className="flex items-center justify-between border-b border-zinc-200 p-8">
-        <div className="h-9 flex flex-col">
+        <div
+          className="h-9 flex flex-col"
+          onClick={() =>
+            socket?.send(JSON.stringify({ text: "haha", value: [1, 2] }))
+          }
+        >
           <p className="text-2xl text-foreground font-light my-auto">
             Dashboard Overview
           </p>
@@ -57,7 +80,7 @@ export default function DashboardView() {
         </div>
 
         <div className="flex flex-col border rounded-xl p-4">
-          <p className="text-2xl">Recent Activity</p>
+          <p className="text-xl">Recent Activity</p>
           <hr className="mt-3" />
 
           <div></div>
