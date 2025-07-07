@@ -26,7 +26,7 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 		return
 	}
 
-	database.DB.Transaction(func(tx *gorm.DB) error {
+	database.DB.Transaction(func(trx *gorm.DB) error {
 		status_before := &models.WorkspaceStatus{}
 		status_after := &models.WorkspaceStatus{}
 
@@ -40,12 +40,12 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 			for index, workspace := range order.WorkspaceId {
 
 				new_workspace := models.Workspace{Id: uint(workspace)}
-				tx.First(&new_workspace)
+				trx.First(&new_workspace)
 
 				new_workspace.Status.Id = uint(order.StatusId)
 				new_workspace.Order = index
 
-				if err := tx.Save(&new_workspace).Error; err != nil {
+				if err := trx.Save(&new_workspace).Error; err != nil {
 					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 						Success: false,
 						Message: "Failed to update workspace order",
@@ -57,10 +57,10 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 		}
 
 		user := models.User{}
-		tx.First(&user, id)
+		trx.First(&user, id)
 
 		workspace := models.Workspace{}
-		tx.First(&workspace, req.WorkspaceId)
+		trx.First(&workspace, req.WorkspaceId)
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
@@ -69,7 +69,7 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 			Description: fmt.Sprintf("User %s has changed status for the %s workspace from %s to %s", user.Username, workspace.Name, status_before.Name, status_after.Name),
 		}
 
-		if err := tx.Create(&history_log).Error; err != nil {
+		if err := trx.Create(&history_log).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
 				Message: "Failed to update workspace order",
@@ -79,7 +79,7 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 		}
 
 		workspace_members := []models.WorkspaceMember{}
-		tx.Where("workspace_id = ?", req.WorkspaceId).Find(&workspace_members)
+		trx.Where("workspace_id = ?", req.WorkspaceId).Find(&workspace_members)
 
 		for _, member := range workspace_members {
 			user_history := models.UserHistoryLog{
@@ -87,7 +87,7 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 				UserId:    member.UserId,
 			}
 
-			if err := tx.Create(&user_history).Error; err != nil {
+			if err := trx.Create(&user_history).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 					Success: false,
 					Message: "Failed to update workspace order",

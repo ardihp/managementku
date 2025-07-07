@@ -14,7 +14,7 @@ func main() {
 
 	database.InitDB()
 
-	tableFlag := flag.String("table", "all-table", "specify the table")
+	tableFlag := flag.String("table", "", "specify the table")
 	flag.Parse()
 	table := *tableFlag
 

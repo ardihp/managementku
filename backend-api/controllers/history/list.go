@@ -41,7 +41,12 @@ func ListHistoryLog(c *gin.Context) {
 
 	for _, log := range user_history_logs {
 		history_log := models.HistoryLog{}
-		database.DB.Preload(clause.Associations).Where("type = ?", req.Type).First(&history_log, log.HistoryId)
+
+		if req.Type == "workspace" {
+			database.DB.Preload(clause.Associations).Where("type = ?", req.Type).First(&history_log, log.HistoryId)
+		} else {
+			database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
+		}
 
 		list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
 			ID:          int(history_log.ID),
