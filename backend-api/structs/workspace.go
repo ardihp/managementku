@@ -144,6 +144,7 @@ type WorkspaceOrder struct {
 }
 
 type WorkspaceUpdateOrderRequest struct {
+	WorkspaceId int              `json:"workspace_id" binding:"required"`
 	OrderStatus []WorkspaceOrder `json:"order_status" binding:"required"`
 }
 

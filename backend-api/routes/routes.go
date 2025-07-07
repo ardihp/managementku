@@ -2,6 +2,7 @@ package routes
 
 import (
 	authControllers "kanban-board/backend-api/controllers/auth"
+	historyControllers "kanban-board/backend-api/controllers/history"
 	socketControllers "kanban-board/backend-api/controllers/socket"
 	userControllers "kanban-board/backend-api/controllers/user"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
@@ -68,6 +69,9 @@ func SetupRouter() *gin.Engine {
 	router.POST("/api/workspace/:id/card/create", middlewares.AuthMiddleware(), workspaceCardControllers.CreateWorkspaceCard)
 	router.POST("/api/workspace/:id/card/status-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardStatusOrder)
 	router.POST("/api/workspace/:id/card/update-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardOrder)
+
+	// History Logs
+	router.GET("/api/history-logs", middlewares.AuthMiddleware(), historyControllers.ListHistoryLog)
 
 	return router
 }
