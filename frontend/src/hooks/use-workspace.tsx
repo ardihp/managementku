@@ -94,6 +94,7 @@ export const useWorkspace = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
       },
     });
   };

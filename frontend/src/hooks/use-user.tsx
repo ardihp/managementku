@@ -1,8 +1,11 @@
 import { endpoint } from "@/const/endpoint";
 import Api from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "./auth/use-auth";
 
 export const useUser = () => {
+  const { user } = useAuth();
+
   const GetListEmployee = () => {
     return useQuery({
       queryKey: ["employee/list"],
@@ -16,7 +19,7 @@ export const useUser = () => {
 
   const GetHistoryLog = (type: "general" | "workspace") => {
     return useQuery({
-      queryKey: ["user/history-logs"],
+      queryKey: ["user/history-logs", user?.id],
       queryFn: async () => {
         const response = await Api.get(
           `${endpoint.user.history_logs}?type=${type}`

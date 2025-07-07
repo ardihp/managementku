@@ -14,7 +14,7 @@ export default function RecentActivity() {
 
       <hr className="mt-3" />
 
-      <div className="flex flex-col h-full overflow-auto max-h-[calc(100vh_-_253px)]">
+      <div className="flex flex-col h-full overflow-auto max-h-[calc(100vh_-_288px)]">
         {loadingLog ? (
           [...new Array(5)].map((item, key) => (
             <div
