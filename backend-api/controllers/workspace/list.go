@@ -37,8 +37,13 @@ func ListWorkspace(c *gin.Context) {
 			database.DB.Model(&models.WorkspaceMember{}).Preload(clause.Associations).Where("user_id = ?", user_id).Order("created_at").Find(&list_workspace)
 
 			for _, list := range list_workspace {
-				if list.Workspace.StatusId == status.Id {
-					user_workspace = append(user_workspace, int(list.WorkspaceId))
+				workspace := &models.Workspace{}
+				database.DB.First(&workspace, list.WorkspaceId)
+
+				if !workspace.IsArchived {
+					if list.Workspace.StatusId == status.Id {
+						user_workspace = append(user_workspace, int(list.WorkspaceId))
+					}
 				}
 			}
 		} else {
