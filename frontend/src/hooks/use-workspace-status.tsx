@@ -74,7 +74,8 @@ export const useWorkspaceStatus = () => {
         return response.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["workspace-status/list"] });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
       },
     });
   };

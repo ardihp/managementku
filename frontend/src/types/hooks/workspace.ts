@@ -12,6 +12,7 @@ export interface OrderStatusItem {
 }
 
 export interface UpdateWorkspaceOrder {
+  workspace_id: number;
   order_status: OrderStatusItem[];
 }
 

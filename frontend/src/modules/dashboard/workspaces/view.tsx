@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useAuth, UserDetail } from "@/hooks/auth/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import {
@@ -17,6 +17,7 @@ import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import FormWorkspaceStatus from "./components/form-status";
 import { Button } from "@/components/ui/button";
 import ArchivedItems from "./components/archived-items";
+import { SocketContext } from "@/context/socket";
 
 export default function WorkspacesView() {
   const [userDetail, setUserDetail] = useState<UserDetail | null>();
@@ -34,6 +35,21 @@ export default function WorkspacesView() {
   const [listWorkspaceByStatus, setListWorkspaceByStatus] = useState<
     WorkspaceByStatus[]
   >([]);
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onopen = () => {
+        console.log("Connected to WebSocket");
+      };
+      socket.onmessage = (event) => {
+        console.log("Message received:", JSON.parse(event.data || "{}"));
+      };
+      socket.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+    }
+  });
 
   const { user } = useAuth();
   const { getListWorkspace, updateWorkspaceOrder } = useWorkspace();
@@ -173,7 +189,10 @@ export default function WorkspacesView() {
         source.index !== destination.index
       ) {
         updateOrder(
-          { order_status: statusWorkspace },
+          {
+            workspace_id: Number(item?.draggableId),
+            order_status: statusWorkspace,
+          },
           { onError: () => setListWorkspaceByStatus(listWorkspaceByStatus) }
         );
       }
