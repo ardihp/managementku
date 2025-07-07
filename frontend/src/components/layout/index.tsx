@@ -1,9 +1,10 @@
 import React, { ReactNode } from "react";
-import Sidebar from "./sidebar";
 import AuthProvider from "@/context/auth";
 import Header from "./header";
 import { useRouter } from "next/router";
 import SocketProvider from "@/context/socket";
+import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
+import AppSidebar from "./sidebar";
 
 export default function LayoutPage({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -14,14 +15,16 @@ export default function LayoutPage({ children }: { children: ReactNode }) {
         {router.pathname.includes("auth") ? (
           children
         ) : (
-          <section className="grid lg:grid-cols-[minmax(0,300px)_minmax(400px,1fr)] h-screen bg-zinc-100/30">
-            <Sidebar />
-            <div className="flex flex-col">
-              <Header />
+          <>
+            <SidebarProvider>
+              <AppSidebar />
+              <main className="flex flex-col bg-zinc-100/30 overflow-auto w-full">
+                <Header />
 
-              {children}
-            </div>
-          </section>
+                {children}
+              </main>
+            </SidebarProvider>
+          </>
         )}
       </AuthProvider>
     </SocketProvider>
