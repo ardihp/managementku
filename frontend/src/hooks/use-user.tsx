@@ -14,7 +14,21 @@ export const useUser = () => {
     });
   };
 
+  const GetHistoryLog = (type: "general" | "workspace") => {
+    return useQuery({
+      queryKey: ["user/history-logs"],
+      queryFn: async () => {
+        const response = await Api.get(
+          `${endpoint.user.history_logs}?type=${type}`
+        );
+        return response.data.data;
+      },
+      staleTime: Infinity,
+    });
+  };
+
   return {
     getListEmployee: GetListEmployee,
+    getHistoryLog: GetHistoryLog,
   };
 };

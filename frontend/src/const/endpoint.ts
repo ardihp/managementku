@@ -41,5 +41,6 @@ export const endpoint = {
   },
   user: {
     list_employee: "/employee",
+    history_logs: "/history-logs",
   },
 };
