@@ -10,7 +10,7 @@ import (
 
 func WorkspaceStatusSeed() {
 	statuses := []models.WorkspaceStatus{
-		{Name: "Backlog", Color: "grey"},
+		{Name: "Backlog", Color: "gray"},
 		{Name: "In Progress", Color: "yellow"},
 		{Name: "Completed", Color: "green"},
 	}
