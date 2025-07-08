@@ -25,9 +25,14 @@ Api.interceptors.response.use(
     return response;
   },
   (error) => {
-    toast(error?.response?.data?.message || error?.response?.data, {
-      id: "toast-error",
-    });
+    console.log(error);
+
+    toast(
+      error?.response?.data?.message || error?.response?.data || error?.message,
+      {
+        id: "toast-error",
+      }
+    );
 
     if (error.status === 401) {
       Cookies.remove("token");
