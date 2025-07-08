@@ -65,6 +65,7 @@ func UpdateWorkspaceOrder(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "general",
+			UserRole:    "manager",
 			Action:      "update-order",
 			Description: fmt.Sprintf("User %s has changed status for the %s workspace from %s to %s", user.Username, workspace.Name, status_before.Name, status_after.Name),
 		}

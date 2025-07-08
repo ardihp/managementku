@@ -35,15 +35,17 @@ func AssignMemberToWorkspace(c *gin.Context) {
 	workspace_tags := []string{}
 
 	user_log := models.HistoryLog{
-		UserId: uint(manager_id),
-		Type:   "general",
-		Action: "assign-member",
+		UserId:   uint(manager_id),
+		Type:     "general",
+		UserRole: "employee",
+		Action:   "assign-member",
 	}
 
 	manager_log := models.HistoryLog{
-		UserId: uint(manager_id),
-		Type:   "general",
-		Action: "assign-member",
+		UserId:   uint(manager_id),
+		Type:     "general",
+		UserRole: "manager",
+		Action:   "assign-member",
 	}
 
 	database.DB.Transaction(func(trx *gorm.DB) error {
@@ -67,7 +69,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 
 			if !slices.Contains(req.UserId, int(member_id)) && member_id != manager_id {
 				user_log.Description = fmt.Sprintf("User %s has remove you from workspace %s", manager.Username, workspace.Name)
-				manager_log.Description = fmt.Sprintf("You remove %s from workspace %s", user.Username, workspace.Name)
+				manager_log.Description = fmt.Sprintf("User %s remove %s from workspace %s", manager.Username, user.Username, workspace.Name)
 
 				logs := []models.HistoryLog{user_log, manager_log}
 
@@ -137,7 +139,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 
 			if user.Id != uint(manager_id) && !slices.Contains(existing_members, int(user.Id)) {
 				user_log.Description = fmt.Sprintf("User %s has added you to workspace %s", manager.Username, workspace.Name)
-				manager_log.Description = fmt.Sprintf("You added %s to workspace %s", user.Username, workspace.Name)
+				manager_log.Description = fmt.Sprintf("User %s added %s to workspace %s", manager.Username, user.Username, workspace.Name)
 
 				logs := []models.HistoryLog{user_log, manager_log}
 

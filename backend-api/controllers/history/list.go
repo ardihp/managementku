@@ -26,37 +26,52 @@ func ListHistoryLog(c *gin.Context) {
 		return
 	}
 
-	user_history_logs := []models.UserHistoryLog{}
-
-	if err := database.DB.Where("user_id = ?", user_id).Order("created_at DESC").Find(&user_history_logs).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to retreive history logs",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
-		return
-	}
-
 	list_histor_logs := []structs.HistoryLogResponse{}
 
-	for _, log := range user_history_logs {
-		history_log := models.HistoryLog{}
+	user_history_logs := []models.UserHistoryLog{}
 
-		if req.Type == "workspace" {
-			database.DB.Preload(clause.Associations).Where("type = ?", req.Type).First(&history_log, log.HistoryId)
-		} else {
-			database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
+	if user.Role == "manager" {
+		history_logs := []models.HistoryLog{}
+
+		database.DB.Order("created_at DESC").Preload(clause.Associations).Find(&history_logs, "user_role = ?", "manager")
+
+		for _, history_log := range history_logs {
+			list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
+				ID:          int(history_log.ID),
+				User:        history_log.User.Username,
+				Type:        history_log.Type,
+				Action:      history_log.Action,
+				Description: history_log.Description,
+				CreatedAt:   history_log.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:   history_log.UpdatedAt.Format("2006-01-02 15:04:05"),
+			})
 		}
 
-		list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
-			ID:          int(history_log.ID),
-			User:        history_log.User.Username,
-			Type:        history_log.Type,
-			Action:      history_log.Action,
-			Description: history_log.Description,
-			CreatedAt:   history_log.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:   history_log.UpdatedAt.Format("2006-01-02 15:04:05"),
-		})
+	} else {
+		if err := database.DB.Where("user_id = ?", user_id).Order("created_at DESC").Find(&user_history_logs).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to retreive history logs",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return
+		}
+
+		for _, log := range user_history_logs {
+			history_log := models.HistoryLog{}
+
+			database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
+
+			list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
+				ID:          int(history_log.ID),
+				User:        history_log.User.Username,
+				Type:        history_log.Type,
+				Action:      history_log.Action,
+				Description: history_log.Description,
+				CreatedAt:   history_log.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:   history_log.UpdatedAt.Format("2006-01-02 15:04:05"),
+			})
+		}
 	}
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
