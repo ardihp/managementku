@@ -34,9 +34,34 @@ export const endpoint = {
 
     card: {
       list: (id: number) => `/workspace/${id}/card`,
+      list_archived: (id: number) => `/workspace/${id}/card/archived`,
       create: (id: number) => `/workspace/${id}/card/create`,
+      update: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/update/${card_id}`,
+      archive: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/archive/${card_id}`,
+      unarchive: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/unarchive/${card_id}`,
+      delete: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/delete/${card_id}`,
       status_order: (id: number) => `/workspace/${id}/card/status-order`,
       update_order: (id: number) => `/workspace/${id}/card/update-order`,
+
+      status: {
+        list: (workspace_id: number) => `/workspace/${workspace_id}/status`,
+        list_archived: (workspace_id: number) =>
+          `/workspace/${workspace_id}/status/archived`,
+        create: (workspace_id: number) =>
+          `/workspace/${workspace_id}/status/create`,
+        update: (workspace_id: number, status_id: number) =>
+          `/workspace/${workspace_id}/status/update/${status_id}`,
+        archive: (workspace_id: number, status_id: number) =>
+          `/workspace/${workspace_id}/status/archive/${status_id}`,
+        unarchive: (workspace_id: number, status_id: number) =>
+          `/workspace/${workspace_id}/status/unarchive/${status_id}`,
+        delete: (workspace_id: number, status_id: number) =>
+          `/workspace/${workspace_id}/status/delete/${status_id}`,
+      },
     },
   },
   user: {
