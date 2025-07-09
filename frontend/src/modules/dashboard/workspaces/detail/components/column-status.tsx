@@ -64,7 +64,7 @@ export default function ColumnStatus({
               ) => {
                 return (
                   <div className="h-full" ref={innerRef} {...droppableProps}>
-                    <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(100vh_-_308px)]">
+                    <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(100vh_-_312px)]">
                       {status.cards.map((card: WorkspaceCard, cardKey) => (
                         <TaskCard
                           key={card.id}

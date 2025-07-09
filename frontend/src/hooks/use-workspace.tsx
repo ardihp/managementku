@@ -46,6 +46,7 @@ export const useWorkspace = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
         toast.success("Workspace created successfully");
       },
     });
@@ -66,6 +67,7 @@ export const useWorkspace = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
         toast.success("Workspace updated successfully");
       },
     });
