@@ -219,7 +219,7 @@ export default function WorkspacesView() {
       )}
 
       <div className="flex flex-col h-full">
-        <section className="flex items-center justify-between border-b border-zinc-200 p-8">
+        <section className="flex items-center justify-between border-b border-zinc-200 p-[28px]">
           <div className="h-9 flex flex-col">
             <p className="text-2xl text-foreground/40 font-light my-auto">
               Workspace{" "}
@@ -254,7 +254,7 @@ export default function WorkspacesView() {
         </section>
 
         {loadingWorkspace ? (
-          <section className="flex p-8 gap-6">
+          <section className="flex p-[28px] gap-6">
             {[...Array(3)].map((item, key) => (
               <div key={key} className="flex flex-col gap-4">
                 <Skeleton className="w-full min-w-[300px] max-w-[300px] h-[45px] rounded-xl" />
@@ -281,7 +281,7 @@ export default function WorkspacesView() {
               ) => {
                 return (
                   <div
-                    className="flex p-8 overflow-auto relative h-full"
+                    className="flex p-[28px] overflow-auto relative h-full"
                     ref={innerRef}
                     {...droppableProps}
                   >

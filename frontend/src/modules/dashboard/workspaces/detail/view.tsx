@@ -184,7 +184,7 @@ export default function DetailWorkspaceView() {
 
   return (
     <div className="flex flex-col h-full">
-      <section className="flex items-center justify-between border-b border-zinc-200 p-8">
+      <section className="flex items-center justify-between border-b border-zinc-200 p-[28px]">
         <div className="h-9 flex items-center gap-1.5">
           <Link href={paths.dashboard.workspace}>
             <p className="text-2xl text-foreground/40 font-light my-auto">
@@ -205,7 +205,7 @@ export default function DetailWorkspaceView() {
 
       <section className="flex flex-col h-full gap-6">
         {loadingWorkspace || loadingWorkspaceCard ? (
-          <section className="flex p-8 gap-6">
+          <section className="flex p-[28px] gap-6">
             {[...Array(3)].map((item, key) => (
               <div key={key} className="flex flex-col gap-4">
                 <Skeleton className="w-full min-w-[300px] max-w-[300px] h-[45px] rounded-xl" />
@@ -229,7 +229,7 @@ export default function DetailWorkspaceView() {
               {({ droppableProps, innerRef, placeholder }) => {
                 return (
                   <div
-                    className="flex overflow-auto p-8 h-full -ml-3"
+                    className="flex overflow-auto p-[28px] h-full -ml-3"
                     {...droppableProps}
                     ref={innerRef}
                   >

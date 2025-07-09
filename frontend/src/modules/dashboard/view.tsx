@@ -32,7 +32,7 @@ export default function DashboardView() {
 
   return (
     <div className="flex flex-col h-full">
-      <section className="flex items-center justify-between border-b border-zinc-200 p-8">
+      <section className="flex items-center justify-between border-b border-zinc-200 p-[28px]">
         <div
           className="h-9 flex flex-col"
           onClick={() =>
@@ -45,7 +45,7 @@ export default function DashboardView() {
         </div>
       </section>
 
-      <div className="grid grid-cols-[2fr_minmax(200px,350px)] gap-6 h-full p-8">
+      <div className="grid grid-cols-[2fr_minmax(200px,350px)] gap-6 h-full p-[28px]">
         <div className="flex flex-col gap-6">
           {loadingWorkspace ? (
             <div className="grid grid-cols-3 gap-6">
