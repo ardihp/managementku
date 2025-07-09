@@ -13,6 +13,7 @@ export interface WorkspaceCard {
   description: string;
   status: WorkspaceStatus;
   members: WorkspaceCardMember[];
+  is_archived: boolean;
 }
 
 export interface WorkspaceCardByStatus extends WorkspaceStatus {

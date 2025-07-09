@@ -25,6 +25,7 @@ export interface WorkspaceByStatus extends WorkspaceStatus {
 
 export interface WorkspaceStatus {
   id: number;
+  order: number;
   name: string;
   color: colorsType;
   is_archived: boolean;
