@@ -7,6 +7,7 @@ import (
 	userControllers "kanban-board/backend-api/controllers/user"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
 	workspaceCardControllers "kanban-board/backend-api/controllers/workspace/card"
+	workspaceCardStatusControllers "kanban-board/backend-api/controllers/workspace/card/status"
 	workspaceStatusControllers "kanban-board/backend-api/controllers/workspace/status"
 	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
 
@@ -66,9 +67,19 @@ func SetupRouter() *gin.Engine {
 
 	// Workspace Card
 	router.GET("/api/workspace/:id/card", middlewares.AuthMiddleware(), workspaceCardControllers.ListWorkspaceCard)
+	router.GET("/api/workspace/:id/card/archived", middlewares.AuthMiddleware(), workspaceCardControllers.ListArchivedWorkspaceCard)
 	router.POST("/api/workspace/:id/card/create", middlewares.AuthMiddleware(), workspaceCardControllers.CreateWorkspaceCard)
 	router.POST("/api/workspace/:id/card/status-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardStatusOrder)
 	router.POST("/api/workspace/:id/card/update-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardOrder)
+
+	// Workspace Card Status
+	router.GET("/api/workspace/:id/status", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ListWorkspaceCardStatus)
+	router.GET("/api/workspace/:id/status/archived", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ListArchivedWorkspaceCardStatus)
+	router.POST("/api/workspace/:id/status/create", middlewares.AuthMiddleware(), workspaceCardStatusControllers.CreateWorkspaceCardStatus)
+	router.PUT("/api/workspace/:id/status/update/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.UpdateWorkspaceCardStatus)
+	router.PUT("/api/workspace/:id/status/archive/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ArchieveWorkspaceCardStatus)
+	router.PUT("/api/workspace/:id/status/unarchive/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.UnArchieveWorkspaceCardStatus)
+	router.DELETE("/api/workspace/:id/status/delete/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.DeleteWorkspaceCardStatus)
 
 	// History Logs
 	router.GET("/api/history-logs", middlewares.AuthMiddleware(), historyControllers.ListHistoryLog)

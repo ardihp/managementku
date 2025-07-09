@@ -132,8 +132,18 @@ type WorkspaceCreateStatusRequest struct {
 	Color string `json:"color" binding:"required"`
 }
 
+type WorkspaceCreateCardStatusRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Color string `json:"color" binding:"required"`
+}
+
 type WorkspaceUpdateStatusRequest struct {
 	Id    int    `json:"id" binding:"required"`
+	Name  string `json:"name" binding:"required"`
+	Color string `json:"color" binding:"required"`
+}
+
+type WorkspaceUpdateCardStatusRequest struct {
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
 }
