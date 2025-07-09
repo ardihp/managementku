@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
@@ -8,11 +9,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func ArchieveWorkspace(c *gin.Context) {
 	var workspace = models.Workspace{}
 	var id = c.Param("id")
+
+	user_id := c.GetInt("user_id")
+	user := models.User{}
+	database.DB.First(&user, user_id)
 
 	if err := database.DB.First(&workspace, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, structs.ErrorResponse{
@@ -34,14 +40,54 @@ func ArchieveWorkspace(c *gin.Context) {
 
 	workspace.IsArchived = true
 
-	if err := database.DB.Save(&workspace).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to archive workspace",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
-		return
-	}
+	database.DB.Transaction(func(trx *gorm.DB) error {
+		if err := trx.Save(&workspace).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to archive workspace",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
+		history_log := models.HistoryLog{
+			UserId:      user.Id,
+			Type:        "general",
+			UserRole:    "manager",
+			Action:      "archive-workspace",
+			Description: fmt.Sprintf("User %s has archived workspace %s", user.Username, workspace.Name),
+		}
+
+		if err := trx.Create(&history_log).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to archive workspace",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
+		workspace_members := []models.WorkspaceMember{}
+		trx.Where("workspace_id = ?", workspace.Id).Find(&workspace_members)
+
+		for _, member := range workspace_members {
+			user_history := models.UserHistoryLog{
+				HistoryId: history_log.ID,
+				UserId:    member.UserId,
+			}
+
+			if err := trx.Create(&user_history).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+					Success: false,
+					Message: "Failed to archive workspace",
+					Errors:  helpers.TranslateErrorMessage(err),
+				})
+				return err
+			}
+		}
+
+		return nil
+	})
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
@@ -53,6 +99,10 @@ func ArchieveWorkspace(c *gin.Context) {
 func UnArchieveWorkspace(c *gin.Context) {
 	var workspace = models.Workspace{}
 	var id = c.Param("id")
+
+	user_id := c.GetInt("user_id")
+	user := models.User{}
+	database.DB.First(&user, user_id)
 
 	if err := database.DB.First(&workspace, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, structs.ErrorResponse{
@@ -74,14 +124,54 @@ func UnArchieveWorkspace(c *gin.Context) {
 
 	workspace.IsArchived = false
 
-	if err := database.DB.Save(&workspace).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to unarchive workspace",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
-		return
-	}
+	database.DB.Transaction(func(trx *gorm.DB) error {
+		if err := trx.Save(&workspace).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to unarchive workspace",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
+		history_log := models.HistoryLog{
+			UserId:      user.Id,
+			Type:        "general",
+			UserRole:    "manager",
+			Action:      "unarchive-workspace",
+			Description: fmt.Sprintf("User %s has unarchived workspace %s", user.Username, workspace.Name),
+		}
+
+		if err := trx.Create(&history_log).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to unarchive workspace",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
+		workspace_members := []models.WorkspaceMember{}
+		trx.Where("workspace_id = ?", workspace.Id).Find(&workspace_members)
+
+		for _, member := range workspace_members {
+			user_history := models.UserHistoryLog{
+				HistoryId: history_log.ID,
+				UserId:    member.UserId,
+			}
+
+			if err := trx.Create(&user_history).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+					Success: false,
+					Message: "Failed to unarchive workspace",
+					Errors:  helpers.TranslateErrorMessage(err),
+				})
+				return err
+			}
+		}
+
+		return nil
+	})
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
