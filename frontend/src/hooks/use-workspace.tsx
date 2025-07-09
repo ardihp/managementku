@@ -111,6 +111,7 @@ export const useWorkspace = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace/archived/list"],
         });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
         toast.success("Workspace archived successfully");
       },
     });
@@ -128,6 +129,7 @@ export const useWorkspace = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace/archived/list"],
         });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
         toast.success("Workspace activated successfully");
       },
     });
@@ -145,6 +147,7 @@ export const useWorkspace = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace/archived/list"],
         });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
         toast.success("Workspace deleted successfully");
       },
     });

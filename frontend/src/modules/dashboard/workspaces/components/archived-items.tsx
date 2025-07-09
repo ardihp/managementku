@@ -47,7 +47,7 @@ export default function ArchivedItems({
             </TabsList>
             <TabsContent
               value="workspace"
-              className="flex flex-col gap-3 max-h-[315px]"
+              className="flex flex-col gap-3 max-h-[315px] overflow-auto"
             >
               {archivedWorkspaces?.length >= 1 ? (
                 archivedWorkspaces.map((workspace: Workspace, key: number) => (
