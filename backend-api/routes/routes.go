@@ -69,6 +69,10 @@ func SetupRouter() *gin.Engine {
 	router.GET("/api/workspace/:id/card", middlewares.AuthMiddleware(), workspaceCardControllers.ListWorkspaceCard)
 	router.GET("/api/workspace/:id/card/archived", middlewares.AuthMiddleware(), workspaceCardControllers.ListArchivedWorkspaceCard)
 	router.POST("/api/workspace/:id/card/create", middlewares.AuthMiddleware(), workspaceCardControllers.CreateWorkspaceCard)
+	router.PUT("/api/workspace/:id/card/update/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCard)
+	router.PUT("/api/workspace/:id/card/archive/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.ArchieveWorkspaceCard)
+	router.PUT("/api/workspace/:id/card/unarchive/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.UnarchieveWorkspaceCard)
+	router.DELETE("/api/workspace/:id/card/delete/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.DeleteWorkspaceCard)
 	router.POST("/api/workspace/:id/card/status-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardStatusOrder)
 	router.POST("/api/workspace/:id/card/update-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardOrder)
 

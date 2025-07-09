@@ -46,10 +46,12 @@ type WorkspaceTypeResponse struct {
 }
 
 type WorkspaceCardResponse struct {
-	Id          uint     `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Members     []Member `json:"members"`
+	Id          uint                `json:"id"`
+	Title       string              `json:"title"`
+	Description string              `json:"description"`
+	Status      WorkspaceCardStatus `json:"status,omitempty"`
+	Members     []Member            `json:"members"`
+	IsArchived  bool                `json:"is_archived"`
 }
 
 type WorkspaceResponse struct {
@@ -122,6 +124,12 @@ type WorkspaceCardByStatusResponse struct {
 }
 
 type WorkspaceCreateCardRequest struct {
+	StatusId    int    `json:"status_id" binding:"required"`
+	Title       string `json:"title" binding:"required"`
+	Description string `json:"description"`
+}
+
+type WorkspaceUpdateCardRequest struct {
 	StatusId    int    `json:"status_id" binding:"required"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description"`
