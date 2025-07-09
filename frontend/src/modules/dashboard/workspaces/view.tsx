@@ -201,13 +201,17 @@ export default function WorkspacesView() {
 
   return (
     <>
-      <FormWorkspaceStatus
-        open={openDialog.status}
-        onOpenChange={() =>
-          setOpenDialog((prevVal) => ({ ...prevVal, status: false }))
-        }
-        status={selectedStatus}
-      />
+      {openDialog.status && (
+        <FormWorkspaceStatus
+          open={openDialog.status}
+          onOpenChange={() => {
+            setOpenDialog((prevVal) => ({ ...prevVal, status: false }));
+            setSelectedStatus(null);
+          }}
+          status={selectedStatus}
+          type="workspace"
+        />
+      )}
 
       {openDialog.archived && (
         <ArchivedItems
@@ -215,6 +219,7 @@ export default function WorkspacesView() {
           onOpenChange={() =>
             setOpenDialog((prevVal) => ({ ...prevVal, archived: false }))
           }
+          type="workspace"
         />
       )}
 

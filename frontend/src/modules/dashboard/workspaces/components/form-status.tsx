@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { colors } from "@/const";
+import { useWorkspaceCardStatus } from "@/hooks/use-workspace-card-status";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import { cn } from "@/lib/utils";
 import { WorkspaceStatus } from "@/types/workspace";
@@ -26,6 +27,8 @@ interface FormWorkspaceStatusProps {
   open: boolean;
   onOpenChange: () => void;
   status?: WorkspaceStatus | null;
+  type: "workspace" | "workspace-detail";
+  workspaceId?: number;
 }
 
 interface FormInputWorkspaceType {
@@ -42,6 +45,8 @@ export default function FormWorkspaceStatus({
   open,
   onOpenChange,
   status,
+  type,
+  workspaceId = 0,
 }: FormWorkspaceStatusProps) {
   const isEdit = !!status;
   const defaultValues = {
@@ -62,24 +67,47 @@ export default function FormWorkspaceStatus({
     defaultValues,
   });
 
+  // type workspace
   const { createWorkspaceStatus, updateWorkspaceStatus } = useWorkspaceStatus();
 
-  const { mutateAsync: create, isPending: loadingCreate } =
+  const { mutateAsync: createStatus, isPending: loadingCreateStatus } =
     createWorkspaceStatus();
-  const { mutateAsync: update, isPending: loadingUpdate } = updateWorkspaceStatus()
+  const { mutateAsync: updateStatus, isPending: loadingUpdateStatus } =
+    updateWorkspaceStatus();
+
+  // type workspace-detail
+  const { createWorkspaceCardStatus, updateWorkspaceCardStatus } =
+    useWorkspaceCardStatus();
+
+  const { mutateAsync: createCardStatus, isPending: loadingCreateCardStatus } =
+    createWorkspaceCardStatus(workspaceId);
+  const { mutateAsync: updateCardStatus, isPending: loadingUpdateCardStatus } =
+    updateWorkspaceCardStatus(workspaceId);
 
   useEffect(() => {
     reset(defaultValues);
   }, [open]);
 
-  const isPending = loadingCreate || loadingUpdate;
+  const isPending =
+    loadingCreateStatus ||
+    loadingUpdateStatus ||
+    loadingCreateCardStatus ||
+    loadingUpdateCardStatus;
 
   const onSubmit = async (data: FormInputWorkspaceType) => {
     try {
       if (isEdit) {
-        await update({ ...data, id: status?.id })
+        if (type === "workspace") {
+          await updateStatus({ ...data, id: status?.id });
+        } else {
+          await updateCardStatus({ data: data, status_id: status?.id });
+        }
       } else {
-        await create(data);
+        if (type === "workspace") {
+          await createStatus(data);
+        } else {
+          await createCardStatus(data);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -149,7 +177,7 @@ export default function FormWorkspaceStatus({
                 ))}
               </SelectContent>
             </Select>
-            <small className="text-red-500">{errors.name?.message}</small>
+            <small className="text-red-500">{errors.color?.message}</small>
           </div>
 
           <button

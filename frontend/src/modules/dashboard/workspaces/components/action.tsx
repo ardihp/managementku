@@ -23,7 +23,7 @@ interface WorkspaceActionProps {
 }
 
 export default function WorkspaceAction({
-  setSelectedWorkspace = () => { },
+  setSelectedWorkspace = () => {},
   workspace,
   isArchived = false,
 }: WorkspaceActionProps) {
@@ -69,7 +69,7 @@ export default function WorkspaceAction({
       )}
 
       <Popover onOpenChange={setOpenPopover} open={openPopover}>
-        <PopoverTrigger className="absolute top-4 right-4 z-[10] size-8 flex items-center justify-center cursor-pointer">
+        <PopoverTrigger className="absolute top-4 right-2 z-[10] size-8 flex items-center justify-center cursor-pointer">
           <Ellipsis className="size-4 text-zinc-500" />
         </PopoverTrigger>
         <PopoverContent className="w-fit flex flex-col p-1">

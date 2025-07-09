@@ -13,14 +13,12 @@ interface WorkspaceCardProps {
   setSelectedWorkspace?: (workspace: Workspace) => void;
   customClassName?: string;
   workspace: Workspace;
-  index?: number;
   isDragging?: boolean;
   ref?: (element?: HTMLElement | null) => void;
 }
 
 const WorkspaceCard = ({
   workspace,
-  index = 0,
   setSelectedWorkspace,
   customClassName,
   isArchived = false,

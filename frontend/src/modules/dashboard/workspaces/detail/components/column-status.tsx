@@ -6,13 +6,16 @@ import React from "react";
 import FormWorkspaceCard from "./form";
 import { GripVertical, Plus } from "lucide-react";
 import TaskCard from "./card";
+import ActionStatus from "../../components/action-status";
+import { WorkspaceStatus } from "@/types/workspace";
 
 interface ColumnStatusProps {
   status: WorkspaceCardByStatus;
   index: number;
   isAdmin: boolean;
   workspaceId: number;
-  setSelectedItem: (item: null) => void;
+  setSelectedCard: (item: WorkspaceCard | null) => void;
+  setSelectedStatus: (item: WorkspaceStatus | null) => void;
 }
 
 export default function ColumnStatus({
@@ -20,7 +23,8 @@ export default function ColumnStatus({
   index,
   isAdmin,
   workspaceId,
-  setSelectedItem,
+  setSelectedCard,
+  setSelectedStatus,
 }: ColumnStatusProps) {
   return (
     <Draggable
@@ -29,26 +33,37 @@ export default function ColumnStatus({
         cards: undefined,
       })}
       index={index}
+      isDragDisabled={!isAdmin}
     >
       {({ dragHandleProps, draggableProps, innerRef }) => {
         return (
           <div
             ref={innerRef}
-            className="flex flex-col gap-4 w-full min-w-[300px] max-w-[300px] mx-3"
+            className="flex flex-col w-full min-w-[300px] max-w-[300px] mx-3"
             {...draggableProps}
           >
             <div
-              className="flex items-center justify-between gap-2 rounded-xl bg-white border opacity-100 py-2 px-4 relative cursor-grab"
+              className="flex items-center justify-between gap-2 mb-2 rounded-xl bg-white border opacity-100 p-2 relative cursor-grab"
               {...dragHandleProps}
             >
-              <GripVertical className="absolute left-2 size-5 text-zinc-400" />
+              <div className="flex items-center gap-5">
+                <ColorfulBadge
+                  content={status.cards.length.toString()}
+                  color={status.color}
+                />
 
-              <p className="ml-5 font-medium">{status.name}</p>
+                <p className="font-medium">{status.name}</p>
+              </div>
 
-              <ColorfulBadge
-                content={status.cards.length.toString()}
-                color={status.color}
-              />
+              {isAdmin && (
+                <ActionStatus
+                  onClickUpdate={() => setSelectedStatus(status)}
+                  status={status}
+                  isArchived={status.is_archived}
+                  type="workspace-detail"
+                  workspaceId={workspaceId}
+                />
+              )}
             </div>
 
             <Droppable
@@ -66,12 +81,30 @@ export default function ColumnStatus({
                   <div className="h-full" ref={innerRef} {...droppableProps}>
                     <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[calc(100vh_-_312px)]">
                       {status.cards.map((card: WorkspaceCard, cardKey) => (
-                        <TaskCard
+                        <Draggable
                           key={card.id}
+                          draggableId={card.id.toString()}
                           index={cardKey}
-                          card={card}
-                          customClassName="my-2"
-                        />
+                        >
+                          {(
+                            { dragHandleProps, draggableProps, innerRef },
+                            { isDragging }
+                          ) => {
+                            return (
+                              <TaskCard
+                                card={card}
+                                workspaceId={workspaceId}
+                                customClassName="my-2"
+                                isArchived={card.is_archived}
+                                isDragging={isDragging}
+                                setSelectedCard={setSelectedCard}
+                                ref={innerRef}
+                                {...dragHandleProps}
+                                {...draggableProps}
+                              />
+                            );
+                          }}
+                        </Draggable>
                       ))}
 
                       <div className={cn(isDraggingOver ? "flex" : "hidden")}>
@@ -79,17 +112,15 @@ export default function ColumnStatus({
                       </div>
                     </div>
 
-                    {isAdmin && (
-                      <FormWorkspaceCard
-                        resetSelectedItem={() => setSelectedItem(null)}
-                        defaultStatus={status.id.toString()}
-                        workspaceId={workspaceId}
-                        buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors w-full mt-2"
-                      >
-                        <Plus className="size-4" />
-                        <p className="text-sm">Add New</p>
-                      </FormWorkspaceCard>
-                    )}
+                    <FormWorkspaceCard
+                      resetSelectedItem={() => setSelectedCard(null)}
+                      defaultStatus={status.id.toString()}
+                      workspaceId={workspaceId}
+                      buttonClassName="flex items-center gap-2 rounded-lg bg-white border opacity-100 py-2 px-4 cursor-pointer hover:bg-zinc-50 transition-colors w-full mt-2"
+                    >
+                      <Plus className="size-4" />
+                      <p className="text-sm">Add New</p>
+                    </FormWorkspaceCard>
                   </div>
                 );
               }}

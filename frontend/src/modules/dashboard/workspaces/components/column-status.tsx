@@ -34,6 +34,7 @@ export default function ColumnStatus({
         workspaces: undefined,
       })}
       index={index}
+      isDragDisabled={!isAdmin}
     >
       {({ dragHandleProps, draggableProps, innerRef }) => {
         return (
@@ -43,7 +44,7 @@ export default function ColumnStatus({
             {...draggableProps}
           >
             <div
-              className="flex items-center justify-between gap-2 rounded-xl bg-white border opacity-100 py-2 px-2 mb-2 relative cursor-grab"
+              className="flex items-center justify-between gap-2 rounded-xl bg-white border opacity-100 py-2 px-2 mb-2 relative"
               {...dragHandleProps}
             >
               <div className="flex items-center gap-5">
@@ -55,11 +56,14 @@ export default function ColumnStatus({
                 <p className="font-medium">{status.name}</p>
               </div>
 
-              <ActionStatus
-                onClickUpdate={() => setSelectedStatus(status)}
-                status={status}
-                isArchived={status.is_archived}
-              />
+              {isAdmin && (
+                <ActionStatus
+                  onClickUpdate={() => setSelectedStatus(status)}
+                  status={status}
+                  isArchived={status.is_archived}
+                  type="workspace"
+                />
+              )}
             </div>
 
             <Droppable
@@ -82,6 +86,7 @@ export default function ColumnStatus({
                             key={workspace.id}
                             draggableId={workspace.id.toString()}
                             index={cardKey}
+                            isDragDisabled={!isAdmin}
                           >
                             {(
                               { dragHandleProps, draggableProps, innerRef },

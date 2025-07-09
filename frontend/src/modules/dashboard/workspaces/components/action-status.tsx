@@ -4,6 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useWorkspaceCardStatus } from "@/hooks/use-workspace-card-status";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import { WorkspaceStatus } from "@/types/workspace";
 import {
@@ -19,29 +20,51 @@ interface ActionStatusProps {
   onClickUpdate?: () => void;
   status: WorkspaceStatus;
   isArchived: boolean;
+  type: "workspace" | "workspace-detail";
+  workspaceId?: number;
 }
 
 export default function ActionStatus({
   onClickUpdate = () => {},
   status,
   isArchived = false,
+  type,
+  workspaceId = 0,
 }: ActionStatusProps) {
   const [openPopover, setOpenPopover] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
 
+  // type workspace
   const {
     archiveWorkspaceStatus,
     unarchiveWorkspaceStatus,
     deleteWorkspaceStatus,
   } = useWorkspaceStatus();
-  const { mutateAsync: archive } = archiveWorkspaceStatus();
-  const { mutateAsync: unarchive } = unarchiveWorkspaceStatus();
-  const { mutateAsync: deleteStatus, isPending: loadingDelete } =
-    deleteWorkspaceStatus();
+
+  const { mutateAsync: archiveStatus } = archiveWorkspaceStatus();
+  const { mutateAsync: unarchiveStatus } = unarchiveWorkspaceStatus();
+  const { mutateAsync: deleteStatus } = deleteWorkspaceStatus();
+
+  // type workspace-detail
+  const {
+    archiveWorkspaceCardStatus,
+    unarchiveWorkspaceCardStatus,
+    deleteWorkspaceCardStatus,
+  } = useWorkspaceCardStatus();
+
+  const { mutateAsync: archiveCardStatus } =
+    archiveWorkspaceCardStatus(workspaceId);
+  const { mutateAsync: unarchiveCardStatus } =
+    unarchiveWorkspaceCardStatus(workspaceId);
+  const { mutateAsync: deleteCardStatus } =
+    deleteWorkspaceCardStatus(workspaceId);
 
   const handleArchive = async () => {
     try {
-      await archive(status.id);
+      if (type === "workspace") {
+        await archiveStatus(status.id);
+      } else {
+        await archiveCardStatus(status.id);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -51,7 +74,11 @@ export default function ActionStatus({
 
   const handleUnarchive = async () => {
     try {
-      await unarchive(status.id);
+      if (type === "workspace") {
+        await unarchiveStatus(status.id);
+      } else {
+        await unarchiveCardStatus(status.id);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -61,7 +88,11 @@ export default function ActionStatus({
 
   const handleDelete = async () => {
     try {
-      await deleteStatus(status.id);
+      if (type === "workspace") {
+        await deleteStatus(status.id);
+      } else {
+        await deleteCardStatus(status.id);
+      }
     } catch (error) {
       console.error(error);
     }

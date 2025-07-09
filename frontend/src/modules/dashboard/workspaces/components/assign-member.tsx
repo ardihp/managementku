@@ -89,29 +89,33 @@ export default function AssignMember({
                 ? [...new Array(4)].map((item, key) => (
                     <Skeleton key={key} className="w-full h-[51px]" />
                   ))
-                : employees.map((employee: Member, key: number) => (
-                    <div
-                      key={key}
-                      className="flex items-center gap-4 border rounded-lg p-2 cursor-pointer hover:bg-zinc-50/50"
-                      onClick={() => handleAssignedMember(employee.id)}
-                    >
-                      <Avatar className="size-10">
-                        <AvatarFallback className="uppercase">
-                          {employee.username[0]}
-                        </AvatarFallback>
-                      </Avatar>
+                : employees
+                    .filter((employee: Member) =>
+                      employee.name.toLowerCase().includes(search.toLowerCase())
+                    )
+                    .map((employee: Member, key: number) => (
+                      <div
+                        key={key}
+                        className="flex items-center gap-4 border rounded-lg p-2 cursor-pointer hover:bg-zinc-50/50"
+                        onClick={() => handleAssignedMember(employee.id)}
+                      >
+                        <Avatar className="size-10">
+                          <AvatarFallback className="uppercase">
+                            {employee.username[0]}
+                          </AvatarFallback>
+                        </Avatar>
 
-                      <p className="font-quicksand capitalize">
-                        {employee.username}
-                      </p>
+                        <p className="font-quicksand capitalize">
+                          {employee.username}
+                        </p>
 
-                      {assignedMember.includes(employee.id) && (
-                        <div className="ml-auto mr-2">
-                          <Check className="size-5" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        {assignedMember.includes(employee.id) && (
+                          <div className="ml-auto mr-2">
+                            <Check className="size-5" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
             </div>
           </div>
         </div>

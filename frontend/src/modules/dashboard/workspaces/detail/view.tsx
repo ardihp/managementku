@@ -14,10 +14,13 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth/use-auth";
 import FormWorkspaceCard from "./components/form";
-import { Plus } from "lucide-react";
+import { Archive, Plus } from "lucide-react";
 import ColumnStatus from "./components/column-status";
 import { WorkspaceStatus } from "@/types/workspace";
 import { CardOrderItem } from "@/types/hooks/workspace-card";
+import FormWorkspaceStatus from "../components/form-status";
+import { Button } from "@/components/ui/button";
+import ArchivedItems from "../components/archived-items";
 
 export default function DetailWorkspaceView() {
   const params = useParams();
@@ -28,10 +31,18 @@ export default function DetailWorkspaceView() {
     updateWorkspaceCardStatusOrder,
     updateWorkspaceCardOrder,
   } = useWorkspaceCard();
-  const [selectedItem, setSelectedItem] = useState<WorkspaceCard | null>(null);
+  const [selectedCard, setSelectedCard] = useState<WorkspaceCard | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<WorkspaceStatus | null>(
+    null
+  );
   const [listWorkspaceCardByStatus, setListWorkspaceCardByStatus] = useState<
     WorkspaceCardByStatus[]
   >([]);
+  const [openDialog, setOpenDialog] = useState({
+    card: false,
+    status: false,
+    archived: false,
+  });
 
   const { data: detailWorkspace, isLoading: loadingWorkspace } =
     getDetailWorkspace(Number(params?.id || 0));
@@ -40,8 +51,12 @@ export default function DetailWorkspaceView() {
     isLoading: loadingWorkspaceCard,
     isFetching: fetchWorkspaceCard,
   } = getListWorkspaceCard(Number(params?.id || 0));
-  const { mutate: updateStatusOrder } = updateWorkspaceCardStatusOrder();
-  const { mutate: updateCardOrder } = updateWorkspaceCardOrder();
+  const { mutate: updateStatusOrder } = updateWorkspaceCardStatusOrder(
+    Number(params?.id || 0)
+  );
+  const { mutate: updateCardOrder } = updateWorkspaceCardOrder(
+    Number(params?.id || 0)
+  );
 
   const isAdmin =
     detailWorkspace?.members.find((member) => member.id === user?.id)?.role ===
@@ -82,7 +97,6 @@ export default function DetailWorkspaceView() {
       ) {
         updateStatusOrder(
           {
-            id: Number(params?.id || 0),
             data: { order_status: sourceWorkspace.map((item) => item.id) },
           },
           {
@@ -170,7 +184,6 @@ export default function DetailWorkspaceView() {
       ) {
         updateCardOrder(
           {
-            id: Number(params?.id || 0),
             data: { order_status: statusWorkspace },
           },
           {
@@ -183,77 +196,148 @@ export default function DetailWorkspaceView() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <section className="flex items-center justify-between border-b border-zinc-200 p-[28px]">
-        <div className="h-9 flex items-center gap-1.5">
-          <Link href={paths.dashboard.workspace}>
-            <p className="text-2xl text-foreground/40 font-light my-auto">
-              Workspace{" "}
-            </p>
-          </Link>
+    <>
+      {openDialog.status && (
+        <FormWorkspaceStatus
+          open={openDialog.status}
+          onOpenChange={() => {
+            setOpenDialog((prevVal) => ({ ...prevVal, status: false }));
+            setSelectedStatus(null);
+          }}
+          status={selectedStatus}
+          type="workspace-detail"
+          workspaceId={Number(params?.id || 0)}
+        />
+      )}
 
-          <div className="text-2xl text-foreground my-auto flex items-center gap-1">
-            /{" "}
-            {loadingWorkspace ? (
-              <Skeleton className="w-60 h-7" />
-            ) : (
-              <span>{detailWorkspace?.name}</span>
-            )}
+      {openDialog.archived && (
+        <ArchivedItems
+          open={openDialog.archived}
+          onOpenChange={() =>
+            setOpenDialog((prevVal) => ({ ...prevVal, archived: false }))
+          }
+          type="workspace-detail"
+          workspaceId={Number(params?.id || 0)}
+        />
+      )}
+
+      <FormWorkspaceCard
+        workspaceId={Number(params?.id || 0)}
+        selectedItem={selectedCard}
+        resetSelectedItem={() => setSelectedCard(null)}
+      >
+        <></>
+      </FormWorkspaceCard>
+
+      <div className="flex flex-col h-full">
+        <section className="flex items-center justify-between border-b border-zinc-200 p-[28px]">
+          <div className="h-9 flex items-center gap-1.5">
+            <Link href={paths.dashboard.workspace}>
+              <p className="text-2xl text-foreground/40 font-light my-auto">
+                Workspace{" "}
+              </p>
+            </Link>
+
+            <div className="text-2xl text-foreground my-auto flex items-center gap-1">
+              /{" "}
+              {loadingWorkspace ? (
+                <Skeleton className="w-60 h-7" />
+              ) : (
+                <span>{detailWorkspace?.name}</span>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
 
-      <section className="flex flex-col h-full gap-6">
-        {loadingWorkspace || loadingWorkspaceCard ? (
-          <section className="flex p-[28px] gap-6">
-            {[...Array(3)].map((item, key) => (
-              <div key={key} className="flex flex-col gap-4">
-                <Skeleton className="w-full min-w-[300px] max-w-[300px] h-[45px] rounded-xl" />
+          <Button
+            className="cursor-pointer"
+            onClick={() =>
+              setOpenDialog((prevVal) => ({ ...prevVal, archived: true }))
+            }
+          >
+            <Archive className="size-4" />
+            <p className="leading-none">Archived Items</p>
+          </Button>
+        </section>
 
-                {[...Array(key + 1)].map((item, key2) => (
-                  <Skeleton
-                    key={key2}
-                    className="w-full min-w-[300px] max-w-[300px] h-[177px] rounded-xl"
-                  />
-                ))}
-              </div>
-            ))}
-          </section>
-        ) : (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable
-              droppableId="column"
-              direction="horizontal"
-              type="STATUS"
-            >
-              {({ droppableProps, innerRef, placeholder }) => {
-                return (
-                  <div
-                    className="flex overflow-auto p-[28px] h-full -ml-3"
-                    {...droppableProps}
-                    ref={innerRef}
-                  >
-                    {listWorkspaceCardByStatus.map(
-                      (status: WorkspaceCardByStatus, key: number) => (
-                        <ColumnStatus
-                          key={status.id}
-                          status={status}
-                          index={key}
-                          isAdmin={isAdmin}
-                          workspaceId={Number(params?.id || 0)}
-                          setSelectedItem={setSelectedItem}
-                        />
-                      )
-                    )}
+        <section className="flex flex-col h-full gap-6">
+          {loadingWorkspace || loadingWorkspaceCard ? (
+            <section className="flex p-[28px] gap-6">
+              {[...Array(3)].map((item, key) => (
+                <div key={key} className="flex flex-col gap-4">
+                  <Skeleton className="w-full min-w-[300px] max-w-[300px] h-[45px] rounded-xl" />
 
-                    {placeholder}
-                  </div>
-                );
-              }}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </section>
-    </div>
+                  {[...Array(key + 1)].map((item, key2) => (
+                    <Skeleton
+                      key={key2}
+                      className="w-full min-w-[300px] max-w-[300px] h-[177px] rounded-xl"
+                    />
+                  ))}
+                </div>
+              ))}
+            </section>
+          ) : (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable
+                droppableId="column"
+                direction="horizontal"
+                type="STATUS"
+              >
+                {(
+                  { droppableProps, innerRef, placeholder },
+                  { isDraggingOver }
+                ) => {
+                  return (
+                    <div
+                      className="flex overflow-auto p-[28px] h-full -ml-3"
+                      {...droppableProps}
+                      ref={innerRef}
+                    >
+                      {listWorkspaceCardByStatus.map(
+                        (status: WorkspaceCardByStatus, key: number) => (
+                          <ColumnStatus
+                            key={status.id}
+                            status={status}
+                            index={key}
+                            isAdmin={isAdmin}
+                            workspaceId={Number(params?.id || 0)}
+                            setSelectedCard={setSelectedCard}
+                            setSelectedStatus={(val) => {
+                              setSelectedStatus(val);
+                              setOpenDialog((prevVal) => ({
+                                ...prevVal,
+                                status: true,
+                              }));
+                            }}
+                          />
+                        )
+                      )}
+
+                      <div className={cn(isDraggingOver ? "flex" : "hidden")}>
+                        {placeholder}
+                      </div>
+
+                      {isAdmin && (
+                        <div
+                          className="flex items-center gap-2 rounded-xl border opacity-100 py-2 px-4 relative h-[45px] min-w-[300px] cursor-pointer hover:bg-white transition-colors"
+                          onClick={() =>
+                            setOpenDialog((prevVal) => ({
+                              ...prevVal,
+                              status: true,
+                            }))
+                          }
+                        >
+                          <Plus className="size-5" />
+                          <p className="font-medium">Add another list</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </section>
+      </div>
+    </>
   );
 }

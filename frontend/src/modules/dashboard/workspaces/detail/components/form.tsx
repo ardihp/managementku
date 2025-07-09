@@ -30,7 +30,7 @@ interface FormWorkspaceProps {
   selectedItem?: WorkspaceCard | null;
   resetSelectedItem?: () => void;
   buttonClassName?: string;
-  defaultStatus: string;
+  defaultStatus?: string;
   workspaceId: number;
   children: React.ReactNode;
 }
@@ -45,19 +45,19 @@ export default function FormWorkspaceCard({
 }: FormWorkspaceProps) {
   const [openDialog, setOpenDialog] = useState(false);
 
-  const { updateWorkspace } = useWorkspace();
-  const { createWorkspaceCard } = useWorkspaceCard();
+  const { createWorkspaceCard, updateWorkspaceCard } = useWorkspaceCard();
 
-  const { mutate: create, isPending: loadingCreate } = createWorkspaceCard();
-  const { mutate: update, isPending: loadingUpdate } = updateWorkspace();
+  const { mutateAsync: create, isPending: loadingCreate } =
+    createWorkspaceCard(workspaceId);
+  const { mutateAsync: update, isPending: loadingUpdate } =
+    updateWorkspaceCard(workspaceId);
+
   const isEdit = !!selectedItem;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
     reset,
     clearErrors,
   } = useForm<FormInputWorkspaceCard>({
@@ -71,6 +71,7 @@ export default function FormWorkspaceCard({
         description: "",
       });
       resetSelectedItem();
+      clearErrors();
     }
   }, [openDialog]);
 
@@ -85,16 +86,23 @@ export default function FormWorkspaceCard({
     }
   }, [selectedItem]);
 
-  const onSubmit = (value: FormInputWorkspaceCard) => {
-    if (isEdit) {
-    } else {
-      create({
-        id: workspaceId,
-        data: {
-          ...value,
-          status_id: Number(defaultStatus || 0),
-        },
-      });
+  const onSubmit = async (value: FormInputWorkspaceCard) => {
+    try {
+      if (isEdit) {
+        await update({
+          card_id: selectedItem.id,
+          data: { ...value, status_id: selectedItem.status.id },
+        });
+      } else {
+        await create({
+          data: {
+            ...value,
+            status_id: Number(defaultStatus || 0),
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
 
     setOpenDialog(false);
