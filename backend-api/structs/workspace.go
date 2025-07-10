@@ -176,5 +176,6 @@ type WorkspaceCardOrder struct {
 }
 
 type WorkspaceCardUpdateOrderRequest struct {
+	CardId      int                  `json:"card_id" binding:"required"`
 	OrderStatus []WorkspaceCardOrder `json:"order_status" binding:"required"`
 }

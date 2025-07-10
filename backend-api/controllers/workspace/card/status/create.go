@@ -53,7 +53,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    "manager",
+			UserRole:    user.Role,
 			Action:      "create-workspace-card-status",
 			Description: fmt.Sprintf("User %s has created new status", user.Username),
 		}

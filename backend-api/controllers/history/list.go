@@ -33,7 +33,7 @@ func ListHistoryLog(c *gin.Context) {
 	if user.Role == "manager" {
 		history_logs := []models.HistoryLog{}
 
-		database.DB.Order("created_at DESC").Preload(clause.Associations).Find(&history_logs, "user_role = ?", "manager")
+		database.DB.Order("created_at DESC").Preload(clause.Associations).Find(&history_logs, "(user_role = ? AND type = ?) OR user_id = ?", "manager", req.Type, user_id)
 
 		for _, history_log := range history_logs {
 			list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
@@ -78,5 +78,48 @@ func ListHistoryLog(c *gin.Context) {
 		Success: true,
 		Message: "Success to retreive history logs",
 		Data:    list_histor_logs,
+	})
+}
+
+func ListWorkspaceHistoryLog(c *gin.Context) {
+	workspace_id := c.Param("id")
+
+	user_id := c.GetInt("user_id")
+	user := models.User{}
+	database.DB.First(&user, user_id)
+
+	list_history_logs := []structs.HistoryLogResponse{}
+
+	workspace_history_logs := []models.WorkspaceHistoryLog{}
+
+	if err := database.DB.Where("workspace_id = ?", workspace_id).Order("created_at DESC").Find(&workspace_history_logs).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+			Success: false,
+			Message: "Failed to retreive history logs",
+			Errors:  helpers.TranslateErrorMessage(err),
+		})
+		return
+	}
+
+	for _, log := range workspace_history_logs {
+		history_log := models.HistoryLog{}
+
+		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
+
+		list_history_logs = append(list_history_logs, structs.HistoryLogResponse{
+			ID:          int(history_log.ID),
+			User:        history_log.User.Username,
+			Type:        history_log.Type,
+			Action:      history_log.Action,
+			Description: history_log.Description,
+			CreatedAt:   history_log.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:   history_log.UpdatedAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	c.JSON(http.StatusOK, structs.SuccessResponse{
+		Success: true,
+		Message: "Success to retreive workspace history logs",
+		Data:    list_history_logs,
 	})
 }

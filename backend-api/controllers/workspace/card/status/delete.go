@@ -58,7 +58,7 @@ func DeleteWorkspaceCardStatus(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    "manager",
+			UserRole:    user.Role,
 			Action:      "delete-workspace-card-status",
 			Description: fmt.Sprintf("User %s has deleted status %s", user.Username, workspace_card_status.Name),
 		}

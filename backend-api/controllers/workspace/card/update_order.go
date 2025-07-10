@@ -1,13 +1,17 @@
 package controllers
 
 import (
+	"fmt"
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
+	"slices"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
@@ -55,8 +59,13 @@ func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
 }
 
 func UpdateWorkspaceCardOrder(c *gin.Context) {
-	var req = structs.WorkspaceCardUpdateOrderRequest{}
-	var workspace_id = c.Param("id")
+	req := structs.WorkspaceCardUpdateOrderRequest{}
+	workspace_id := c.Param("id")
+	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
+
+	user_id := c.GetInt("user_id")
+	user := models.User{}
+	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -76,36 +85,83 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		return
 	}
 
-	for _, order := range req.OrderStatus {
-		for index, card_id := range order.CardId {
-			var new_workspace_card = models.WorkspaceCard{Id: uint(card_id)}
+	database.DB.Transaction(func(trx *gorm.DB) error {
+		status_before := &models.WorkspaceCardStatus{}
+		status_after := &models.WorkspaceCardStatus{}
 
-			if err := database.DB.Where("id = ? AND workspace_id = ?", card_id, workspace_id).First(&new_workspace_card).Error; err != nil {
-				c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-					Success: false,
-					Message: "Workspace card not found",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
-				return
+		for _, order := range req.OrderStatus {
+			if slices.Contains(order.CardId, req.CardId) {
+				database.DB.First(&status_after, order.StatusId)
+			} else {
+				database.DB.First(&status_before, order.StatusId)
 			}
 
-			new_workspace_card.Status.Id = uint(order.StatusId)
-			new_workspace_card.Order = index
+			for index, card_id := range order.CardId {
+				var new_workspace_card = models.WorkspaceCard{Id: uint(card_id)}
 
-			if err := database.DB.Save(&new_workspace_card).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-					Success: false,
-					Message: "Failed to update workspace card order",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
-				return
+				if err := database.DB.Where("id = ? AND workspace_id = ?", card_id, workspace_id).First(&new_workspace_card).Error; err != nil {
+					c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
+						Success: false,
+						Message: "Workspace card not found",
+						Errors:  helpers.TranslateErrorMessage(err),
+					})
+					return err
+				}
+
+				new_workspace_card.Status.Id = uint(order.StatusId)
+				new_workspace_card.Order = index
+
+				if err := database.DB.Save(&new_workspace_card).Error; err != nil {
+					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+						Success: false,
+						Message: "Failed to update workspace card order",
+						Errors:  helpers.TranslateErrorMessage(err),
+					})
+					return err
+				}
 			}
 		}
-	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success update workspace card order",
-		Data:    "",
+		workspace_card := models.WorkspaceCard{}
+		database.DB.First(&workspace_card, req.CardId)
+
+		history_log := models.HistoryLog{
+			UserId:      user.Id,
+			Type:        "workspace",
+			UserRole:    "manager",
+			Action:      "update-order",
+			Description: fmt.Sprintf("User %s has changed status for the %s card from %s to %s", user.Username, workspace_card.Title, status_before.Name, status_after.Name),
+		}
+
+		if err := trx.Create(&history_log).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to update workspace card order",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
+		workspace_history := models.WorkspaceHistoryLog{
+			HistoryId:   history_log.ID,
+			WorkspaceId: uint(parsed_workspace_id),
+		}
+
+		if err := trx.Create(&workspace_history).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to update workspace card order",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
+		c.JSON(http.StatusOK, structs.SuccessResponse{
+			Success: true,
+			Message: "Success update workspace card order",
+			Data:    "",
+		})
+
+		return nil
 	})
 }

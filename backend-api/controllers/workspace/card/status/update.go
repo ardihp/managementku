@@ -58,7 +58,7 @@ func UpdateWorkspaceCardStatus(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    "manager",
+			UserRole:    user.Role,
 			Action:      "update-workspace-card-status",
 			Description: fmt.Sprintf("User %s has changes to status %s", user.Username, workspace_card_status.Name),
 		}

@@ -55,7 +55,7 @@ func ArchieveWorkspaceCardStatus(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    "manager",
+			UserRole:    user.Role,
 			Action:      "archive-workspace-card-status",
 			Description: fmt.Sprintf("User %s has archived status %s", user.Username, workspace_card_status.Name),
 		}
@@ -137,7 +137,7 @@ func UnArchieveWorkspaceCardStatus(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    "manager",
+			UserRole:    user.Role,
 			Action:      "unarchive-workspace-card-status",
 			Description: fmt.Sprintf("User %s has unarchive status %s", user.Username, workspace_card_status.Name),
 		}

@@ -87,6 +87,7 @@ func SetupRouter() *gin.Engine {
 
 	// History Logs
 	router.GET("/api/history-logs", middlewares.AuthMiddleware(), historyControllers.ListHistoryLog)
+	router.GET("/api/workspace/:id/history-logs", middlewares.AuthMiddleware(), historyControllers.ListWorkspaceHistoryLog)
 
 	return router
 }
