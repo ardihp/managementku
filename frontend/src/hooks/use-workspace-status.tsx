@@ -7,9 +7,11 @@ import {
 } from "@/types/hooks/workspace-status";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "./auth/use-auth";
 
 export const useWorkspaceStatus = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const GetListWorkspaceStatus = () => {
     return useQuery({
@@ -30,6 +32,7 @@ export const useWorkspaceStatus = () => {
         return response.data.data;
       },
       staleTime: Infinity,
+      enabled: user?.role === "manager",
     });
   };
 

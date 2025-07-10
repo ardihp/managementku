@@ -53,6 +53,50 @@ export const useWorkspaceCard = () => {
     });
   };
 
+  const GetListWorkspaceCardActivities = (
+    workspace_id: number,
+    card_id: number
+  ) => {
+    return useQuery({
+      queryKey: ["workspace-card/list-activity", card_id],
+      queryFn: async () => {
+        const response = await Api.get(
+          endpoint.workspace.card.activity.list(workspace_id, card_id)
+        );
+        return response.data.data;
+      },
+      staleTime: Infinity,
+      enabled: card_id !== 0,
+    });
+  };
+
+  const CreateWorkspaceCardActivity = (
+    workspace_id: number,
+    card_id: number
+  ) => {
+    return useMutation({
+      mutationKey: ["workspace-card/create-activity"],
+      mutationFn: async (data: { message: string }) => {
+        const response = await Api.post(
+          endpoint.workspace.card.activity.create(workspace_id, card_id),
+          data
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+      },
+    });
+  };
+
   const CreateWorkspaceCard = (workspace_id: number) => {
     return useMutation({
       mutationKey: ["workspace-card/create"],
@@ -225,6 +269,8 @@ export const useWorkspaceCard = () => {
     getListWorkspaceHistoryLog: GetListWorkspaceHistoryLog,
     getListWorkspaceCard: GetListWorkspaceCard,
     getListArchivedWorkspaceCard: GetListArchivedWorkspaceCard,
+    getListWorkspaceCardActivities: GetListWorkspaceCardActivities,
+    createWorkspaceCardActivity: CreateWorkspaceCardActivity,
     createWorkspaceCard: CreateWorkspaceCard,
     updateWorkspaceCard: UpdateWorkspaceCard,
     archivedWorkspaceCard: ArchivedWorkspaceCard,

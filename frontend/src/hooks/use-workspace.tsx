@@ -8,9 +8,11 @@ import {
 import { Workspace } from "@/types/workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "./auth/use-auth";
 
 export const useWorkspace = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const GetListWorkspace = () => {
     return useQuery({
@@ -174,6 +176,7 @@ export const useWorkspace = () => {
         return response.data.data;
       },
       staleTime: Infinity,
+      enabled: user?.role === "manager",
     });
   };
 

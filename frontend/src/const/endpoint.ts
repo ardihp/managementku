@@ -33,10 +33,13 @@ export const endpoint = {
     },
 
     card: {
-      history_log: (id: number) => `/workspace/${id}/history-logs`,
-      list: (id: number) => `/workspace/${id}/card`,
-      list_archived: (id: number) => `/workspace/${id}/card/archived`,
-      create: (id: number) => `/workspace/${id}/card/create`,
+      history_log: (workspace_id: number) =>
+        `/workspace/${workspace_id}/history-logs`,
+      list: (workspace_id: number) => `/workspace/${workspace_id}/card`,
+      list_archived: (workspace_id: number) =>
+        `/workspace/${workspace_id}/card/archived`,
+      create: (workspace_id: number) =>
+        `/workspace/${workspace_id}/card/create`,
       update: (workspace_id: number, card_id: number) =>
         `/workspace/${workspace_id}/card/update/${card_id}`,
       archive: (workspace_id: number, card_id: number) =>
@@ -45,8 +48,10 @@ export const endpoint = {
         `/workspace/${workspace_id}/card/unarchive/${card_id}`,
       delete: (workspace_id: number, card_id: number) =>
         `/workspace/${workspace_id}/card/delete/${card_id}`,
-      status_order: (id: number) => `/workspace/${id}/card/status-order`,
-      update_order: (id: number) => `/workspace/${id}/card/update-order`,
+      status_order: (workspace_id: number) =>
+        `/workspace/${workspace_id}/card/status-order`,
+      update_order: (workspace_id: number) =>
+        `/workspace/${workspace_id}/card/update-order`,
 
       status: {
         list: (workspace_id: number) => `/workspace/${workspace_id}/status`,
@@ -62,6 +67,13 @@ export const endpoint = {
           `/workspace/${workspace_id}/status/unarchive/${status_id}`,
         delete: (workspace_id: number, status_id: number) =>
           `/workspace/${workspace_id}/status/delete/${status_id}`,
+      },
+
+      activity: {
+        list: (workspace_id: number, card_id: number) =>
+          `/workspace/${workspace_id}/card/${card_id}/activity`,
+        create: (workspace_id: number, card_id: number) =>
+          `/workspace/${workspace_id}/card/${card_id}/create-activity`,
       },
     },
   },
