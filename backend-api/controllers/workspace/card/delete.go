@@ -46,7 +46,7 @@ func DeleteWorkspaceCard(c *gin.Context) {
 		if err := trx.Create(&history_log).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to delete workspace",
+				Message: "Failed to delete workspace card",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return err
@@ -66,10 +66,19 @@ func DeleteWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
+		if err := trx.Where("card_id = ?", card_id).Delete(&models.WorkspaceCardActivity{}).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to delete workspace card",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
 		if err := trx.Where("card_id = ?", card_id).Delete(&models.WorkspaceCardMember{}).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to delete workspace",
+				Message: "Failed to delete workspace card",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return err
@@ -78,7 +87,7 @@ func DeleteWorkspaceCard(c *gin.Context) {
 		if err := trx.Where("workspace_id = ? AND id = ?", workspace_id, card_id).Delete(&models.WorkspaceCard{}).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to delete workspace",
+				Message: "Failed to delete workspace card",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return err

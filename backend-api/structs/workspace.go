@@ -45,6 +45,15 @@ type WorkspaceTypeResponse struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type WorkspaceCardActivityResponse struct {
+	Id          int    `json:"id"`
+	UserCreated string `json:"user_created"`
+	Type        string `json:"type"`
+	Message     string `json:"message"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+}
+
 type WorkspaceCardResponse struct {
 	Id          uint                `json:"id"`
 	Title       string              `json:"title"`
@@ -181,4 +190,8 @@ type WorkspaceCardOrder struct {
 type WorkspaceCardUpdateOrderRequest struct {
 	CardId      int                  `json:"card_id" binding:"required"`
 	OrderStatus []WorkspaceCardOrder `json:"order_status" binding:"required"`
+}
+
+type WorkspaceCardCreateActivityRequst struct {
+	Message string `json:"message"`
 }

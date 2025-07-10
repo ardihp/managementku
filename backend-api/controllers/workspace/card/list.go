@@ -159,7 +159,7 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 
 		c.JSON(http.StatusOK, structs.SuccessResponse{
 			Success: true,
-			Message: "Success to retreive workspace card status",
+			Message: "Success to retreive workspace card",
 			Data:    list_archived_workspace_cards,
 		})
 

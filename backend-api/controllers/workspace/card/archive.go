@@ -52,6 +52,22 @@ func ArchieveWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
+		workspace_card_activity := models.WorkspaceCardActivity{
+			CardId:  workspace_card.Id,
+			UserId:  uint(user_id),
+			Type:    "general",
+			Message: fmt.Sprintf("User %s archive this card", user.Username),
+		}
+
+		if err := trx.Create(&workspace_card_activity).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to archive workspace card",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
@@ -134,6 +150,22 @@ func UnarchieveWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
+		workspace_card_activity := models.WorkspaceCardActivity{
+			CardId:  workspace_card.Id,
+			UserId:  uint(user_id),
+			Type:    "general",
+			Message: fmt.Sprintf("User %s unarchive this card", user.Username),
+		}
+
+		if err := trx.Create(&workspace_card_activity).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to unarchive workspace card",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
@@ -145,7 +177,7 @@ func UnarchieveWorkspaceCard(c *gin.Context) {
 		if err := trx.Create(&history_log).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to unarchive workspace",
+				Message: "Failed to unarchive workspace card",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return err

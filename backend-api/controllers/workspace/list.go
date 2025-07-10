@@ -176,8 +176,8 @@ func ListWorkspaceByID(c *gin.Context) {
 }
 
 func ListArchivedWorkspace(c *gin.Context) {
-	var user_id = c.GetInt("user_id")
-	var user = models.User{Id: uint(user_id)}
+	user_id := c.GetInt("user_id")
+	user := models.User{Id: uint(user_id)}
 
 	if err := database.DB.First(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{

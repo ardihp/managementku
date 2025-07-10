@@ -7,6 +7,7 @@ import (
 	userControllers "kanban-board/backend-api/controllers/user"
 	workspaceControllers "kanban-board/backend-api/controllers/workspace"
 	workspaceCardControllers "kanban-board/backend-api/controllers/workspace/card"
+	workspaceCardActivityControllers "kanban-board/backend-api/controllers/workspace/card/activity"
 	workspaceCardStatusControllers "kanban-board/backend-api/controllers/workspace/card/status"
 	workspaceStatusControllers "kanban-board/backend-api/controllers/workspace/status"
 	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
@@ -84,6 +85,10 @@ func SetupRouter() *gin.Engine {
 	router.PUT("/api/workspace/:id/status/archive/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ArchieveWorkspaceCardStatus)
 	router.PUT("/api/workspace/:id/status/unarchive/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.UnArchieveWorkspaceCardStatus)
 	router.DELETE("/api/workspace/:id/status/delete/:status_id", middlewares.AuthMiddleware(), workspaceCardStatusControllers.DeleteWorkspaceCardStatus)
+
+	// Workspace Card Activity
+	router.GET("/api/workspace/:id/card/:card_id/activity", middlewares.AuthMiddleware(), workspaceCardActivityControllers.ListWorkspaceCardActivity)
+	router.POST("/api/workspace/:id/card/:card_id/create-activity", middlewares.AuthMiddleware(), workspaceCardActivityControllers.CreateWorkspaceCardActivity)
 
 	// History Logs
 	router.GET("/api/history-logs", middlewares.AuthMiddleware(), historyControllers.ListHistoryLog)

@@ -72,6 +72,22 @@ func CreateWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
+		workspace_card_activity := models.WorkspaceCardActivity{
+			CardId:  card.Id,
+			UserId:  uint(user_id),
+			Type:    "general",
+			Message: fmt.Sprintf("User %s created this card", user.Username),
+		}
+
+		if err := trx.Create(&workspace_card_activity).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to create workspace card",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
@@ -83,7 +99,7 @@ func CreateWorkspaceCard(c *gin.Context) {
 		if err := trx.Create(&history_log).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to update workspace card order",
+				Message: "Failed to create workspace card",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return err
@@ -97,7 +113,7 @@ func CreateWorkspaceCard(c *gin.Context) {
 		if err := trx.Create(&workspace_history).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 				Success: false,
-				Message: "Failed to update workspace card order",
+				Message: "Failed to create workspace card",
 				Errors:  helpers.TranslateErrorMessage(err),
 			})
 			return err

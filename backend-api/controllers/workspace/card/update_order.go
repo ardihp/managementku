@@ -125,6 +125,22 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		workspace_card := models.WorkspaceCard{}
 		database.DB.First(&workspace_card, req.CardId)
 
+		workspace_card_activity := models.WorkspaceCardActivity{
+			CardId:  workspace_card.Id,
+			UserId:  uint(user_id),
+			Type:    "general",
+			Message: fmt.Sprintf("User %s change status from %s to %s", user.Username, status_before.Name, status_after.Name),
+		}
+
+		if err := trx.Create(&workspace_card_activity).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to update workspace card order",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",

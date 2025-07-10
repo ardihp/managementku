@@ -88,3 +88,15 @@ type WorkspaceCardMember struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type WorkspaceCardActivity struct {
+	Id        uint `json:"id" gorm:"primaryKey"`
+	CardId    uint `json:"card_id"`
+	Card      WorkspaceCard
+	UserId    uint `json:"user_id"`
+	User      User
+	Type      string    `json:"type" gorm:"type:enum('general', 'comment')"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}

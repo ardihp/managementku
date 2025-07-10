@@ -67,6 +67,22 @@ func UpdateWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
+		workspace_card_activity := models.WorkspaceCardActivity{
+			CardId:  workspace_card.Id,
+			UserId:  uint(user_id),
+			Type:    "general",
+			Message: fmt.Sprintf("User %s has changes to this card", user.Username),
+		}
+
+		if err := trx.Create(&workspace_card_activity).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
+				Success: false,
+				Message: "Failed to update workspace card",
+				Errors:  helpers.TranslateErrorMessage(err),
+			})
+			return err
+		}
+
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
