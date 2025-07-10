@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -96,6 +97,7 @@ func (c *Client) read() {
 			break
 		}
 
+		time.Sleep(600 * time.Millisecond)
 		jsonMessage, _ := json.Marshal(&Message{Sender: c.Id, Content: MessageContent{Text: parsedMessage.Text, Type: parsedMessage.Type}})
 		manager.Broadcast <- jsonMessage
 	}

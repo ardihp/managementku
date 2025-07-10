@@ -13,8 +13,8 @@ import (
 )
 
 func ListWorkspaceCard(c *gin.Context) {
-	var id = c.Param("id")
-	var workspace_cards = []models.WorkspaceCardStatus{}
+	id := c.Param("id")
+	workspace_cards := []models.WorkspaceCardStatus{}
 
 	if err := database.DB.Where("workspace_id = ? AND is_archived = ?", id, false).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_cards).Error; err != nil {
 		c.JSON(http.StatusNotFound, structs.ErrorResponse{
@@ -75,8 +75,11 @@ func ListWorkspaceCard(c *gin.Context) {
 					IsArchived: card.Status.IsArchived,
 					Order:      card.Status.Order,
 				},
-				Members:    list_member,
-				IsArchived: card.IsArchived,
+				UserCreated: card.UserCreated.Username,
+				Members:     list_member,
+				IsArchived:  card.IsArchived,
+				CreatedAt:   card.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:   card.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
 		}
 
@@ -146,8 +149,11 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 					IsArchived: card.Status.IsArchived,
 					Order:      card.Status.Order,
 				},
-				Members:    list_member,
-				IsArchived: card.IsArchived,
+				UserCreated: card.UserCreated.Username,
+				Members:     list_member,
+				IsArchived:  card.IsArchived,
+				CreatedAt:   card.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:   card.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
 		}
 

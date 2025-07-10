@@ -65,17 +65,19 @@ type WorkspaceCardStatus struct {
 }
 
 type WorkspaceCard struct {
-	Id          uint `json:"id" gorm:"primaryKey"`
-	Order       int  `json:"order" gorm:"not null"`
-	WorkspaceId uint `json:"workspace_id"`
-	Workspace   Workspace
-	StatusId    uint `json:"status_id"`
-	Status      WorkspaceCardStatus
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	IsArchived  bool      `json:"is_archived" gorm:"default:false"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Id            uint `json:"id" gorm:"primaryKey"`
+	Order         int  `json:"order" gorm:"not null"`
+	WorkspaceId   uint `json:"workspace_id"`
+	Workspace     Workspace
+	StatusId      uint `json:"status_id"`
+	Status        WorkspaceCardStatus
+	UserCreatedId uint `json:"user_id"`
+	UserCreated   User
+	Title         string    `json:"title"`
+	Description   string    `json:"description"`
+	IsArchived    bool      `json:"is_archived" gorm:"default:false"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type WorkspaceCardMember struct {

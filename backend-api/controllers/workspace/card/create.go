@@ -55,11 +55,12 @@ func CreateWorkspaceCard(c *gin.Context) {
 		result := trx.Model(&models.WorkspaceCard{}).Where("status_id = ?", req.StatusId)
 
 		var card = models.WorkspaceCard{
-			WorkspaceId: uint(parsed_workspace_id),
-			StatusId:    uint(req.StatusId),
-			Title:       req.Title,
-			Description: req.Description,
-			Order:       int(result.RowsAffected),
+			WorkspaceId:   uint(parsed_workspace_id),
+			StatusId:      uint(req.StatusId),
+			UserCreatedId: uint(user_id),
+			Title:         req.Title,
+			Description:   req.Description,
+			Order:         int(result.RowsAffected),
 		}
 
 		if err := trx.Create(&card).Error; err != nil {

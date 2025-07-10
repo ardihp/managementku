@@ -49,9 +49,12 @@ type WorkspaceCardResponse struct {
 	Id          uint                `json:"id"`
 	Title       string              `json:"title"`
 	Description string              `json:"description"`
-	Status      WorkspaceCardStatus `json:"status,omitempty"`
+	Status      WorkspaceCardStatus `json:"status"`
+	UserCreated string              `json:"user_created"`
 	Members     []Member            `json:"members"`
 	IsArchived  bool                `json:"is_archived"`
+	CreatedAt   string              `json:"created_at"`
+	UpdatedAt   string              `json:"updated_at"`
 }
 
 type WorkspaceResponse struct {
