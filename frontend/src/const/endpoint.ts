@@ -33,6 +33,7 @@ export const endpoint = {
     },
 
     card: {
+      history_log: (id: number) => `/workspace/${id}/history-logs`,
       list: (id: number) => `/workspace/${id}/card`,
       list_archived: (id: number) => `/workspace/${id}/card/archived`,
       create: (id: number) => `/workspace/${id}/card/create`,

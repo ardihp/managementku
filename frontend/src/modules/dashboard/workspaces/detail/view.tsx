@@ -14,13 +14,15 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth/use-auth";
 import FormWorkspaceCard from "./components/form";
-import { Archive, Plus } from "lucide-react";
+import { Archive, History, Plus } from "lucide-react";
 import ColumnStatus from "./components/column-status";
 import { WorkspaceStatus } from "@/types/workspace";
 import { CardOrderItem } from "@/types/hooks/workspace-card";
 import FormWorkspaceStatus from "../components/form-status";
 import { Button } from "@/components/ui/button";
 import ArchivedItems from "../components/archived-items";
+import HistoryLog from "./components/history-log";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function DetailWorkspaceView() {
   const params = useParams();
@@ -42,6 +44,7 @@ export default function DetailWorkspaceView() {
     card: false,
     status: false,
     archived: false,
+    history: false,
   });
 
   const { data: detailWorkspace, isLoading: loadingWorkspace } =
@@ -184,7 +187,10 @@ export default function DetailWorkspaceView() {
       ) {
         updateCardOrder(
           {
-            data: { order_status: statusWorkspace },
+            data: {
+              card_id: Number(item.draggableId),
+              order_status: statusWorkspace,
+            },
           },
           {
             onError: () =>
@@ -221,6 +227,16 @@ export default function DetailWorkspaceView() {
         />
       )}
 
+      {openDialog.history && (
+        <HistoryLog
+          open={openDialog.history}
+          onOpenChange={() =>
+            setOpenDialog((prevVal) => ({ ...prevVal, history: false }))
+          }
+          workspaceId={Number(params?.id || 0)}
+        />
+      )}
+
       <FormWorkspaceCard
         workspaceId={Number(params?.id || 0)}
         selectedItem={selectedCard}
@@ -248,15 +264,39 @@ export default function DetailWorkspaceView() {
             </div>
           </div>
 
-          <Button
-            className="cursor-pointer"
-            onClick={() =>
-              setOpenDialog((prevVal) => ({ ...prevVal, archived: true }))
-            }
-          >
-            <Archive className="size-4" />
-            <p className="leading-none">Archived Items</p>
-          </Button>
+          <div className="flex h-full items-center gap-4">
+            <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto ml-auto">
+              {detailWorkspace?.members.map((member, key) => (
+                <Avatar key={key} title={member.username} className="size-8">
+                  <AvatarFallback className="uppercase text-sm">
+                    {member.username?.split(" ")?.map((text) => text?.[0])}
+                  </AvatarFallback>
+                </Avatar>
+              ))}
+            </div>
+
+            <div className="w-[1px] bg-zinc-300 h-5 ml-4" />
+
+            <Button
+              className="cursor-pointer"
+              onClick={() =>
+                setOpenDialog((prevVal) => ({ ...prevVal, archived: true }))
+              }
+            >
+              <Archive className="size-4" />
+              <p className="leading-none">Archived Items</p>
+            </Button>
+
+            <Button
+              className="cursor-pointer"
+              onClick={() =>
+                setOpenDialog((prevVal) => ({ ...prevVal, history: true }))
+              }
+            >
+              <History className="size-4" />
+              <p className="leading-none">History Logs</p>
+            </Button>
+          </div>
         </section>
 
         <section className="flex flex-col h-full gap-6">
@@ -316,20 +356,18 @@ export default function DetailWorkspaceView() {
                         {placeholder}
                       </div>
 
-                      {isAdmin && (
-                        <div
-                          className="flex items-center gap-2 rounded-xl border opacity-100 py-2 px-4 relative h-[45px] min-w-[300px] cursor-pointer hover:bg-white transition-colors"
-                          onClick={() =>
-                            setOpenDialog((prevVal) => ({
-                              ...prevVal,
-                              status: true,
-                            }))
-                          }
-                        >
-                          <Plus className="size-5" />
-                          <p className="font-medium">Add another list</p>
-                        </div>
-                      )}
+                      <div
+                        className="flex items-center gap-2 rounded-xl border opacity-100 py-2 px-4 relative h-[45px] min-w-[300px] cursor-pointer hover:bg-white transition-colors"
+                        onClick={() =>
+                          setOpenDialog((prevVal) => ({
+                            ...prevVal,
+                            status: true,
+                          }))
+                        }
+                      >
+                        <Plus className="size-5" />
+                        <p className="font-medium">Add another list</p>
+                      </div>
                     </div>
                   );
                 }}

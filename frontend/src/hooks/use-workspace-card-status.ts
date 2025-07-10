@@ -55,6 +55,9 @@ export const useWorkspaceCardStatus = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list", workspace_id],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
         toast.success("Status created successfully");
       },
     });
@@ -83,6 +86,9 @@ export const useWorkspaceCardStatus = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list", workspace_id],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
         toast.success("Status updated successfully");
       },
     });
@@ -103,6 +109,9 @@ export const useWorkspaceCardStatus = () => {
         });
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
         });
         toast.success("Status archived successfully");
       },
@@ -125,6 +134,9 @@ export const useWorkspaceCardStatus = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list", workspace_id],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
         toast.success("Status activated successfully");
       },
     });
@@ -145,6 +157,9 @@ export const useWorkspaceCardStatus = () => {
         });
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
         });
         toast.success("Status deleted successfully");
       },

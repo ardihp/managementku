@@ -55,15 +55,13 @@ export default function ColumnStatus({
                 <p className="font-medium">{status.name}</p>
               </div>
 
-              {isAdmin && (
-                <ActionStatus
-                  onClickUpdate={() => setSelectedStatus(status)}
-                  status={status}
-                  isArchived={status.is_archived}
-                  type="workspace-detail"
-                  workspaceId={workspaceId}
-                />
-              )}
+              <ActionStatus
+                onClickUpdate={() => setSelectedStatus(status)}
+                status={status}
+                isArchived={status.is_archived}
+                type="workspace-detail"
+                workspaceId={workspaceId}
+              />
             </div>
 
             <Droppable

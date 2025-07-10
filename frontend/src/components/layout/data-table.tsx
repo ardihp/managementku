@@ -38,12 +38,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading: boolean;
+  disablePaginationSize?: boolean;
 }
 
 export default function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = true,
+  disablePaginationSize = false,
 }: DataTableProps<TData, TValue>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -136,32 +138,34 @@ export default function DataTable<TData, TValue>({
         </div>
 
         <div className="flex items-center gap-14">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-medium">Rows per page</p>
+          {!disablePaginationSize && (
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium">Rows per page</p>
 
-            <Select
-              value={pagination.pageSize.toString()}
-              onValueChange={(val) =>
-                setPagination((prevVal) => ({
-                  ...prevVal,
-                  pageSize: Number(val),
-                }))
-              }
-            >
-              <SelectTrigger className="w-[75px] bg-transparent!">
-                <SelectValue placeholder="Row Count" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {["10", "25", "50", "100"].map((size) => (
-                    <SelectItem key={size} value={size}>
-                      {size}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+              <Select
+                value={pagination.pageSize.toString()}
+                onValueChange={(val) =>
+                  setPagination((prevVal) => ({
+                    ...prevVal,
+                    pageSize: Number(val),
+                  }))
+                }
+              >
+                <SelectTrigger className="w-[75px] bg-transparent!">
+                  <SelectValue placeholder="Row Count" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {["10", "25", "50", "100"].map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <p className="text-sm font-medium">
             Page {pagination.pageIndex + 1} of {table.getPageCount()}

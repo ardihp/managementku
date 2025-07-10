@@ -16,5 +16,6 @@ export interface CardOrderItem {
 }
 
 export interface UpdateWorkspaceCardOrderRequest {
+  card_id: number;
   order_status: CardOrderItem[];
 }
