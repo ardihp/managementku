@@ -16,6 +16,7 @@ import { useWorkspace } from "@/hooks/use-workspace";
 import { cn } from "@/lib/utils";
 import { WorkspaceCard } from "@/types/workspace-card";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
+import TextEditor from "@/components/ui/text-editor";
 
 interface FormInputWorkspaceCard {
   title: string;
@@ -60,8 +61,14 @@ export default function FormWorkspaceCard({
     formState: { errors },
     reset,
     clearErrors,
+    setValue,
+    watch,
   } = useForm<FormInputWorkspaceCard>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
   });
 
   useEffect(() => {
@@ -113,7 +120,7 @@ export default function FormWorkspaceCard({
   return (
     <Dialog onOpenChange={setOpenDialog} open={openDialog}>
       <DialogTrigger className={buttonClassName}>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="min-w-xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Update" : "New"} Card</DialogTitle>
           <DialogDescription>
@@ -137,17 +144,15 @@ export default function FormWorkspaceCard({
             <small className="text-red-500">{errors.title?.message}</small>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-auto">
             <label htmlFor="description" className="text-sm">
               Description
             </label>
-            <Textarea
-              id="description"
-              rows={4}
-              placeholder="Input card description..."
-              className="bg-transparent! resize-none h-[80px]"
+            <TextEditor
+              value={watch("description") || ""}
+              placeholder="Input card decription..."
+              onValueChange={(val) => setValue("description", val)}
               disabled={loadingCreate || loadingUpdate}
-              {...register("description")}
             />
             <small className="text-red-500">
               {errors.description?.message}

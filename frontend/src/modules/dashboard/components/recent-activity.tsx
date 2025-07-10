@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/hooks/use-user";
 import { HistoryLog } from "@/types/history-logs";
+import dayjs from "dayjs";
 import React from "react";
 
 export default function RecentActivity() {
@@ -33,7 +34,7 @@ export default function RecentActivity() {
           logs.map((log: HistoryLog, key: number) => (
             <div
               key={key}
-              className="flex gap-4 items-center first:border-0 border-t p-4 bg-transparent hover:bg-zinc-300/50 duration-200"
+              className="flex gap-4 items-start first:border-0 border-t p-4 bg-transparent hover:bg-zinc-300/50 duration-200"
             >
               <Avatar className="size-10">
                 <AvatarFallback className="capitalize">
@@ -41,9 +42,14 @@ export default function RecentActivity() {
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex flex-col">
-                <p className="font-medium capitalize truncate">{log.user}</p>
-                <p className="text-xs line-clamp-2 opacity-80 font-light">
+              <div className="flex flex-col w-full">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium capitalize truncate">{log.user}</p>
+                  <p className="text-xs">
+                    {dayjs(log.created_at).format("DD/MM/YYYY, HH:mm:ss")} WIB
+                  </p>
+                </div>
+                <p className="text-xs opacity-80 font-light">
                   {log.description}
                 </p>
               </div>

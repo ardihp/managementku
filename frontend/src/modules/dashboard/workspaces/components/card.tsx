@@ -68,7 +68,7 @@ const WorkspaceCard = ({
           </p>
 
           <p
-            className="font-quicksand text-xs font-medium text-zinc-400 capitalize leading-[18px] line-clamp-2"
+            className="font-quicksand text-xs font-medium text-zinc-400 capitalize leading-[18px] whitespace-break-spaces"
             title={workspace.description}
           >
             {workspace.description}
@@ -76,8 +76,8 @@ const WorkspaceCard = ({
 
           <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto ml-auto">
             {workspace.members.map((member, key) => (
-              <Avatar key={key} title={member.username} className="size-8">
-                <AvatarFallback className="uppercase text-sm">
+              <Avatar key={key} title={member.username} className="size-6">
+                <AvatarFallback className="uppercase text-xs">
                   {member.username?.split(" ")?.map((text) => text?.[0])}
                 </AvatarFallback>
               </Avatar>

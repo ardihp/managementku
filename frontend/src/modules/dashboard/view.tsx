@@ -10,35 +10,13 @@ import RecentActivity from "./components/recent-activity";
 
 export default function DashboardView() {
   const { getListWorkspace } = useWorkspace();
-  const { socket } = useContext(SocketContext);
-
-  useEffect(() => {
-    if (socket) {
-      socket.onopen = () => {
-        console.log("connected");
-      };
-
-      socket.onmessage = (event) => {
-        console.log("message received: ", JSON.parse(event.data || "{}"));
-      };
-
-      socket.onclose = () => {
-        console.log("connection close");
-      };
-    }
-  });
 
   const { data: workspaces, isLoading: loadingWorkspace } = getListWorkspace();
 
   return (
     <div className="flex flex-col h-full">
       <section className="flex items-center justify-between border-b border-zinc-200 p-[28px]">
-        <div
-          className="h-9 flex flex-col"
-          onClick={() =>
-            socket?.send(JSON.stringify({ text: "haha", value: [1, 2] }))
-          }
-        >
+        <div className="h-9 flex flex-col">
           <p className="text-2xl text-foreground font-light my-auto">
             Dashboard Overview
           </p>

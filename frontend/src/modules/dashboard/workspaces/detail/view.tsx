@@ -61,6 +61,8 @@ export default function DetailWorkspaceView() {
     Number(params?.id || 0)
   );
 
+  const isLoading = loadingWorkspace || loadingWorkspaceCard || !params?.id;
+
   const isAdmin =
     detailWorkspace?.members.find((member) => member.id === user?.id)?.role ===
     "admin";
@@ -256,7 +258,7 @@ export default function DetailWorkspaceView() {
 
             <div className="text-2xl text-foreground my-auto flex items-center gap-1">
               /{" "}
-              {loadingWorkspace ? (
+              {isLoading ? (
                 <Skeleton className="w-60 h-7" />
               ) : (
                 <span>{detailWorkspace?.name}</span>
@@ -268,7 +270,7 @@ export default function DetailWorkspaceView() {
             <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto ml-auto">
               {detailWorkspace?.members.map((member, key) => (
                 <Avatar key={key} title={member.username} className="size-8">
-                  <AvatarFallback className="uppercase text-sm">
+                  <AvatarFallback className="uppercase text-sm pt-0.5">
                     {member.username?.split(" ")?.map((text) => text?.[0])}
                   </AvatarFallback>
                 </Avatar>
@@ -300,7 +302,7 @@ export default function DetailWorkspaceView() {
         </section>
 
         <section className="flex flex-col h-full gap-6">
-          {loadingWorkspace || loadingWorkspaceCard ? (
+          {isLoading ? (
             <section className="flex p-[28px] gap-6">
               {[...Array(3)].map((item, key) => (
                 <div key={key} className="flex flex-col gap-4">

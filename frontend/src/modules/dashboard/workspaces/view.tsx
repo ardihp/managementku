@@ -27,6 +27,7 @@ export default function WorkspacesView() {
   const [selectedStatus, setSelectedStatus] = useState<WorkspaceStatus | null>(
     null
   );
+  const [loadingPage, setLoadingPage] = useState(true);
   const [openDialog, setOpenDialog] = useState({
     workspace: false,
     status: false,
@@ -36,20 +37,6 @@ export default function WorkspacesView() {
     WorkspaceByStatus[]
   >([]);
   const { socket } = useContext(SocketContext);
-
-  useEffect(() => {
-    if (socket) {
-      socket.onopen = () => {
-        console.log("Connected to WebSocket");
-      };
-      socket.onmessage = (event) => {
-        console.log("Message received:", JSON.parse(event.data || "{}"));
-      };
-      socket.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-    }
-  });
 
   const { user } = useAuth();
   const { getListWorkspace, updateWorkspaceOrder } = useWorkspace();
@@ -64,6 +51,22 @@ export default function WorkspacesView() {
   const { mutate: updateOrder } = updateWorkspaceOrder();
   const { mutate: updateStatusOrder } = updateWorkspaceStatusOrder();
 
+  const isLoading = loadingPage || loadingWorkspace;
+
+  useEffect(() => {
+    if (socket) {
+      socket.onopen = () => {
+        console.log("Connected to WebSocket");
+      };
+      socket.onmessage = (event) => {
+        console.log("socket message in");
+      };
+      socket.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+    }
+  });
+
   useEffect(() => {
     setUserDetail(user);
   }, []);
@@ -71,6 +74,7 @@ export default function WorkspacesView() {
   useEffect(() => {
     if (!loadingWorkspace && !fetchWorkspace) {
       setListWorkspaceByStatus(listWorkspace);
+      setLoadingPage(false);
     }
   }, [loadingWorkspace, fetchWorkspace]);
 
@@ -197,6 +201,10 @@ export default function WorkspacesView() {
         );
       }
     }
+
+    // socket?.send(
+    //   JSON.stringify({ text: [1, 2, 3], type: "reorder-workspace" })
+    // );
   };
 
   return (
@@ -258,7 +266,7 @@ export default function WorkspacesView() {
           )}
         </section>
 
-        {loadingWorkspace ? (
+        {isLoading ? (
           <section className="flex p-[28px] gap-6">
             {[...Array(3)].map((item, key) => (
               <div key={key} className="flex flex-col gap-4">
@@ -267,7 +275,7 @@ export default function WorkspacesView() {
                 {[...Array(key + 1)].map((item, key2) => (
                   <Skeleton
                     key={key2}
-                    className="w-full min-w-[300px] max-w-[300px] h-[177px] rounded-xl"
+                    className="w-full min-w-[300px] max-w-[300px] h-[152px] rounded-xl"
                   />
                 ))}
               </div>
