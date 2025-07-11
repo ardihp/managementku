@@ -76,6 +76,7 @@ type WorkspaceCard struct {
 	Title         string    `json:"title"`
 	Description   string    `json:"description"`
 	IsArchived    bool      `json:"is_archived" gorm:"default:false"`
+	IsCompleted   bool      `json:"is_completed" gorm:"default:false"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }

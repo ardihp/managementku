@@ -62,6 +62,7 @@ type WorkspaceCardResponse struct {
 	UserCreated string              `json:"user_created"`
 	Members     []Member            `json:"members"`
 	IsArchived  bool                `json:"is_archived"`
+	IsCompleted bool                `json:"is_completed"`
 	CreatedAt   string              `json:"created_at"`
 	UpdatedAt   string              `json:"updated_at"`
 }

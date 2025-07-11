@@ -78,6 +78,7 @@ func ListWorkspaceCard(c *gin.Context) {
 				UserCreated: card.UserCreated.Username,
 				Members:     list_member,
 				IsArchived:  card.IsArchived,
+				IsCompleted: card.IsCompleted,
 				CreatedAt:   card.CreatedAt.Format("2006-01-02 15:04:05"),
 				UpdatedAt:   card.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
@@ -152,6 +153,7 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 				UserCreated: card.UserCreated.Username,
 				Members:     list_member,
 				IsArchived:  card.IsArchived,
+				IsCompleted: card.IsCompleted,
 				CreatedAt:   card.CreatedAt.Format("2006-01-02 15:04:05"),
 				UpdatedAt:   card.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})

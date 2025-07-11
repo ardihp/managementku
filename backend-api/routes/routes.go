@@ -81,6 +81,8 @@ func SetupRouter() *gin.Engine {
 	router.POST("/api/workspace/:id/card/assign", middlewares.AuthMiddleware(), workspaceCardControllers.AssignMemberToWorkspaceCard)
 	router.PUT("/api/workspace/:id/card/watch/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.WatchWorkspaceCard)
 	router.PUT("/api/workspace/:id/card/unwatch/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.UnwatchWorkspaceCard)
+	router.PUT("/api/workspace/:id/card/complete/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.MarkWorkspaceCardComplete)
+	router.PUT("/api/workspace/:id/card/incomplete/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.MarkWorkspaceCardIncomplete)
 
 	// Workspace Card Status
 	router.GET("/api/workspace/:id/status", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ListWorkspaceCardStatus)
