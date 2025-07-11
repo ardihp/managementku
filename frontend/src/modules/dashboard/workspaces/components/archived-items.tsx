@@ -23,6 +23,7 @@ interface ArchivedItemsProps {
   onOpenChange: () => void;
   type: "workspace" | "workspace-detail";
   workspaceId?: number;
+  isAdmin?: boolean;
 }
 
 export default function ArchivedItems({
@@ -30,6 +31,7 @@ export default function ArchivedItems({
   onOpenChange,
   type,
   workspaceId = 0,
+  isAdmin = false,
 }: ArchivedItemsProps) {
   // type workspace
   const { getListArchivedWorkspace } = useWorkspace();
@@ -79,6 +81,7 @@ export default function ArchivedItems({
                     card={card}
                     isArchived={card.is_archived}
                     workspaceId={workspaceId}
+                    isAdmin={isAdmin}
                   />
                 ))
               ) : (

@@ -24,8 +24,10 @@ export interface WorkspaceCardByStatus extends WorkspaceStatus {
 }
 
 export interface WorkspaceCardActivity {
+  id: number;
   user_created: string;
   message: string;
+  type: string;
   created_at: Date;
   updated_at: Date;
 }

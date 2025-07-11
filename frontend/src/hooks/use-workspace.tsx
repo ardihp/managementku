@@ -25,6 +25,20 @@ export const useWorkspace = () => {
     });
   };
 
+  const GetListWorkspaceMember = (workspace_id: number) => {
+    return useQuery({
+      queryKey: ["workspace/list-member", workspace_id],
+      queryFn: async () => {
+        const response = await Api.get(
+          endpoint.workspace.list_member(workspace_id)
+        );
+        return response.data.data;
+      },
+      staleTime: Infinity,
+      enabled: workspace_id !== 0,
+    });
+  };
+
   const GetDetailWorkspace = (id: number) => {
     return useQuery({
       queryKey: ["workspace/detail", id],
@@ -182,6 +196,7 @@ export const useWorkspace = () => {
 
   return {
     getListWorkspace: GetListWorkspace,
+    getListWorkspaceMember: GetListWorkspaceMember,
     getDetailWorkspace: GetDetailWorkspace,
     createWorkspace: CreateWorkspace,
     updateWorkspace: UpdateWorkspace,

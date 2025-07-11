@@ -24,12 +24,23 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const MenuBar = ({ refetch = 0 }: { refetch?: number }) => {
+const MenuBar = ({
+  refetch = 0,
+  value = "",
+}: {
+  refetch?: number;
+  value?: string;
+}) => {
   const { editor } = useCurrentEditor();
 
   useEffect(() => {
     if (refetch >= 1) {
-      editor?.commands.clearContent(true);
+      if (value === "") {
+        editor?.destroy();
+      } else {
+        editor?.commands.clearContent();
+        editor?.commands.setContent(value);
+      }
     }
   }, [refetch]);
 
@@ -276,7 +287,7 @@ export default function TextEditor({
         ),
       }}
       content={value}
-      slotBefore={<MenuBar refetch={refetch} />}
+      slotBefore={<MenuBar refetch={refetch} value={value} />}
       extensions={[
         ...extensions,
         Placeholder.configure({

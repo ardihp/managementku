@@ -91,6 +91,7 @@ export default function ColumnStatus({
                             return (
                               <TaskCard
                                 card={card}
+                                isAdmin={isAdmin}
                                 workspaceId={workspaceId}
                                 customClassName="my-2"
                                 isArchived={card.is_archived}

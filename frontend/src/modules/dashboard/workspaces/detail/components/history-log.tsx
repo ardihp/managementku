@@ -27,18 +27,20 @@ export default function HistoryLog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="min-w-fit">
+      <DialogContent className="min-w-2xl max-w-2xl">
         <DialogHeader>
           <DialogTitle>Workspace History Logs</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
-        <DataTable
-          columns={historyColumns}
-          data={historyLogs}
-          isLoading={loadingHistory}
-          disablePaginationSize
-        />
+        <div className="max-w-full">
+          <DataTable
+            columns={historyColumns}
+            data={historyLogs}
+            isLoading={loadingHistory}
+            disablePaginationSize
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

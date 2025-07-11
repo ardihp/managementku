@@ -19,3 +19,8 @@ export interface UpdateWorkspaceCardOrderRequest {
   card_id: number;
   order_status: CardOrderItem[];
 }
+
+export interface AssignWorkspaceCardMemberRequest {
+  card_id: number;
+  user_id: number[];
+}

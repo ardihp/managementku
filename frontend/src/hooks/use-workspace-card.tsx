@@ -1,10 +1,12 @@
 import { endpoint } from "@/const/endpoint";
 import Api from "@/services/api";
 import {
+  AssignWorkspaceCardMemberRequest,
   CreateWorkspaceCardRequest,
   UpdateWorkspaceCardOrderRequest,
   UpdateWorkspaceCardRequest,
 } from "@/types/hooks/workspace-card";
+import { WorkspaceCard } from "@/types/workspace-card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -53,6 +55,95 @@ export const useWorkspaceCard = () => {
     });
   };
 
+  const GetListWorkspaceCardMember = (card_id: number) => {
+    return useQuery({
+      queryKey: ["workspace-card/list-member", card_id],
+      queryFn: async () => {
+        const response = await Api.get(
+          endpoint.workspace.card.list_member(card_id)
+        );
+        return response.data.data;
+      },
+      staleTime: Infinity,
+      enabled: card_id !== 0,
+    });
+  };
+
+  const AssignWorkspaceCardMember = (workspace_id: number, card_id: number) => {
+    return useMutation({
+      mutationKey: ["workspace-card/assign"],
+      mutationFn: async (data: AssignWorkspaceCardMemberRequest) => {
+        const response = await Api.post(
+          endpoint.workspace.card.assign_member(workspace_id),
+          data
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
+      },
+    });
+  };
+
+  const WatchWorkspaceCard = (workspace_id: number, card_id: number) => {
+    return useMutation({
+      mutationKey: ["workspace-card/watch"],
+      mutationFn: async (data: { user_id: number }) => {
+        const response = await Api.put(
+          endpoint.workspace.card.watch(workspace_id, card_id),
+          data
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
+      },
+    });
+  };
+
+  const UnwatchWorkspaceCard = (workspace_id: number, card_id: number) => {
+    return useMutation({
+      mutationKey: ["workspace-card/unwatch"],
+      mutationFn: async (data: { user_id: number }) => {
+        const response = await Api.put(
+          endpoint.workspace.card.unwatch(workspace_id, card_id),
+          data
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({ queryKey: ["user/history-logs"] });
+      },
+    });
+  };
+
   const GetListWorkspaceCardActivities = (
     workspace_id: number,
     card_id: number
@@ -89,6 +180,79 @@ export const useWorkspaceCard = () => {
         });
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+      },
+    });
+  };
+
+  const UpdateWorkspaceCardActivity = (
+    workspace_id: number,
+    card_id: number
+  ) => {
+    return useMutation({
+      mutationKey: ["workspace-card/update-activity"],
+      mutationFn: async ({
+        activity_id,
+        data,
+      }: {
+        activity_id: number;
+        data: { message: string };
+      }) => {
+        const response = await Api.put(
+          endpoint.workspace.card.activity.update(
+            workspace_id,
+            card_id,
+            activity_id
+          ),
+          data
+        );
+        return response.data.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-archived", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+      },
+    });
+  };
+
+  const DeleteWorkspaceCardActivity = (
+    workspace_id: number,
+    card_id: number
+  ) => {
+    return useMutation({
+      mutationKey: ["workspace-card/delete-activity"],
+      mutationFn: async (activity_id: number) => {
+        const response = await Api.delete(
+          endpoint.workspace.card.activity.delete(
+            workspace_id,
+            card_id,
+            activity_id
+          )
+        );
+        return response.data.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", card_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-archived", workspace_id],
         });
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
@@ -254,9 +418,12 @@ export const useWorkspaceCard = () => {
         );
         return response.data;
       },
-      onSuccess: () => {
+      onSuccess: (response: { data: WorkspaceCard }) => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-activity", response.data.id],
         });
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
@@ -269,8 +436,14 @@ export const useWorkspaceCard = () => {
     getListWorkspaceHistoryLog: GetListWorkspaceHistoryLog,
     getListWorkspaceCard: GetListWorkspaceCard,
     getListArchivedWorkspaceCard: GetListArchivedWorkspaceCard,
+    getListWorkspaceCardMember: GetListWorkspaceCardMember,
+    assignWorkspaceCardMember: AssignWorkspaceCardMember,
+    watchWorkspaceCard: WatchWorkspaceCard,
+    unwatchWorkspaceCard: UnwatchWorkspaceCard,
     getListWorkspaceCardActivities: GetListWorkspaceCardActivities,
     createWorkspaceCardActivity: CreateWorkspaceCardActivity,
+    updateWorkspaceCardActivity: UpdateWorkspaceCardActivity,
+    deleteWorkspaceCardActivity: DeleteWorkspaceCardActivity,
     createWorkspaceCard: CreateWorkspaceCard,
     updateWorkspaceCard: UpdateWorkspaceCard,
     archivedWorkspaceCard: ArchivedWorkspaceCard,

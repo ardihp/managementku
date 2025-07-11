@@ -8,51 +8,59 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { WorkspaceCard, WorkspaceCardActivity } from "@/types/workspace-card";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, CircleX, Loader2 } from "lucide-react";
 import dayjs from "dayjs";
 import WorkspaceAction from "./action";
 import ColorfulBadge from "@/components/layout/colorful-badge";
 import TextEditor from "@/components/ui/text-editor";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import ActivityItem from "./activity-item";
 
 interface DetailWorkspaceCardProps {
   open: boolean;
-  onOpenChange: () => void;
   card: WorkspaceCard;
   workspaceId: number;
+  isAdmin: boolean;
   setSelectedCard: (val: WorkspaceCard) => void;
+  onOpenChange: () => void;
 }
 
 export default function DetailWorkspaceCard({
   open,
-  onOpenChange,
   card,
   workspaceId,
+  isAdmin,
   setSelectedCard,
+  onOpenChange,
 }: DetailWorkspaceCardProps) {
   const [message, setMessage] = useState("");
   const [refetch, setRefetch] = useState(0);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [editComment, setEditCommend] = useState(false);
+  const [selectedComment, setSelectedComment] = useState(0);
 
-  const { getListWorkspaceCardActivities, createWorkspaceCardActivity } =
-    useWorkspaceCard();
+  const {
+    getListWorkspaceCardActivities,
+    createWorkspaceCardActivity,
+    updateWorkspaceCardActivity,
+  } = useWorkspaceCard();
 
   const { data: activities, isLoading: loadingActivity } =
     getListWorkspaceCardActivities(workspaceId, open ? card.id : 0);
-
   const { mutateAsync: create, isPending: loadingCreate } =
     createWorkspaceCardActivity(workspaceId, open ? card.id : 0);
+  const { mutateAsync: update, isPending: loadingUpdate } =
+    updateWorkspaceCardActivity(workspaceId, open ? card.id : 0);
 
   useEffect(() => {
     if (contentLoaded && open) {
       const descriptionheight =
-        document.getElementById("description")?.clientHeight || 0;
+        document.getElementById("description")?.offsetHeight || 0;
       const detailHeaderheight =
-        document.getElementById("detail-header")?.clientHeight || 0;
+        document.getElementById("detail-header")?.offsetHeight || 0;
       const floatingFormheight =
-        document.getElementById("floating-form")?.clientHeight || 0;
+        document.getElementById("floating-form")?.offsetHeight || 0;
 
       const wrapperElement = document.getElementById("wrapper-detail");
       if (wrapperElement) {
@@ -69,11 +77,13 @@ export default function DetailWorkspaceCard({
   }, [contentLoaded, open, message]);
 
   useEffect(() => {
-    setMessage("");
-    setRefetch(refetch + 1);
+    setEditCommend(false);
+    setSelectedComment(0);
+    setContentLoaded(false);
 
     if (open) {
-      setContentLoaded(false);
+      setMessage("");
+      setRefetch(refetch + 1);
     }
 
     setTimeout(() => {
@@ -85,13 +95,19 @@ export default function DetailWorkspaceCard({
     e.preventDefault();
 
     try {
-      await create({ message });
+      if (editComment) {
+        await update({ activity_id: selectedComment, data: { message } });
+      } else {
+        await create({ message });
+      }
     } catch (error) {
       console.log(error);
     }
 
     setMessage("");
     setRefetch(refetch + 1);
+    setEditCommend(false);
+    setSelectedComment(0);
   }
 
   return (
@@ -121,6 +137,8 @@ export default function DetailWorkspaceCard({
                 card={card}
                 isArchived={card.is_archived}
                 workspaceId={workspaceId}
+                afterAction={onOpenChange}
+                isAdmin={isAdmin}
               />
             </div>
           </div>
@@ -137,6 +155,26 @@ export default function DetailWorkspaceCard({
               </span>
               , {dayjs(card.created_at).format("DD/MM/YYYY HH:mm:ss")} WIB
             </p>
+          </div>
+
+          <div className="flex flex-col gap-3 mt-3">
+            <p className="text-sm font-medium leading-none">
+              Who watch this card
+            </p>
+
+            {card.members.length >= 1 ? (
+              <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2">
+                {card.members.map((member, key) => (
+                  <Avatar key={key} title={member.username} className="size-6">
+                    <AvatarFallback className="uppercase text-xs">
+                      {member.username?.split(" ")?.map((text) => text?.[0])}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+            ) : (
+              <p>-</p>
+            )}
           </div>
 
           <DrawerDescription className="hidden"></DrawerDescription>
@@ -171,44 +209,29 @@ export default function DetailWorkspaceCard({
                   <div className="flex flex-col h-full items-center justify-center">
                     <Loader2 className="animate-spin mx-auto mb-2 size-6" />
                   </div>
-                ) : activities?.length >= 1 ? (
+                ) : (
                   activities?.map(
                     (activity: WorkspaceCardActivity, key: number) => (
-                      <div
+                      <ActivityItem
                         key={key}
-                        className="flex gap-4 items-start first:border-0 border-t py-4 px-[25px] bg-transparent hover:bg-zinc-300/50 duration-200"
-                      >
-                        <Avatar className="size-10">
-                          <AvatarFallback className="capitalize">
-                            {activity.user_created[0]}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="flex flex-col w-full">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium capitalize truncate">
-                              {activity.user_created}
-                            </p>
-                            <p className="text-xs">
-                              {dayjs(activity.created_at).format(
-                                "DD/MM/YYYY, HH:mm:ss"
-                              )}{" "}
-                              WIB
-                            </p>
-                          </div>
-
-                          <div
-                            className="text-xs opacity-80 font-light description-detail"
-                            dangerouslySetInnerHTML={{
-                              __html: activity.message,
-                            }}
-                          />
-                        </div>
-                      </div>
+                        activity={activity}
+                        cardId={card.id}
+                        workspaceId={workspaceId}
+                        onSelectEdit={(selected_id) => {
+                          setMessage(activity.message);
+                          setRefetch(refetch + 1);
+                          setEditCommend(true);
+                          setSelectedComment(selected_id);
+                        }}
+                        afterDelete={() => {
+                          setMessage("");
+                          setRefetch(refetch + 1);
+                          setEditCommend(false);
+                          setSelectedComment(0);
+                        }}
+                      />
                     )
                   )
-                ) : (
-                  <></>
                 )}
               </div>
             </div>
@@ -216,23 +239,44 @@ export default function DetailWorkspaceCard({
             <form
               id="floating-form"
               onSubmit={handleSubmit}
-              className="flex p-[14px] fixed bottom-0 border-t items-end gap-2 w-xl z-10 bg-white"
+              className="flex p-[14px] min-h-[105px] fixed bottom-0 border-t gap-2 w-xl z-10 bg-white"
             >
               <div className="flex flex-col gap-2 w-full">
                 <TextEditor
                   value={message}
-                  onValueChange={(newVal) =>
-                    setMessage(newVal === "<p></p>" ? "" : newVal)
-                  }
+                  onValueChange={(newVal) => {
+                    setMessage(newVal === "<p></p>" ? "" : newVal);
+                  }}
                   editorClassName="max-h-[80px] overflow-auto"
                   refetch={refetch}
-                  disabled={loadingCreate}
+                  disabled={loadingCreate || loadingUpdate}
                 />
               </div>
 
-              <Button className="h-[34px]" disabled={!message || loadingCreate}>
-                <p className="leading-none">Send</p>
-              </Button>
+              <div className="flex flex-col">
+                {editComment && (
+                  <div
+                    className="flex items-center justify-center cursor-pointer h-9 w-fit mx-auto"
+                    onClick={() => {
+                      setEditCommend(false);
+                      setSelectedComment(0);
+                      setMessage("");
+                      setRefetch(refetch + 1);
+                    }}
+                  >
+                    <CircleX className="size-6" />
+                  </div>
+                )}
+
+                <Button
+                  className="h-[34px] mt-auto"
+                  disabled={!message || loadingCreate || loadingUpdate}
+                >
+                  <p className="leading-none">
+                    {editComment ? "Save" : "Send"}
+                  </p>
+                </Button>
+              </div>
             </form>
           </div>
         )}

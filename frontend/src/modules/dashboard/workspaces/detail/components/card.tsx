@@ -11,6 +11,7 @@ interface TaskCardProps {
   workspaceId?: number;
   isArchived: boolean;
   card: WorkspaceCard;
+  isAdmin?: boolean;
   setSelectedCard?: (val: WorkspaceCard) => void;
   customClassName?: string;
   isDragging?: boolean;
@@ -19,6 +20,7 @@ interface TaskCardProps {
 
 export default function TaskCard({
   card,
+  isAdmin = false,
   workspaceId = 0,
   customClassName,
   setSelectedCard = () => {},
@@ -37,6 +39,7 @@ export default function TaskCard({
         onOpenChange={() => setOpenDrawer(false)}
         card={card}
         workspaceId={workspaceId}
+        isAdmin={isAdmin}
       />
 
       <div
@@ -53,11 +56,12 @@ export default function TaskCard({
           card={card}
           isArchived={isArchived}
           workspaceId={workspaceId}
+          isAdmin={isAdmin}
         />
 
         <div
           className="w-full border rounded-xl bg-white group-hover:bg-zinc-50/50 flex flex-col p-4 gap-3 duration-200"
-          onClick={() => (isArchived ? {} : setOpenDrawer(true))}
+          onClick={() => setOpenDrawer(true)}
         >
           <p
             className="font-medium capitalize leading-none line-clamp-2"
@@ -66,29 +70,37 @@ export default function TaskCard({
             {card.title}
           </p>
 
-          {card.description && (
-            <div className="flex items-center gap-3">
-              <div title="This card has a description.">
-                <Text className="size-4 opacity-70" />
-              </div>
+          {(card.description || card.members.length >= 1) && (
+            <div className="flex items-center justify-between min-h-6">
+              {card.description && (
+                <div className="flex items-center gap-3">
+                  <div title="This card has a description.">
+                    <Text className="size-4 opacity-70" />
+                  </div>
 
-              {card.description.includes("<a") && (
-                <div title="This card has a link.">
-                  <Link2 className="size-4 opacity-70" />
+                  {card.description.includes("<a") && (
+                    <div title="This card has a link.">
+                      <Link2 className="size-4 opacity-70" />
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {card.members.length >= 1 && (
-            <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto">
-              {card.members.map((member, key) => (
-                <Avatar key={key} title={member.username} className="size-8">
-                  <AvatarFallback className="uppercase text-sm">
-                    {member.username?.split(" ")?.map((text) => text?.[0])}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
+              {card.members.length >= 1 && (
+                <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto">
+                  {card.members.map((member, key) => (
+                    <Avatar
+                      key={key}
+                      title={member.username}
+                      className="size-6"
+                    >
+                      <AvatarFallback className="uppercase text-xs">
+                        {member.username?.split(" ")?.map((text) => text?.[0])}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

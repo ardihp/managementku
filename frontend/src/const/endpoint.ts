@@ -13,6 +13,7 @@ export const endpoint = {
     list_archived: "/workspace/archived",
     update_order: "/workspace/update-order",
     assign_member: "/workspace/assign",
+    list_member: (id: number) => `/workspace-member/${id}`,
 
     status: {
       list: "/workspace/status",
@@ -38,6 +39,7 @@ export const endpoint = {
       list: (workspace_id: number) => `/workspace/${workspace_id}/card`,
       list_archived: (workspace_id: number) =>
         `/workspace/${workspace_id}/card/archived`,
+      list_member: (card_id: number) => `/card-member/${card_id}`,
       create: (workspace_id: number) =>
         `/workspace/${workspace_id}/card/create`,
       update: (workspace_id: number, card_id: number) =>
@@ -52,6 +54,12 @@ export const endpoint = {
         `/workspace/${workspace_id}/card/status-order`,
       update_order: (workspace_id: number) =>
         `/workspace/${workspace_id}/card/update-order`,
+      assign_member: (workspace_id: number) =>
+        `/workspace/${workspace_id}/card/assign`,
+      watch: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/watch/${card_id}`,
+      unwatch: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/unwatch/${card_id}`,
 
       status: {
         list: (workspace_id: number) => `/workspace/${workspace_id}/status`,
@@ -74,6 +82,10 @@ export const endpoint = {
           `/workspace/${workspace_id}/card/${card_id}/activity`,
         create: (workspace_id: number, card_id: number) =>
           `/workspace/${workspace_id}/card/${card_id}/create-activity`,
+        update: (workspace_id: number, card_id: number, activity_id: number) =>
+          `/workspace/${workspace_id}/card/${card_id}/update-activity/${activity_id}`,
+        delete: (workspace_id: number, card_id: number, activity_id: number) =>
+          `/workspace/${workspace_id}/card/${card_id}/delete-activity/${activity_id}`,
       },
     },
   },

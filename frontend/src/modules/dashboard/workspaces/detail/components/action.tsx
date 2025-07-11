@@ -7,42 +7,54 @@ import {
 import {
   Archive,
   ArchiveRestore,
+  BadgeMinus,
   Ellipsis,
+  Merge,
   Pencil,
   Trash2,
   Users2,
 } from "lucide-react";
-import { useWorkspace } from "@/hooks/use-workspace";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import { WorkspaceCard } from "@/types/workspace-card";
+import AssignMember from "./assign-member";
+import { useAuth } from "@/hooks/auth/use-auth";
 
 interface WorkspaceActionProps {
-  setSelectedCard?: (item: any) => void;
   card: WorkspaceCard;
   isArchived: boolean;
   workspaceId?: number;
+  isAdmin?: boolean;
+  afterAction?: () => void;
+  setSelectedCard?: (item: any) => void;
 }
 
 export default function WorkspaceAction({
-  setSelectedCard = () => {},
   card,
   isArchived = false,
   workspaceId = 0,
+  isAdmin = false,
+  afterAction = () => {},
+  setSelectedCard = () => {},
 }: WorkspaceActionProps) {
   const [openPopover, setOpenPopover] = useState(false);
   const [openDialog, setOpenDialog] = useState({
     member: false,
   });
+  const { user } = useAuth();
 
   const {
     archivedWorkspaceCard,
     unarchivedWorkspaceCard,
     deleteWorkspaceCard,
+    watchWorkspaceCard,
+    unwatchWorkspaceCard,
   } = useWorkspaceCard();
 
   const { mutateAsync: archiveCard } = archivedWorkspaceCard(workspaceId);
   const { mutateAsync: unarchiveCard } = unarchivedWorkspaceCard(workspaceId);
   const { mutateAsync: deleteCard } = deleteWorkspaceCard(workspaceId);
+  const { mutateAsync: watch } = watchWorkspaceCard(workspaceId, card.id);
+  const { mutateAsync: unwatch } = unwatchWorkspaceCard(workspaceId, card.id);
 
   const handleArchiveWorkspace = async (id: number) => {
     try {
@@ -51,6 +63,7 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    afterAction();
   };
 
   const handleUnarchiveWorkspace = async (id: number) => {
@@ -60,6 +73,7 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    afterAction();
   };
 
   const handleDeleteWorkspace = async (id: number) => {
@@ -69,19 +83,39 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    afterAction();
+  };
+
+  const handleWatchWorkspace = async () => {
+    try {
+      await watch({ user_id: user?.id || 0 });
+    } catch (error) {
+      console.error(error);
+    }
+    setOpenPopover(false);
+  };
+
+  const handleUnwatchWorkspace = async () => {
+    try {
+      await unwatch({ user_id: user?.id || 0 });
+    } catch (error) {
+      console.error(error);
+    }
+    setOpenPopover(false);
   };
 
   return (
     <>
-      {/* {openDialog.member && (
+      {openDialog.member && (
         <AssignMember
           open={openDialog.member}
           onOpenChange={() =>
             setOpenDialog((prevVal) => ({ ...prevVal, member: false }))
           }
-          workspace={workspace}
+          workspaceId={workspaceId}
+          card={card}
         />
-      )} */}
+      )}
 
       <Popover onOpenChange={setOpenPopover} open={openPopover}>
         <PopoverTrigger className="absolute top-2 right-2 z-[10] size-8 flex items-center justify-center cursor-pointer">
@@ -114,16 +148,40 @@ export default function WorkspaceAction({
                 <Pencil className="size-4" />
                 <p className="text-sm">Update</p>
               </div>
-              <div
-                className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
-                onClick={() => {
-                  setOpenPopover(false);
-                  setOpenDialog((prevVal) => ({ ...prevVal, member: true }));
-                }}
-              >
-                <Users2 className="size-4" />
-                <p className="text-sm">Assign Member</p>
-              </div>
+              {isAdmin ? (
+                <div
+                  className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+                  onClick={() => {
+                    setOpenPopover(false);
+                    setOpenDialog((prevVal) => ({ ...prevVal, member: true }));
+                  }}
+                >
+                  <Users2 className="size-4" />
+                  <p className="text-sm">Assign Member</p>
+                </div>
+              ) : card.members.some((member) => member.id === user?.id) ? (
+                <div
+                  className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+                  onClick={() => {
+                    setOpenPopover(false);
+                    handleUnwatchWorkspace();
+                  }}
+                >
+                  <BadgeMinus className="size-4" />
+                  <p className="text-sm">Unwatch this Card</p>
+                </div>
+              ) : (
+                <div
+                  className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+                  onClick={() => {
+                    setOpenPopover(false);
+                    handleWatchWorkspace();
+                  }}
+                >
+                  <Merge className="size-4 -rotate-90" />
+                  <p className="text-sm">Watch this Card</p>
+                </div>
+              )}
               <div
                 className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
                 onClick={() => handleArchiveWorkspace(card.id)}

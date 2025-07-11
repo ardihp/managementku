@@ -21,5 +21,10 @@ export const historyColumns: ColumnDef<HistoryLog>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      return (
+        <p className="text-wrap">{row.original.description}</p>
+      );
+    },
   },
 ];
