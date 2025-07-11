@@ -37,6 +37,8 @@ func SetupRouter() *gin.Engine {
 
 	// User
 	router.GET("/api/employee", middlewares.AuthMiddleware(), userControllers.ListEmployee)
+	router.GET("/api/card-member/:id", middlewares.AuthMiddleware(), userControllers.ListWorkspaceCardMember)
+	router.GET("/api/workspace-member/:id", middlewares.AuthMiddleware(), userControllers.ListWorkspaceMember)
 
 	// Workspace
 	router.GET("/api/workspace", middlewares.AuthMiddleware(), workspaceControllers.ListWorkspace)
@@ -76,6 +78,9 @@ func SetupRouter() *gin.Engine {
 	router.DELETE("/api/workspace/:id/card/delete/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.DeleteWorkspaceCard)
 	router.POST("/api/workspace/:id/card/status-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardStatusOrder)
 	router.POST("/api/workspace/:id/card/update-order", middlewares.AuthMiddleware(), workspaceCardControllers.UpdateWorkspaceCardOrder)
+	router.POST("/api/workspace/:id/card/assign", middlewares.AuthMiddleware(), workspaceCardControllers.AssignMemberToWorkspaceCard)
+	router.PUT("/api/workspace/:id/card/watch/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.WatchWorkspaceCard)
+	router.PUT("/api/workspace/:id/card/unwatch/:card_id", middlewares.AuthMiddleware(), workspaceCardControllers.UnwatchWorkspaceCard)
 
 	// Workspace Card Status
 	router.GET("/api/workspace/:id/status", middlewares.AuthMiddleware(), workspaceCardStatusControllers.ListWorkspaceCardStatus)

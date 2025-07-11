@@ -108,6 +108,15 @@ type WorkspaceAssignMember struct {
 	UserId      []int `json:"user_id" binding:"required"`
 }
 
+type WorkspaceCardAssignMember struct {
+	CardId int   `json:"card_id" binding:"required"`
+	UserId []int `json:"user_id" binding:"required"`
+}
+
+type WorkspaceWatchCardRequest struct {
+	UserId int `json:"user_id" binding:"required"`
+}
+
 type WorkspaceCreateRoleRequest struct {
 	Name string `json:"name" binding:"required"`
 }

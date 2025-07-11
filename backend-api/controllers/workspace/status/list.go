@@ -45,7 +45,8 @@ func ListWorkspaceStatus(c *gin.Context) {
 func ListArchivedWorkspaceStatus(c *gin.Context) {
 	workspace_status := []models.WorkspaceStatus{}
 	user_id := c.GetInt("user_id")
-	user := models.User{Id: uint(user_id)}
+	user := models.User{}
+	database.DB.First(&user, user_id)
 
 	if err := database.DB.Where("is_archived = ?", true).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_status).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -60,7 +61,6 @@ func ListArchivedWorkspaceStatus(c *gin.Context) {
 		c.JSON(http.StatusForbidden, structs.ErrorResponse{
 			Success: false,
 			Message: "You are not allowed to access this resource",
-			Errors:  map[string]string{},
 		})
 		return
 	}

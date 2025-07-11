@@ -67,22 +67,6 @@ func UpdateWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
-		workspace_card_activity := models.WorkspaceCardActivity{
-			CardId:  workspace_card.Id,
-			UserId:  uint(user_id),
-			Type:    "general",
-			Message: fmt.Sprintf("User %s has changes to this card", user.Username),
-		}
-
-		if err := trx.Create(&workspace_card_activity).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return err
-		}
-
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
@@ -117,7 +101,22 @@ func UpdateWorkspaceCard(c *gin.Context) {
 		c.JSON(http.StatusOK, structs.SuccessResponse{
 			Success: true,
 			Message: "Workspace updated successfully",
-			Data:    "",
+			Data: structs.WorkspaceCardResponse{
+				Id:          workspace_card.Id,
+				Title:       workspace_card.Title,
+				Description: workspace_card.Description,
+				Status: structs.WorkspaceCardStatus{
+					Id:         workspace_card.Status.Id,
+					Order:      workspace_card.Status.Order,
+					Name:       workspace_card.Status.Name,
+					Color:      workspace_card.Status.Color,
+					IsArchived: workspace_card.Status.IsArchived,
+				},
+				UserCreated: workspace_card.UserCreated.Username,
+				IsArchived:  workspace_card.IsArchived,
+				CreatedAt:   workspace_card.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:   workspace_card.UpdatedAt.Format("2006-01-02 15:04:05"),
+			},
 		})
 
 		return nil
