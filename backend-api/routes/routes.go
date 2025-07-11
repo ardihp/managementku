@@ -94,6 +94,8 @@ func SetupRouter() *gin.Engine {
 	// Workspace Card Activity
 	router.GET("/api/workspace/:id/card/:card_id/activity", middlewares.AuthMiddleware(), workspaceCardActivityControllers.ListWorkspaceCardActivity)
 	router.POST("/api/workspace/:id/card/:card_id/create-activity", middlewares.AuthMiddleware(), workspaceCardActivityControllers.CreateWorkspaceCardActivity)
+	router.PUT("/api/workspace/:id/card/:card_id/update-activity/:activity_id", middlewares.AuthMiddleware(), workspaceCardActivityControllers.UpdateWorkspaceCardActivity)
+	router.DELETE("/api/workspace/:id/card/:card_id/delete-activity/:activity_id", middlewares.AuthMiddleware(), workspaceCardActivityControllers.DeleteWorkspaceCardActivity)
 
 	// History Logs
 	router.GET("/api/history-logs", middlewares.AuthMiddleware(), historyControllers.ListHistoryLog)
