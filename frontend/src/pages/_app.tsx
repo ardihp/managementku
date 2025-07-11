@@ -25,13 +25,13 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <main className={cn(geistSans.variable, quicksand.variable, "font-sans")}>
-      <LayoutPage>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <LayoutPage>
           <Component {...pageProps} />
           <Toaster />
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-        </QueryClientProvider>
-      </LayoutPage>
+        </LayoutPage>
+      </QueryClientProvider>
     </main>
   );
 }

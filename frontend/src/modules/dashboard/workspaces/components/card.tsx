@@ -38,7 +38,7 @@ const WorkspaceCard = ({
       ref={ref}
       {...rest}
     >
-      {user!.role === "manager" && (
+      {user?.role === "manager" && (
         <WorkspaceAction
           setSelectedWorkspace={setSelectedWorkspace}
           workspace={workspace}

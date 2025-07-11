@@ -4,7 +4,7 @@ import { endpoint } from "@/const/endpoint";
 import { paths } from "@/const/routes";
 import { AuthContext } from "@/context/auth";
 import Api from "@/services/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { cookies } from "next/headers";
 import { useRouter } from "next/router";
@@ -36,6 +36,7 @@ export const useAuth = () => {
   const user = Cookies.get("user");
   const { setIsAuth } = useContext(AuthContext);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const HandleSignIn = () => {
     return useMutation({
@@ -60,6 +61,7 @@ export const useAuth = () => {
   const HandleLogout = () => {
     const toastID = "sign-out";
     toast("Signing out...", { id: toastID });
+    queryClient.removeQueries();
     Cookies.remove("token");
     Cookies.remove("user");
     setIsAuth(false);
