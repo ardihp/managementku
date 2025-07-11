@@ -8,6 +8,8 @@ import {
   Archive,
   ArchiveRestore,
   BadgeMinus,
+  CircleCheck,
+  CircleX,
   Ellipsis,
   Merge,
   Pencil,
@@ -48,6 +50,8 @@ export default function WorkspaceAction({
     deleteWorkspaceCard,
     watchWorkspaceCard,
     unwatchWorkspaceCard,
+    completeWorkspaceCard,
+    incompleteWorkspaceCard,
   } = useWorkspaceCard();
 
   const { mutateAsync: archiveCard } = archivedWorkspaceCard(workspaceId);
@@ -55,6 +59,8 @@ export default function WorkspaceAction({
   const { mutateAsync: deleteCard } = deleteWorkspaceCard(workspaceId);
   const { mutateAsync: watch } = watchWorkspaceCard(workspaceId, card.id);
   const { mutateAsync: unwatch } = unwatchWorkspaceCard(workspaceId, card.id);
+  const { mutateAsync: complete } = completeWorkspaceCard(workspaceId);
+  const { mutateAsync: incomplete } = incompleteWorkspaceCard(workspaceId);
 
   const handleArchiveWorkspace = async (id: number) => {
     try {
@@ -104,6 +110,24 @@ export default function WorkspaceAction({
     setOpenPopover(false);
   };
 
+  const handleCompletedWorkspace = async () => {
+    try {
+      await complete(card.id);
+    } catch (error) {
+      console.error(error);
+    }
+    setOpenPopover(false);
+  };
+
+  const handleIncompletedWorkspace = async () => {
+    try {
+      await incomplete(card.id);
+    } catch (error) {
+      console.error(error);
+    }
+    setOpenPopover(false);
+  };
+
   return (
     <>
       {openDialog.member && (
@@ -141,6 +165,23 @@ export default function WorkspaceAction({
             </>
           ) : (
             <>
+              {card.is_completed ? (
+                <div
+                  className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+                  onClick={() => handleIncompletedWorkspace()}
+                >
+                  <CircleX className="size-4" />
+                  <p className="text-sm">Mark Incomplete</p>
+                </div>
+              ) : (
+                <div
+                  className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
+                  onClick={() => handleCompletedWorkspace()}
+                >
+                  <CircleCheck className="size-4" />
+                  <p className="text-sm">Mark Complete</p>
+                </div>
+              )}
               <div
                 className="flex items-center gap-2 hover:bg-zinc-50 py-2 px-3 rounded cursor-pointer"
                 onClick={() => setSelectedCard(card)}

@@ -60,6 +60,10 @@ export const endpoint = {
         `/workspace/${workspace_id}/card/watch/${card_id}`,
       unwatch: (workspace_id: number, card_id: number) =>
         `/workspace/${workspace_id}/card/unwatch/${card_id}`,
+      mark_complete: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/complete/${card_id}`,
+      mark_incomplete: (workspace_id: number, card_id: number) =>
+        `/workspace/${workspace_id}/card/incomplete/${card_id}`,
 
       status: {
         list: (workspace_id: number) => `/workspace/${workspace_id}/status`,

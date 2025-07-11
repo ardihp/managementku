@@ -362,6 +362,52 @@ export const useWorkspaceCard = () => {
     });
   };
 
+  const CompletedWorkspaceCard = (workspace_id: number) => {
+    return useMutation({
+      mutationKey: ["workspace-card/mark-complete"],
+      mutationFn: async (card_id: number) => {
+        const response = await Api.put(
+          endpoint.workspace.card.mark_complete(workspace_id, card_id)
+        );
+        return response.data.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-archived", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+      },
+    });
+  };
+
+  const IncompleteWorkspaceCard = (workspace_id: number) => {
+    return useMutation({
+      mutationKey: ["workspace-card/mark-incomplete"],
+      mutationFn: async (card_id: number) => {
+        const response = await Api.put(
+          endpoint.workspace.card.mark_incomplete(workspace_id, card_id)
+        );
+        return response.data.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/list-archived", workspace_id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace-card/history-log", workspace_id],
+        });
+      },
+    });
+  };
+
   const DeleteWorkspaceCard = (workspace_id: number) => {
     return useMutation({
       mutationKey: ["workspace-card/delete"],
@@ -436,19 +482,25 @@ export const useWorkspaceCard = () => {
     getListWorkspaceHistoryLog: GetListWorkspaceHistoryLog,
     getListWorkspaceCard: GetListWorkspaceCard,
     getListArchivedWorkspaceCard: GetListArchivedWorkspaceCard,
+
     getListWorkspaceCardMember: GetListWorkspaceCardMember,
     assignWorkspaceCardMember: AssignWorkspaceCardMember,
     watchWorkspaceCard: WatchWorkspaceCard,
     unwatchWorkspaceCard: UnwatchWorkspaceCard,
+
     getListWorkspaceCardActivities: GetListWorkspaceCardActivities,
     createWorkspaceCardActivity: CreateWorkspaceCardActivity,
     updateWorkspaceCardActivity: UpdateWorkspaceCardActivity,
     deleteWorkspaceCardActivity: DeleteWorkspaceCardActivity,
+
     createWorkspaceCard: CreateWorkspaceCard,
     updateWorkspaceCard: UpdateWorkspaceCard,
     archivedWorkspaceCard: ArchivedWorkspaceCard,
     unarchivedWorkspaceCard: UnarchivedWorkspaceCard,
     deleteWorkspaceCard: DeleteWorkspaceCard,
+    completeWorkspaceCard: CompletedWorkspaceCard,
+    incompleteWorkspaceCard: IncompleteWorkspaceCard,
+
     updateWorkspaceCardStatusOrder: UpdateWorkspaceCardStatusOrder,
     updateWorkspaceCardOrder: UpdateWorkspaceCardOrder,
   };

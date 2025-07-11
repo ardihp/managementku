@@ -60,7 +60,12 @@ export default function TaskCard({
         />
 
         <div
-          className="w-full border rounded-xl bg-white group-hover:bg-zinc-50/50 flex flex-col p-4 gap-3 duration-200"
+          className={cn(
+            "w-full border rounded-xl flex flex-col p-4 gap-3 duration-200",
+            card.is_completed
+              ? "bg-[#f5f8f5] border-[#8aa895]"
+              : "bg-white group-hover:bg-zinc-50/50"
+          )}
           onClick={() => setOpenDrawer(true)}
         >
           <p

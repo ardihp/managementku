@@ -14,6 +14,7 @@ export interface WorkspaceCard {
   status: WorkspaceStatus;
   members: WorkspaceCardMember[];
   is_archived: boolean;
+  is_completed: boolean;
   user_created: string;
   created_at: Date;
   updated_at: Date;
