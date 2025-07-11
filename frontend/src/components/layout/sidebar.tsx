@@ -70,7 +70,9 @@ export default function AppSidebar() {
                     >
                       {item.icon}
 
-                      <p className="font-medium leading-none mt-0.5">{item.title}</p>
+                      <p className="font-medium leading-none mt-0.5">
+                        {item.title}
+                      </p>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -100,7 +102,9 @@ export default function AppSidebar() {
                       >
                         {item.icon}
 
-                        <p className="font-medium leading-none mt-0.5">{item.title}</p>
+                        <p className="font-medium leading-none mt-0.5">
+                          {item.title}
+                        </p>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -142,9 +146,8 @@ export default function AppSidebar() {
                 side="right"
                 align="center"
               >
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>Options</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem onClick={userSignOut}>
                   Logout
                 </DropdownMenuItem>

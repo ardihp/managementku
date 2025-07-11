@@ -39,6 +39,10 @@ export interface Workspace {
   status: WorkspaceStatus;
   members: Member[];
   is_archived: boolean;
+  count_cards: {
+    completed: number;
+    incomplete: number;
+  };
   created_at: string;
   updated_at: string;
 }

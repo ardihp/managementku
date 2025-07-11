@@ -27,7 +27,7 @@ export default function WorkspacesView() {
   const [selectedStatus, setSelectedStatus] = useState<WorkspaceStatus | null>(
     null
   );
-  const [loadingPage, setLoadingPage] = useState(true);
+  const [loadingPage, setLoadingPage] = useState(false);
   const [openDialog, setOpenDialog] = useState({
     workspace: false,
     status: false,
@@ -72,6 +72,10 @@ export default function WorkspacesView() {
   }, []);
 
   useEffect(() => {
+    if (loadingWorkspace) {
+      setLoadingPage(true);
+    }
+
     if (!loadingWorkspace && !fetchWorkspace) {
       setListWorkspaceByStatus(listWorkspace);
       setLoadingPage(false);

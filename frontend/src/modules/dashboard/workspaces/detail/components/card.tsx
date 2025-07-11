@@ -4,7 +4,7 @@ import { WorkspaceCard, WorkspaceCardMember } from "@/types/workspace-card";
 import { Draggable } from "@hello-pangea/dnd";
 import React, { useState } from "react";
 import WorkspaceAction from "./action";
-import { Link2, Text } from "lucide-react";
+import { CircleCheck, Link2, Text } from "lucide-react";
 import DetailWorkspaceCard from "./detail-card";
 
 interface TaskCardProps {
@@ -60,39 +60,42 @@ export default function TaskCard({
         />
 
         <div
-          className={cn(
-            "w-full border rounded-xl flex flex-col p-4 gap-3 duration-200",
-            card.is_completed
-              ? "bg-[#f5f8f5] border-[#8aa895]"
-              : "bg-white group-hover:bg-zinc-50/50"
-          )}
+          className="w-full border rounded-xl flex flex-col p-4 gap-3 duration-200 bg-white group-hover:bg-zinc-50/50"
           onClick={() => setOpenDrawer(true)}
         >
-          <p
-            className="font-medium capitalize leading-none line-clamp-2"
-            title={card.title}
-          >
-            {card.title}
-          </p>
+          <div className="flex items-start gap-3">
+            {card.is_completed && (
+              <div title="This card mark completed">
+                <CircleCheck className="size-6 opacity-70 text-green-700 fill-green-100" />
+              </div>
+            )}
+
+            <p
+              className="font-medium capitalize line-clamp-2 min-h-6"
+              title={card.title}
+            >
+              {card.title}
+            </p>
+          </div>
 
           {(card.description || card.members.length >= 1) && (
-            <div className="flex items-center justify-between min-h-6">
+            <div className="flex items-center gap-3 min-h-6">
               {card.description && (
                 <div className="flex items-center gap-3">
                   <div title="This card has a description.">
-                    <Text className="size-4 opacity-70" />
+                    <Text className="size-5 opacity-70" />
                   </div>
 
                   {card.description.includes("<a") && (
                     <div title="This card has a link.">
-                      <Link2 className="size-4 opacity-70" />
+                      <Link2 className="size-5 opacity-70" />
                     </div>
                   )}
                 </div>
               )}
 
               {card.members.length >= 1 && (
-                <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto">
+                <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto ml-auto">
                   {card.members.map((member, key) => (
                     <Avatar
                       key={key}

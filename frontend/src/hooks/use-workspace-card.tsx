@@ -278,6 +278,7 @@ export const useWorkspaceCard = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
         });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Card created successfully");
       },
     });
@@ -333,6 +334,7 @@ export const useWorkspaceCard = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
         });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Card archived successfully");
       },
     });
@@ -357,6 +359,7 @@ export const useWorkspaceCard = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
         });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
         toast.success("Card activated successfully");
       },
     });
@@ -381,6 +384,7 @@ export const useWorkspaceCard = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
         });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
       },
     });
   };
@@ -404,6 +408,7 @@ export const useWorkspaceCard = () => {
         queryClient.invalidateQueries({
           queryKey: ["workspace-card/history-log", workspace_id],
         });
+        queryClient.invalidateQueries({ queryKey: ["workspace/list"] });
       },
     });
   };

@@ -7,6 +7,8 @@ import ColorfulBadge from "@/components/layout/colorful-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth/use-auth";
+import { Progress } from "@/components/ui/progress";
+import { colorsCode } from "@/const";
 
 interface WorkspaceCardProps {
   isArchived: boolean;
@@ -74,7 +76,31 @@ const WorkspaceCard = ({
             {workspace.description}
           </p>
 
-          <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto ml-auto">
+          <div className="flex flex-col my-2 gap-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-zinc-600">Progress cards</p>
+              <p className="text-sm text-zinc-600">
+                {Number(
+                  (workspace.count_cards.completed /
+                    (workspace.count_cards.completed +
+                      workspace.count_cards.incomplete)) *
+                    100 || 0
+                ).toFixed(0)}{" "}
+                %
+              </p>
+            </div>
+            <Progress
+              value={
+                (workspace.count_cards.completed /
+                  (workspace.count_cards.completed +
+                    workspace.count_cards.incomplete)) *
+                100
+              }
+              className="w-full h-2 bg-zinc-200/50"
+            />
+          </div>
+
+          <div className="*:data-[slot=avatar]:ring-zinc-200 *:data-[slot=avatar]:bg-zinc-100 flex -space-x-2 *:data-[slot=avatar]:ring-2 mt-auto">
             {workspace.members.map((member, key) => (
               <Avatar key={key} title={member.username} className="size-6">
                 <AvatarFallback className="uppercase text-xs">
