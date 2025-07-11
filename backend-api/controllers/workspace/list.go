@@ -80,6 +80,9 @@ func ListWorkspace(c *gin.Context) {
 				})
 			}
 
+			completed_card := database.DB.Find(&[]models.WorkspaceCard{}, "workspace_id = ? AND is_completed = ? AND is_archived = ?", workspace_id, true, false)
+			incomplete_card := database.DB.Find(&[]models.WorkspaceCard{}, "workspace_id = ? AND is_completed = ? AND is_archived = ?", workspace_id, false, false)
+
 			list_workspace_by_status = append(list_workspace_by_status, structs.WorkspaceResponse{
 				Id:          workspace.Id,
 				Name:        workspace.Name,
@@ -94,6 +97,10 @@ func ListWorkspace(c *gin.Context) {
 					Name:       workspace.Status.Name,
 					Color:      workspace.Status.Color,
 					IsArchived: workspace.Status.IsArchived,
+				},
+				CountCards: structs.CountWorkspaceCard{
+					Completed:   int(completed_card.RowsAffected),
+					Incompleted: int(incomplete_card.RowsAffected),
 				},
 				Members:    members,
 				Tags:       workspace_tags,
@@ -235,6 +242,9 @@ func ListArchivedWorkspace(c *gin.Context) {
 			})
 		}
 
+		completed_card := database.DB.Find(&[]models.WorkspaceCard{}, "workspace_id = ? AND is_completed = ? AND is_archived = ?", workspace.Id, true, false)
+		incomplete_card := database.DB.Find(&[]models.WorkspaceCard{}, "workspace_id = ? AND is_completed = ? AND is_archived = ?", workspace.Id, false, false)
+
 		list_workspace = append(list_workspace, structs.WorkspaceResponse{
 			Id:          workspace.Id,
 			Name:        workspace.Name,
@@ -245,9 +255,14 @@ func ListArchivedWorkspace(c *gin.Context) {
 				Color: workspace.Type.Color,
 			},
 			Status: structs.WorkspaceStatus{
-				Id:    workspace.Status.Id,
-				Name:  workspace.Status.Name,
-				Color: workspace.Status.Color,
+				Id:         workspace.Status.Id,
+				Name:       workspace.Status.Name,
+				Color:      workspace.Status.Color,
+				IsArchived: workspace.Status.IsArchived,
+			},
+			CountCards: structs.CountWorkspaceCard{
+				Completed:   int(completed_card.RowsAffected),
+				Incompleted: int(incomplete_card.RowsAffected),
 			},
 			Tags:       workspace_tags,
 			Members:    members,

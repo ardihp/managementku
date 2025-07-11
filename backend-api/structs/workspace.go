@@ -67,17 +67,23 @@ type WorkspaceCardResponse struct {
 	UpdatedAt   string              `json:"updated_at"`
 }
 
+type CountWorkspaceCard struct {
+	Completed   int `json:"completed"`
+	Incompleted int `json:"incomplete"`
+}
+
 type WorkspaceResponse struct {
-	Id          uint            `json:"id"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	Type        WorkspaceType   `json:"type"`
-	Status      WorkspaceStatus `json:"status,omitempty"`
-	Members     []Member        `json:"members"`
-	Tags        []string        `json:"tags"`
-	IsArchived  bool            `json:"is_archived"`
-	CreatedAt   string          `json:"created_at"`
-	UpdatedAt   string          `json:"updated_at"`
+	Id          uint               `json:"id"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Type        WorkspaceType      `json:"type"`
+	Status      WorkspaceStatus    `json:"status,omitempty"`
+	Members     []Member           `json:"members"`
+	Tags        []string           `json:"tags"`
+	IsArchived  bool               `json:"is_archived"`
+	CountCards  CountWorkspaceCard `json:"count_cards"`
+	CreatedAt   string             `json:"created_at"`
+	UpdatedAt   string             `json:"updated_at"`
 }
 
 type WorkspaceByStatusResponse struct {
