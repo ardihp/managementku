@@ -7,6 +7,8 @@ import (
 	"kanban-board/backend-api/database"
 	seeds "kanban-board/backend-api/database/seeds"
 	"kanban-board/backend-api/routes"
+
+	socketController "kanban-board/backend-api/controllers/socket"
 )
 
 func main() {
@@ -32,6 +34,8 @@ func main() {
 		}
 		return
 	}
+
+	go socketController.Manager.Start()
 
 	r := routes.SetupRouter()
 
