@@ -174,10 +174,17 @@ func ListWorkspaceByID(c *gin.Context) {
 				Name:  workspace.Type.Name,
 				Color: workspace.Type.Color,
 			},
-			Members:   members,
-			Tags:      workspace_tags,
-			CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+			Status: structs.WorkspaceStatus{
+				Id:         workspace.Status.Id,
+				Name:       workspace.Status.Name,
+				Color:      workspace.Status.Color,
+				IsArchived: workspace.Status.IsArchived,
+			},
+			IsArchived: workspace.IsArchived,
+			Members:    members,
+			Tags:       workspace_tags,
+			CreatedAt:  workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:  workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
 	})
 }
