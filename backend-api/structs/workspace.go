@@ -55,16 +55,17 @@ type WorkspaceCardActivityResponse struct {
 }
 
 type WorkspaceCardResponse struct {
-	Id          uint                `json:"id"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	Status      WorkspaceCardStatus `json:"status"`
-	UserCreated string              `json:"user_created"`
-	Members     []Member            `json:"members"`
-	IsArchived  bool                `json:"is_archived"`
-	IsCompleted bool                `json:"is_completed"`
-	CreatedAt   string              `json:"created_at"`
-	UpdatedAt   string              `json:"updated_at"`
+	Id           uint                `json:"id"`
+	Title        string              `json:"title"`
+	Description  string              `json:"description"`
+	Status       WorkspaceCardStatus `json:"status"`
+	UserCreated  string              `json:"user_created"`
+	Members      []Member            `json:"members"`
+	CommentCount int                 `json:"comment_count"`
+	IsArchived   bool                `json:"is_archived"`
+	IsCompleted  bool                `json:"is_completed"`
+	CreatedAt    string              `json:"created_at"`
+	UpdatedAt    string              `json:"updated_at"`
 }
 
 type CountWorkspaceCard struct {

@@ -28,7 +28,7 @@ func ListWorkspaceCard(c *gin.Context) {
 	var list_workspace_cards = []structs.WorkspaceCardByStatusResponse{}
 
 	for _, status := range workspace_cards {
-		var workspace_card_by_status = []models.WorkspaceCard{}
+		workspace_card_by_status := []models.WorkspaceCard{}
 
 		if err := database.DB.Where("workspace_id = ? AND status_id = ? AND is_archived = ?", id, status.Id, false).Preload(clause.Associations).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_card_by_status).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -39,10 +39,10 @@ func ListWorkspaceCard(c *gin.Context) {
 			return
 		}
 
-		var list_workspace_card_by_status = []structs.WorkspaceCardResponse{}
+		list_workspace_card_by_status := []structs.WorkspaceCardResponse{}
 
 		for _, card := range workspace_card_by_status {
-			var members = []models.WorkspaceCardMember{}
+			members := []models.WorkspaceCardMember{}
 
 			if err := database.DB.Where("card_id = ?", card.Id).Preload(clause.Associations).Find(&members).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -53,7 +53,7 @@ func ListWorkspaceCard(c *gin.Context) {
 				return
 			}
 
-			var list_member = []structs.Member{}
+			list_member := []structs.Member{}
 
 			for _, member := range members {
 				list_member = append(list_member, structs.Member{
@@ -63,6 +63,8 @@ func ListWorkspaceCard(c *gin.Context) {
 					Email:    member.User.Email,
 				})
 			}
+
+			result := database.DB.Where("card_id = ? AND type = ?", card.Id, "comment").Preload(clause.Associations).Find(&[]models.WorkspaceCardActivity{})
 
 			list_workspace_card_by_status = append(list_workspace_card_by_status, structs.WorkspaceCardResponse{
 				Id:          card.Id,
@@ -75,12 +77,13 @@ func ListWorkspaceCard(c *gin.Context) {
 					IsArchived: card.Status.IsArchived,
 					Order:      card.Status.Order,
 				},
-				UserCreated: card.UserCreated.Username,
-				Members:     list_member,
-				IsArchived:  card.IsArchived,
-				IsCompleted: card.IsCompleted,
-				CreatedAt:   card.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt:   card.UpdatedAt.Format("2006-01-02 15:04:05"),
+				UserCreated:  card.UserCreated.Username,
+				Members:      list_member,
+				CommentCount: int(result.RowsAffected),
+				IsArchived:   card.IsArchived,
+				IsCompleted:  card.IsCompleted,
+				CreatedAt:    card.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:    card.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
 		}
 
@@ -139,6 +142,8 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 				})
 			}
 
+			result := trx.Where("card_id = ? AND type = ?", card.Id, "comment").Preload(clause.Associations).Find(&[]models.WorkspaceCardActivity{})
+
 			list_archived_workspace_cards = append(list_archived_workspace_cards, structs.WorkspaceCardResponse{
 				Id:          card.Id,
 				Title:       card.Title,
@@ -150,12 +155,13 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 					IsArchived: card.Status.IsArchived,
 					Order:      card.Status.Order,
 				},
-				UserCreated: card.UserCreated.Username,
-				Members:     list_member,
-				IsArchived:  card.IsArchived,
-				IsCompleted: card.IsCompleted,
-				CreatedAt:   card.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt:   card.UpdatedAt.Format("2006-01-02 15:04:05"),
+				UserCreated:  card.UserCreated.Username,
+				Members:      list_member,
+				CommentCount: int(result.RowsAffected),
+				IsArchived:   card.IsArchived,
+				IsCompleted:  card.IsCompleted,
+				CreatedAt:    card.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:    card.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
 		}
 
