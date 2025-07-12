@@ -52,7 +52,7 @@ func CreateWorkspaceCard(c *gin.Context) {
 	}
 
 	database.DB.Transaction(func(trx *gorm.DB) error {
-		result := trx.Model(&models.WorkspaceCard{}).Where("status_id = ?", req.StatusId)
+		result := trx.Where("status_id = ?", req.StatusId).Find(&[]models.WorkspaceCard{})
 
 		var card = models.WorkspaceCard{
 			WorkspaceId:   uint(parsed_workspace_id),
