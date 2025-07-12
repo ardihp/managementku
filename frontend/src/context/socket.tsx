@@ -14,7 +14,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8000/ws");
+    const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_SOCKET_URL}`);
 
     if (user) {
       setSocket(ws);
@@ -82,6 +82,16 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
         queryClient.invalidateQueries({
           queryKey: ["user/history-logs", user?.id],
         });
+      };
+
+      socket.onclose = () => {
+        const newSocket = new WebSocket(
+          `ws://${process.env.NEXT_PUBLIC_SOCKET_URL}`
+        );
+
+        if (user) {
+          setSocket(newSocket);
+        }
       };
     }
   });
