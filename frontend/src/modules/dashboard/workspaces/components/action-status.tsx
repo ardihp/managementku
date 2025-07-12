@@ -4,6 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { SocketContext } from "@/context/socket";
 import { useWorkspaceCardStatus } from "@/hooks/use-workspace-card-status";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import { WorkspaceStatus } from "@/types/workspace";
@@ -14,7 +15,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 interface ActionStatusProps {
   onClickUpdate?: () => void;
@@ -32,6 +33,7 @@ export default function ActionStatus({
   workspaceId = 0,
 }: ActionStatusProps) {
   const [openPopover, setOpenPopover] = useState(false);
+  const { socket } = useContext(SocketContext);
 
   // type workspace
   const {
@@ -70,6 +72,9 @@ export default function ActionStatus({
     }
 
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({ type: "mark-progress", workspace_id: workspaceId })
+    );
   };
 
   const handleUnarchive = async () => {
@@ -84,6 +89,9 @@ export default function ActionStatus({
     }
 
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({ type: "mark-progress", workspace_id: workspaceId })
+    );
   };
 
   const handleDelete = async () => {
@@ -98,6 +106,9 @@ export default function ActionStatus({
     }
 
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({ type: "mark-progress", workspace_id: workspaceId })
+    );
   };
 
   return (

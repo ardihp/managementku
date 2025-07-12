@@ -8,13 +8,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SocketContext } from "@/context/socket";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import { cn } from "@/lib/utils";
 import { Member } from "@/types/workspace";
 import { WorkspaceCard } from "@/types/workspace-card";
 import { Check } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 interface AssignMemberProps {
   open: boolean;
@@ -31,6 +32,8 @@ export default function AssignMember({
 }: AssignMemberProps) {
   const [search, setSearch] = useState("");
   const [assignedMember, setAssignedMember] = useState<number[]>([]);
+  const { socket } = useContext(SocketContext);
+
   const { getListWorkspaceMember } = useWorkspace();
   const { assignWorkspaceCardMember } = useWorkspaceCard();
 
@@ -75,6 +78,13 @@ export default function AssignMember({
     }
 
     onOpenChange();
+    socket?.send(
+      JSON.stringify({
+        type: "detail-card",
+        workspace_id: workspaceId,
+        card_id: card.id,
+      })
+    );
   };
 
   return (

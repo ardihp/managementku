@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -20,6 +20,7 @@ import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import { WorkspaceCard } from "@/types/workspace-card";
 import AssignMember from "./assign-member";
 import { useAuth } from "@/hooks/auth/use-auth";
+import { SocketContext } from "@/context/socket";
 
 interface WorkspaceActionProps {
   card: WorkspaceCard;
@@ -43,6 +44,7 @@ export default function WorkspaceAction({
     member: false,
   });
   const { user } = useAuth();
+  const { socket } = useContext(SocketContext);
 
   const {
     archivedWorkspaceCard,
@@ -99,6 +101,13 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({
+        text: "",
+        type: "detail-card",
+        workspace_id: workspaceId,
+      })
+    );
   };
 
   const handleUnwatchWorkspace = async () => {
@@ -108,6 +117,13 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({
+        text: "",
+        type: "detail-card",
+        workspace_id: workspaceId,
+      })
+    );
   };
 
   const handleCompletedWorkspace = async () => {
@@ -117,6 +133,13 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({
+        text: "",
+        type: "mark-progress",
+        workspace_id: workspaceId,
+      })
+    );
   };
 
   const handleIncompletedWorkspace = async () => {
@@ -126,6 +149,13 @@ export default function WorkspaceAction({
       console.error(error);
     }
     setOpenPopover(false);
+    socket?.send(
+      JSON.stringify({
+        text: "",
+        type: "mark-progress",
+        workspace_id: workspaceId,
+      })
+    );
   };
 
   return (

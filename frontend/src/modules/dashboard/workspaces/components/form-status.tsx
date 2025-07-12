@@ -14,12 +14,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { colors } from "@/const";
+import { SocketContext } from "@/context/socket";
 import { useWorkspaceCardStatus } from "@/hooks/use-workspace-card-status";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
 import { cn } from "@/lib/utils";
 import { WorkspaceStatus } from "@/types/workspace";
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -53,6 +54,7 @@ export default function FormWorkspaceStatus({
     name: status?.name || "",
     color: status?.color || "",
   };
+  const { socket } = useContext(SocketContext);
 
   const {
     register,
@@ -114,6 +116,9 @@ export default function FormWorkspaceStatus({
     }
 
     onOpenChange();
+    socket?.send(
+      JSON.stringify({ type: "mark-progress", workspace_id: workspaceId })
+    );
   };
 
   return (

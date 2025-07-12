@@ -54,20 +54,6 @@ export default function WorkspacesView() {
   const isLoading = loadingPage || loadingWorkspace;
 
   useEffect(() => {
-    if (socket) {
-      socket.onopen = () => {
-        console.log("Connected to WebSocket");
-      };
-      socket.onmessage = (event) => {
-        console.log("socket message in");
-      };
-      socket.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-    }
-  });
-
-  useEffect(() => {
     setUserDetail(user);
   }, []);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LayoutPage from "@/components/layout";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { useParams } from "next/navigation";
@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import ArchivedItems from "../components/archived-items";
 import HistoryLog from "./components/history-log";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SocketContext } from "@/context/socket";
 
 export default function DetailWorkspaceView() {
   const params = useParams();
@@ -46,6 +47,7 @@ export default function DetailWorkspaceView() {
     archived: false,
     history: false,
   });
+  const { socket } = useContext(SocketContext);
 
   const { data: detailWorkspace, isLoading: loadingWorkspace } =
     getDetailWorkspace(Number(params?.id || 0));
@@ -201,6 +203,13 @@ export default function DetailWorkspaceView() {
         );
       }
     }
+
+    socket?.send(
+      JSON.stringify({
+        type: "detail-card",
+        workspace_id: detailWorkspace?.id,
+      })
+    );
   };
 
   return (

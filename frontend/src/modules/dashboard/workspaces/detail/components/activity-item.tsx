@@ -2,13 +2,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import { WorkspaceCardActivity } from "@/types/workspace-card";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/auth/use-auth";
+import { SocketContext } from "@/context/socket";
 
 interface ActivityItemProps {
   activity: WorkspaceCardActivity;
@@ -26,6 +28,8 @@ export default function ActivityItem({
   afterDelete = () => {},
 }: ActivityItemProps) {
   const [openPopoverDelete, setOpenPopoverDelete] = useState(false);
+  const { user } = useAuth();
+  const { socket } = useContext(SocketContext);
 
   const { deleteWorkspaceCardActivity } = useWorkspaceCard();
 
@@ -42,6 +46,13 @@ export default function ActivityItem({
     }
     setOpenPopoverDelete(false);
     afterDelete();
+    socket?.send(
+      JSON.stringify({
+        card_id: cardId,
+        workspace_id: workspaceId,
+        type: "card-activity",
+      })
+    );
   }
 
   return (
@@ -69,37 +80,47 @@ export default function ActivityItem({
           }}
         />
 
-        {activity.type === "comment" && (
+        {((activity.type === "comment" &&
+          user?.username === activity.user_created) ||
+          activity.created_at !== activity.updated_at) && (
           <div className="flex items-center gap-3">
-            <div
-              className="cursor-pointer"
-              onClick={() => onSelectEdit(activity.id)}
-            >
-              <p className="text-xs">Edit</p>
-            </div>
+            {activity.type === "comment" &&
+              user?.username === activity.user_created && (
+                <>
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => onSelectEdit(activity.id)}
+                  >
+                    <p className="text-xs">Edit</p>
+                  </div>
 
-            <Popover
-              open={openPopoverDelete}
-              onOpenChange={setOpenPopoverDelete}
-            >
-              <PopoverTrigger className="cursor-pointer">
-                <p className="text-xs">Delete</p>
-              </PopoverTrigger>
-              <PopoverContent className="flex flex-col gap-3" align="start">
-                <p className="text-sm">
-                  Deleting a comment is forever. There is no undo.
-                </p>
+                  <Popover
+                    open={openPopoverDelete}
+                    onOpenChange={setOpenPopoverDelete}
+                  >
+                    <PopoverTrigger className="cursor-pointer">
+                      <p className="text-xs">Delete</p>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="flex flex-col gap-3"
+                      align="start"
+                    >
+                      <p className="text-sm">
+                        Deleting a comment is forever. There is no undo.
+                      </p>
 
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  className="w-fit ml-auto cursor-pointer"
-                  onClick={() => handleDelete(activity.id)}
-                >
-                  <p className="text-sm">Delete</p>
-                </Button>
-              </PopoverContent>
-            </Popover>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="w-fit ml-auto cursor-pointer"
+                        onClick={() => handleDelete(activity.id)}
+                      >
+                        <p className="text-sm">Delete</p>
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </>
+              )}
 
             {activity.created_at !== activity.updated_at && (
               <p className="text-xs ml-auto">Edited</p>

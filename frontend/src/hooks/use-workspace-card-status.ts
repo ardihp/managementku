@@ -26,7 +26,7 @@ export const useWorkspaceCardStatus = () => {
 
   const GetListArchivedWorkspaceCardStatus = (workspace_id: number) => {
     return useQuery({
-      queryKey: ["workspace-card-status/list-archived"],
+      queryKey: ["workspace-card-status/list-archived", workspace_id],
       queryFn: async () => {
         const response = await Api.get(
           endpoint.workspace.card.status.list_archived(workspace_id)

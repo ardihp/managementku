@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { WorkspaceCard, WorkspaceCardMember } from "@/types/workspace-card";
-import { Draggable } from "@hello-pangea/dnd";
-import React, { useState } from "react";
+import { WorkspaceCard } from "@/types/workspace-card";
+import React, { useContext, useState } from "react";
 import WorkspaceAction from "./action";
-import { CircleCheck, Link2, Text } from "lucide-react";
+import { CircleCheck, Link2, MessageSquare, Text } from "lucide-react";
 import DetailWorkspaceCard from "./detail-card";
+import { SocketContext } from "@/context/socket";
 
 interface TaskCardProps {
   workspaceId?: number;
@@ -30,6 +30,7 @@ export default function TaskCard({
   ...rest
 }: TaskCardProps) {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const { socket } = useContext(SocketContext);
 
   return (
     <>
@@ -57,6 +58,15 @@ export default function TaskCard({
           isArchived={isArchived}
           workspaceId={workspaceId}
           isAdmin={isAdmin}
+          afterAction={() =>
+            socket?.send(
+              JSON.stringify({
+                type: "mark-progress",
+                workspace_id: workspaceId,
+                card_id: card.id,
+              })
+            )
+          }
         />
 
         <div
@@ -78,8 +88,10 @@ export default function TaskCard({
             </p>
           </div>
 
-          {(card.description || card.members.length >= 1) && (
-            <div className="flex items-center gap-3 min-h-6">
+          {(card.description ||
+            card.members.length >= 1 ||
+            card.comment_count >= 1) && (
+            <div className="flex items-center gap-4 min-h-6">
               {card.description && (
                 <div className="flex items-center gap-3">
                   <div title="This card has a description.">
@@ -91,6 +103,16 @@ export default function TaskCard({
                       <Link2 className="size-5 opacity-70" />
                     </div>
                   )}
+                </div>
+              )}
+
+              {card.comment_count >= 1 && (
+                <div
+                  className="flex items-center gap-2"
+                  title="This card has a comment."
+                >
+                  <MessageSquare className="size-5 opacity-70" />
+                  <p className="text-sm">{card.comment_count}</p>
                 </div>
               )}
 

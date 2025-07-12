@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -16,6 +16,8 @@ import TextEditor from "@/components/ui/text-editor";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import ActivityItem from "./activity-item";
+import { SocketContext } from "@/context/socket";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface DetailWorkspaceCardProps {
   open: boolean;
@@ -39,6 +41,7 @@ export default function DetailWorkspaceCard({
   const [contentLoaded, setContentLoaded] = useState(false);
   const [editComment, setEditCommend] = useState(false);
   const [selectedComment, setSelectedComment] = useState(0);
+  const { socket } = useContext(SocketContext);
 
   const {
     getListWorkspaceCardActivities,
@@ -108,6 +111,14 @@ export default function DetailWorkspaceCard({
     setRefetch(refetch + 1);
     setEditCommend(false);
     setSelectedComment(0);
+    socket?.send(
+      JSON.stringify({
+        text: "",
+        type: "card-activity",
+        workspace_id: workspaceId,
+        card_id: card.id,
+      })
+    );
   }
 
   return (
@@ -137,7 +148,16 @@ export default function DetailWorkspaceCard({
                 card={card}
                 isArchived={card.is_archived}
                 workspaceId={workspaceId}
-                afterAction={onOpenChange}
+                afterAction={() => {
+                  onOpenChange();
+                  socket?.send(
+                    JSON.stringify({
+                      text: "",
+                      type: "card-activity",
+                      workspace_id: workspaceId,
+                    })
+                  );
+                }}
                 isAdmin={isAdmin}
               />
             </div>

@@ -33,7 +33,6 @@ export default function ColumnStatus({
         cards: undefined,
       })}
       index={index}
-      isDragDisabled={!isAdmin}
     >
       {({ dragHandleProps, draggableProps, innerRef }) => {
         return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { WorkspaceCard } from "@/types/workspace-card";
 import { useWorkspaceCard } from "@/hooks/use-workspace-card";
 import TextEditor from "@/components/ui/text-editor";
+import { SocketContext } from "@/context/socket";
 
 interface FormInputWorkspaceCard {
   title: string;
@@ -45,6 +46,7 @@ export default function FormWorkspaceCard({
   children,
 }: FormWorkspaceProps) {
   const [openDialog, setOpenDialog] = useState(false);
+  const { socket } = useContext(SocketContext);
 
   const { createWorkspaceCard, updateWorkspaceCard } = useWorkspaceCard();
 
@@ -115,6 +117,9 @@ export default function FormWorkspaceCard({
     setOpenDialog(false);
     resetSelectedItem();
     reset({ title: "", description: "" });
+    socket?.send(
+      JSON.stringify({ type: "detail-card", workspace_id: workspaceId })
+    );
   };
 
   return (

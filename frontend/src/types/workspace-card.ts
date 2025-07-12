@@ -13,6 +13,7 @@ export interface WorkspaceCard {
   description: string;
   status: WorkspaceStatus;
   members: WorkspaceCardMember[];
+  comment_count: number;
   is_archived: boolean;
   is_completed: boolean;
   user_created: string;
