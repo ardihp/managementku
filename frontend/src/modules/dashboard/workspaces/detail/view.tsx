@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import LayoutPage from "@/components/layout";
 import { useWorkspace } from "@/hooks/use-workspace";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { paths } from "@/const/routes";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,6 +24,7 @@ import ArchivedItems from "../components/archived-items";
 import HistoryLog from "./components/history-log";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SocketContext } from "@/context/socket";
+import { toast } from "sonner";
 
 export default function DetailWorkspaceView() {
   const params = useParams();
@@ -48,9 +49,14 @@ export default function DetailWorkspaceView() {
     history: false,
   });
   const { socket } = useContext(SocketContext);
+  const router = useRouter();
 
-  const { data: detailWorkspace, isLoading: loadingWorkspace } =
-    getDetailWorkspace(Number(params?.id || 0));
+  const {
+    data: detailWorkspace,
+    isLoading: loadingWorkspace,
+    isFetching: refetchWorkspace,
+    isError,
+  } = getDetailWorkspace(Number(params?.id || 0));
   const {
     data: listWorkspaceCard,
     isLoading: loadingWorkspaceCard,
@@ -74,6 +80,23 @@ export default function DetailWorkspaceView() {
       setListWorkspaceCardByStatus(listWorkspaceCard || []);
     }
   }, [loadingWorkspaceCard, fetchWorkspaceCard]);
+
+  useEffect(() => {
+    if (detailWorkspace && !refetchWorkspace) {
+      if (detailWorkspace?.is_archived) {
+        toast.info("This workspace has been archived!");
+        router.replace("/dashboard/workspaces");
+      }
+      if (!detailWorkspace?.members.some((member) => member.id === user?.id)) {
+        toast.info("You have been removed from the workspace!");
+        router.replace("/dashboard/workspaces");
+      }
+    }
+
+    if (isError) {
+      router.replace("/dashboard/workspaces");
+    }
+  }, [refetchWorkspace]);
 
   const handleDragEnd = (item: any) => {
     if (!item.destination) return;

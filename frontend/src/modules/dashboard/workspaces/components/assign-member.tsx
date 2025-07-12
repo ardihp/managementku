@@ -8,12 +8,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SocketContext } from "@/context/socket";
 import { useUser } from "@/hooks/use-user";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { cn } from "@/lib/utils";
 import { Member, Workspace, WorkspaceRole } from "@/types/workspace";
 import { Check } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 interface AssignMemberProps {
   open: boolean;
@@ -28,6 +29,8 @@ export default function AssignMember({
 }: AssignMemberProps) {
   const [search, setSearch] = useState("");
   const [assignedMember, setAssignedMember] = useState<number[]>([]);
+  const { socket } = useContext(SocketContext);
+
   const { getListEmployee } = useUser();
   const { assignWorkspaceMember } = useWorkspace();
 
@@ -63,6 +66,9 @@ export default function AssignMember({
           onOpenChange();
         },
       }
+    );
+    socket?.send(
+      JSON.stringify({ type: "assign-workspace", workspace_id: workspace.id })
     );
   };
 

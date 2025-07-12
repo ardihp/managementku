@@ -48,7 +48,10 @@ const WorkspaceCard = ({
         />
       )}
 
-      <Link href={`${paths.dashboard.workspace}/${workspace.id}`}>
+      <Link
+        href={`${paths.dashboard.workspace}/${workspace.id}`}
+        className={isArchived ? "pointer-events-none" : ""}
+      >
         <div className="w-full border rounded-xl bg-white group-hover:bg-zinc-50/50 flex flex-col p-4 gap-2 min-h-[152px] duration-200">
           <div className="flex items-center gap-2 overflow-auto">
             <ColorfulBadge content={"🛠️"} color={workspace.status.color} />

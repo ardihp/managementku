@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -15,6 +15,7 @@ import {
 import { useWorkspace } from "@/hooks/use-workspace";
 import { Workspace } from "@/types/workspace";
 import AssignMember from "./assign-member";
+import { SocketContext } from "@/context/socket";
 
 interface WorkspaceActionProps {
   setSelectedWorkspace?: (item: any) => void;
@@ -37,23 +38,33 @@ export default function WorkspaceAction({
   const { mutate: archive } = archiveWorkspace();
   const { mutate: unarchive } = unarchiveWorkspace();
   const { mutate: remove } = deleteWorkspace();
+  const { socket } = useContext(SocketContext);
 
   const handleArchiveWorkspace = (id: number) => {
     archive(id, {
       onSuccess: () => setOpenPopover(false),
     });
+    socket?.send(
+      JSON.stringify({ type: "assign-workspace", workspace_id: workspace.id })
+    );
   };
 
   const handleUnarchiveWorkspace = (id: number) => {
     unarchive(id, {
       onSuccess: () => setOpenPopover(false),
     });
+    socket?.send(
+      JSON.stringify({ type: "assign-workspace", workspace_id: workspace.id })
+    );
   };
 
   const handleDeleteWorkspace = (id: number) => {
     remove(id, {
       onSuccess: () => setOpenPopover(false),
     });
+    socket?.send(
+      JSON.stringify({ type: "assign-workspace", workspace_id: workspace.id })
+    );
   };
 
   return (

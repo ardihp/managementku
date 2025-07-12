@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -24,6 +24,7 @@ import { Workspace, WorkspaceStatus, WorkspaceType } from "@/types/workspace";
 import { Plus, X } from "lucide-react";
 import { cn, handleConffeti } from "@/lib/utils";
 import { useWorkspaceStatus } from "@/hooks/use-workspace-status";
+import { SocketContext } from "@/context/socket";
 
 interface FormInputWorkspace {
   name: string;
@@ -56,6 +57,7 @@ export default function FormWorkspace({
   children,
 }: FormWorkspaceProps) {
   const [openDialog, setOpenDialog] = useState(false);
+  const { socket } = useContext(SocketContext);
 
   const { getListWorkspaceType, createWorkspace, updateWorkspace } =
     useWorkspace();
@@ -153,6 +155,7 @@ export default function FormWorkspace({
     setOpenDialog(false);
     resetSelectedWorkspace();
     reset({ name: "", description: "", type_id: "", status_id: "", tags: [] });
+    socket?.send(JSON.stringify({ type: "refresh-workspace" }));
   };
 
   return (

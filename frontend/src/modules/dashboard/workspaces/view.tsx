@@ -20,7 +20,6 @@ import ArchivedItems from "./components/archived-items";
 import { SocketContext } from "@/context/socket";
 
 export default function WorkspacesView() {
-  const [userDetail, setUserDetail] = useState<UserDetail | null>();
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
     null
   );
@@ -36,9 +35,9 @@ export default function WorkspacesView() {
   const [listWorkspaceByStatus, setListWorkspaceByStatus] = useState<
     WorkspaceByStatus[]
   >([]);
+  const { user } = useAuth();
   const { socket } = useContext(SocketContext);
 
-  const { user } = useAuth();
   const { getListWorkspace, updateWorkspaceOrder } = useWorkspace();
   const { updateWorkspaceStatusOrder } = useWorkspaceStatus();
 
@@ -52,10 +51,6 @@ export default function WorkspacesView() {
   const { mutate: updateStatusOrder } = updateWorkspaceStatusOrder();
 
   const isLoading = loadingPage || loadingWorkspace;
-
-  useEffect(() => {
-    setUserDetail(user);
-  }, []);
 
   useEffect(() => {
     if (loadingWorkspace) {
@@ -192,9 +187,7 @@ export default function WorkspacesView() {
       }
     }
 
-    // socket?.send(
-    //   JSON.stringify({ text: [1, 2, 3], type: "reorder-workspace" })
-    // );
+    socket?.send(JSON.stringify({ type: "refresh-workspace" }));
   };
 
   return (
@@ -232,7 +225,7 @@ export default function WorkspacesView() {
             </p>
           </div>
 
-          {userDetail?.role === "manager" && (
+          {user?.role === "manager" && !isLoading && (
             <div className="flex items-center gap-4">
               <Button
                 className="cursor-pointer"
@@ -271,7 +264,7 @@ export default function WorkspacesView() {
               </div>
             ))}
           </section>
-        ) : listWorkspaceByStatus?.length >= 1 ? (
+        ) : (
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable
               droppableId="column"
@@ -294,7 +287,7 @@ export default function WorkspacesView() {
                           key={status.id}
                           index={key}
                           status={status}
-                          isAdmin={userDetail?.role === "manager"}
+                          isAdmin={user?.role === "manager"}
                           setSelectedWorkspace={setSelectedWorkspace}
                           setSelectedStatus={(val) => {
                             setSelectedStatus(val);
@@ -311,7 +304,7 @@ export default function WorkspacesView() {
                       {placeholder}
                     </div>
 
-                    {userDetail?.role === "manager" && (
+                    {user?.role === "manager" && (
                       <div
                         className="flex items-center gap-2 rounded-xl border opacity-100 py-2 px-4 relative h-[45px] min-w-[300px] cursor-pointer hover:bg-white transition-colors"
                         onClick={() =>
@@ -330,12 +323,6 @@ export default function WorkspacesView() {
               }}
             </Droppable>
           </DragDropContext>
-        ) : (
-          <div className="flex flex-col h-full gap-2 items-center justify-center">
-            <Archive className="size-10 stroke-[1.5px] text-zinc-700" />
-
-            <p className="text-zinc-700">There's no workspace available</p>
-          </div>
         )}
       </div>
     </>
