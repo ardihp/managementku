@@ -25,8 +25,6 @@ Api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log(error);
-
     toast(
       error?.response?.data?.message || error?.response?.data || error?.message,
       {

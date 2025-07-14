@@ -5,6 +5,7 @@ export const paths = {
     notification: "/dashboard/notification",
     archive: "/dashboard/archive",
     type: "/dashboard/type",
+    employee: "/dashboard/employees",
   },
   auth: {
     sign_in: "/auth/sign-in",

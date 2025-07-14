@@ -94,7 +94,10 @@ export const endpoint = {
     },
   },
   user: {
-    list_employee: "/employee",
+    list_user: "/users",
+    update_user: (user_id: number) => `/user/${user_id}`,
+    delete_user: (user_id: number) => `/user-delete/${user_id}`,
+    list_employee: "/employees",
     history_logs: "/history-logs",
   },
 };

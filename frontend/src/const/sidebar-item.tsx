@@ -1,4 +1,4 @@
-import { FolderOpen, Gauge, StretchHorizontal } from "lucide-react";
+import { FolderOpen, Gauge, StretchHorizontal, UsersRound } from "lucide-react";
 import { paths } from "./routes";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
@@ -27,5 +27,10 @@ export const sidebarItemManager: SidebarItem[] = [
     title: "Workspace Types",
     href: paths.dashboard.type,
     icon: <StretchHorizontal className={cn("size-6")} />,
+  },
+  {
+    title: "Employees",
+    href: paths.dashboard.employee,
+    icon: <UsersRound className={cn("size-6")} />,
   },
 ];
