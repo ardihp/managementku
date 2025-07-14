@@ -6,6 +6,7 @@ type UserResponse struct {
 	Username  string  `json:"username"`
 	Email     string  `json:"email"`
 	Role      string  `json:"role"`
+	IsDeleted bool    `json:"is_deleted"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt string  `json:"updated_at"`
 	Token     *string `json:"token,omitempty"`

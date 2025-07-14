@@ -34,7 +34,7 @@ func ListEmployee(c *gin.Context) {
 
 	var employees = []models.User{}
 
-	if err := database.DB.Where("role = ?", "employee").Find(&employees).Error; err != nil {
+	if err := database.DB.Where("role = ? AND is_deleted = ?", "employee", false).Find(&employees).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
 			Success: false,
 			Message: "Failed to get user info",

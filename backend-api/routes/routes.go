@@ -36,7 +36,10 @@ func SetupRouter() *gin.Engine {
 	router.POST("/api/login", authControllers.LoginUser)
 
 	// User
-	router.GET("/api/employee", middlewares.AuthMiddleware(), userControllers.ListEmployee)
+	router.GET("/api/users", middlewares.AuthMiddleware(), userControllers.ListUser)
+	router.PUT("/api/user/:id", middlewares.AuthMiddleware(), userControllers.UpdateUser)
+	router.PUT("/api/user-delete/:id", middlewares.AuthMiddleware(), userControllers.DeleteUser)
+	router.GET("/api/employees", middlewares.AuthMiddleware(), userControllers.ListEmployee)
 	router.GET("/api/card-member/:id", middlewares.AuthMiddleware(), userControllers.ListWorkspaceCardMember)
 	router.GET("/api/workspace-member/:id", middlewares.AuthMiddleware(), userControllers.ListWorkspaceMember)
 

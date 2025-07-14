@@ -7,8 +7,9 @@ type User struct {
 	Name      string    `json:"name"`
 	Username  string    `json:"username" gorm:"unique;not null"`
 	Email     string    `json:"email" gorm:"unique;not null"`
-	Role      string    `json:"role"`
+	Role      string    `json:"role" gorm:"type:enum('manager', 'employee')"`
 	Password  string    `json:"password"`
+	IsDeleted bool      `json:"is_deleted" gorm:"default:false"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

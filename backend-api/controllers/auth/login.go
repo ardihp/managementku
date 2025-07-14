@@ -24,7 +24,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("username = ?", req.Username).First(&user).Error; err != nil {
+	if err := database.DB.Where("username = ? AND is_deleted = ?", req.Username, false).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, structs.ErrorResponse{
 			Success: false,
 			Message: "User Not Found",
