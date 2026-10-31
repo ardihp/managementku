@@ -26,9 +26,12 @@ func main() {
 			seeds.WorkspaceStatusSeed()
 		case table == "types":
 			seeds.WorkspaceTypeSeed()
+		case table == "users":
+			seeds.UserSeeds()
 		case table == "all-table":
 			seeds.WorkspaceTypeSeed()
 			seeds.WorkspaceStatusSeed()
+			seeds.UserSeeds()
 		default:
 			fmt.Println("your argument not found")
 		}
