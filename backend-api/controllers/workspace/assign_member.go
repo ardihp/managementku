@@ -15,50 +15,37 @@ import (
 )
 
 func AssignMemberToWorkspace(c *gin.Context) {
-	var req = structs.WorkspaceAssignMember{}
+	req := structs.WorkspaceAssignMember{}
+	user_id := c.GetInt("user_id")
+	user := models.User{}
+	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
-	manager_id := c.GetInt("user_id")
-	manager := models.User{}
-	database.DB.First(&manager, manager_id)
-
 	workspace := models.Workspace{}
-	members := []structs.Member{}
-	workspace_tags := []string{}
+	members := []structs.WorkspaceMember{}
 
-	user_log := models.HistoryLog{
-		UserId:   uint(manager_id),
+	member_log := models.HistoryLog{
+		UserId:   uint(user_id),
 		Type:     "general",
 		UserRole: "employee",
 		Action:   "assign-member",
 	}
 
-	manager_log := models.HistoryLog{
-		UserId:   uint(manager_id),
+	user_log := models.HistoryLog{
+		UserId:   uint(user_id),
 		Type:     "general",
 		UserRole: "manager",
 		Action:   "assign-member",
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Preload(clause.Associations).First(&workspace, req.WorkspaceId).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace not found",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
-
-		trx.Model(&models.WorkspaceTag{}).Where("workspace_id = ?", req.WorkspaceId).Pluck("tag", &workspace_tags)
 
 		existing_members := []int{}
 		trx.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", req.WorkspaceId).Pluck("user_id", &existing_members)
@@ -67,32 +54,22 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			user := models.User{}
 			trx.First(&user, member_id)
 
-			if !slices.Contains(req.UserId, int(member_id)) && member_id != manager_id {
-				user_log.Description = fmt.Sprintf("User %s has remove you from workspace %s", manager.Username, workspace.Name)
-				manager_log.Description = fmt.Sprintf("User %s remove %s from workspace %s", manager.Username, user.Username, workspace.Name)
+			if !slices.Contains(req.UserId, int(member_id)) && member_id != user_id {
+				member_log.Description = fmt.Sprintf("User %s has remove you from workspace %s", user.Username, workspace.Name)
+				user_log.Description = fmt.Sprintf("User %s remove %s from workspace %s", user.Username, user.Username, workspace.Name)
 
-				logs := []models.HistoryLog{user_log, manager_log}
+				logs := []models.HistoryLog{member_log, user_log}
 
 				if err := trx.Create(&logs).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to assign user",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
 				user_history := []models.UserHistoryLog{
 					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: uint(manager_id)},
+					{HistoryId: logs[1].ID, UserId: uint(user_id)},
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to update workspace order",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 			}
@@ -105,11 +82,6 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			exist_member := models.WorkspaceMember{}
 
 			if err := trx.First(&user, req.UserId[key]).Error; err != nil {
-				c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-					Success: false,
-					Message: "User Not Found",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
 				return err
 			}
 
@@ -129,7 +101,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 				Role:        role,
 			})
 
-			members = append(members, structs.Member{
+			members = append(members, structs.WorkspaceMember{
 				Id:       user.Id,
 				Name:     user.Name,
 				Username: user.Username,
@@ -137,57 +109,42 @@ func AssignMemberToWorkspace(c *gin.Context) {
 				Role:     role,
 			})
 
-			if user.Id != uint(manager_id) && !slices.Contains(existing_members, int(user.Id)) {
-				user_log.Description = fmt.Sprintf("User %s has added you to workspace %s", manager.Username, workspace.Name)
-				manager_log.Description = fmt.Sprintf("User %s added %s to workspace %s", manager.Username, user.Username, workspace.Name)
+			if user.Id != uint(user_id) && !slices.Contains(existing_members, int(user.Id)) {
+				member_log.Description = fmt.Sprintf("User %s has added you to workspace %s", user.Username, workspace.Name)
+				user_log.Description = fmt.Sprintf("User %s added %s to workspace %s", user.Username, user.Username, workspace.Name)
 
-				logs := []models.HistoryLog{user_log, manager_log}
+				logs := []models.HistoryLog{user_log, user_log}
 
 				if err := trx.Create(&logs).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to assign user",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
 				user_history := []models.UserHistoryLog{
 					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: uint(manager_id)},
+					{HistoryId: logs[1].ID, UserId: uint(user_id)},
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to update workspace order",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 			}
 		}
 
 		if err := trx.Where("workspace_id = ?", req.WorkspaceId).Delete(&models.WorkspaceMember{}).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to assign user",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		if err := trx.Create(&assigned_user).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to assign user",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed assign member to workspace", err)
+		return
+	}
 
 	c.JSON(http.StatusCreated, structs.SuccessResponse{
 		Success: true,
@@ -196,14 +153,9 @@ func AssignMemberToWorkspace(c *gin.Context) {
 			Id:          workspace.Id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Type: structs.WorkspaceType{
-				Name:  workspace.Type.Name,
-				Color: workspace.Type.Color,
-			},
-			Members:   members,
-			Tags:      workspace_tags,
-			CreatedAt: workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt: workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+			Members:     members,
+			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 		},
 	})
 }

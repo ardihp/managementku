@@ -14,25 +14,21 @@ import (
 )
 
 func DeleteWorkspace(c *gin.Context) {
-	var id = c.Param("id")
-	parseId, _ := strconv.Atoi(id)
+	workspace_id := c.Param("id")
+	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 
 	user_id := c.GetInt("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
-	if err := database.DB.First(&models.Workspace{}, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+	if err := database.DB.First(&models.Workspace{}, parsed_workspace_id).Error; err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Workspace not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		workspace := models.Workspace{}
-		trx.First(&workspace, parseId)
+		trx.First(&workspace, parsed_workspace_id)
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
@@ -43,11 +39,6 @@ func DeleteWorkspace(c *gin.Context) {
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -61,62 +52,33 @@ func DeleteWorkspace(c *gin.Context) {
 			}
 
 			if err := trx.Create(&user_history).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-					Success: false,
-					Message: "Failed to delete workspace",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
 				return err
 			}
 		}
 
-		if err := trx.Where("workspace_id = ?", id).Delete(&models.WorkspaceMember{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+		if err := trx.Where("workspace_id = ?", parsed_workspace_id).Delete(&models.WorkspaceMember{}).Error; err != nil {
 			return err
 		}
 
-		if err := trx.Where("workspace_id = ?", id).Delete(&models.WorkspaceTag{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+		if err := trx.Where("workspace_id = ?", parsed_workspace_id).Delete(&models.WorkspaceCard{}).Error; err != nil {
 			return err
 		}
 
-		if err := trx.Where("workspace_id = ?", id).Delete(&models.WorkspaceCard{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+		if err := trx.Where("workspace_id = ?", parsed_workspace_id).Delete(&models.WorkspaceCardStatus{}).Error; err != nil {
 			return err
 		}
 
-		if err := trx.Where("workspace_id = ?", id).Delete(&models.WorkspaceCardStatus{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return err
-		}
-
-		if err := trx.Delete(&models.Workspace{}, parseId).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+		if err := trx.Delete(&models.Workspace{}, parsed_workspace_id).Error; err != nil {
 			return err
 		}
 
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to delete workspace", err)
+		return
+	}
 
 	c.JSON(http.StatusOK, structs.SuccessResponse{
 		Success: true,
