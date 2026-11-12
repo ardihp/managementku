@@ -34,7 +34,7 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 	database.DB.First(&manager, manager_id)
 
 	workspace_card := models.WorkspaceCard{}
-	members := []structs.Member{}
+	members := []structs.WorkspaceMember{}
 
 	user_log := models.HistoryLog{
 		UserId:   uint(manager_id),
@@ -135,12 +135,12 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 				UserId: user.Id,
 			})
 
-			members = append(members, structs.Member{
+			members = append(members, structs.WorkspaceMember{
 				Id:       user.Id,
 				Name:     user.Name,
 				Username: user.Username,
 				Email:    user.Email,
-				Role:     "member",
+				Role:     "employee",
 			})
 
 			if user.Id != uint(manager_id) && !slices.Contains(existing_members, int(user.Id)) {

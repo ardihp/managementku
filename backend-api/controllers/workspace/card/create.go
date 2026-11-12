@@ -55,12 +55,12 @@ func CreateWorkspaceCard(c *gin.Context) {
 		result := trx.Where("status_id = ?", req.StatusId).Find(&[]models.WorkspaceCard{})
 
 		var card = models.WorkspaceCard{
-			WorkspaceId:   uint(parsed_workspace_id),
-			StatusId:      uint(req.StatusId),
-			UserCreatedId: uint(user_id),
-			Title:         req.Title,
-			Description:   req.Description,
-			Order:         int(result.RowsAffected),
+			WorkspaceId:           uint(parsed_workspace_id),
+			WorkspaceCardStatusId: uint(req.StatusId),
+			UserCreatedId:         uint(user_id),
+			Title:                 req.Title,
+			Description:           req.Description,
+			Order:                 int(result.RowsAffected),
 		}
 
 		if err := trx.Create(&card).Error; err != nil {
@@ -73,10 +73,10 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_card_activity := models.WorkspaceCardActivity{
-			CardId:  card.Id,
-			UserId:  uint(user_id),
-			Type:    "general",
-			Message: fmt.Sprintf("User %s created this card", user.Username),
+			WorkspaceCardId: card.Id,
+			UserId:          uint(user_id),
+			Type:            "general",
+			Message:         fmt.Sprintf("User %s created this card", user.Username),
 		}
 
 		if err := trx.Create(&workspace_card_activity).Error; err != nil {
@@ -126,7 +126,7 @@ func CreateWorkspaceCard(c *gin.Context) {
 				Id:          card.Id,
 				Title:       card.Title,
 				Description: card.Description,
-				Members:     []structs.Member{},
+				Members:     []structs.WorkspaceMember{},
 			},
 		})
 

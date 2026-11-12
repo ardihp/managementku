@@ -1,25 +1,11 @@
 package structs
 
-type Member struct {
+type WorkspaceMember struct {
 	Id       uint   `json:"id"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
-}
-
-type WorkspaceStatus struct {
-	Id         uint   `json:"id"`
-	Order      int    `json:"order"`
-	Name       string `json:"name"`
-	Color      string `json:"color"`
-	IsArchived bool   `json:"is_archived"`
-}
-
-type WorkspaceType struct {
-	Id    uint   `json:"id"`
-	Name  string `json:"name"`
-	Color string `json:"color"`
 }
 
 type WorkspaceCardStatus struct {
@@ -37,14 +23,6 @@ type WorkspaceRoleResponse struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-type WorkspaceTypeResponse struct {
-	Id        uint   `json:"id"`
-	Name      string `json:"name"`
-	Color     string `json:"color"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-}
-
 type WorkspaceCardActivityResponse struct {
 	Id          int    `json:"id"`
 	UserCreated string `json:"user_created"`
@@ -55,17 +33,17 @@ type WorkspaceCardActivityResponse struct {
 }
 
 type WorkspaceCardResponse struct {
-	Id           uint                `json:"id"`
-	Title        string              `json:"title"`
-	Description  string              `json:"description"`
-	Status       WorkspaceCardStatus `json:"status"`
-	UserCreated  string              `json:"user_created"`
-	Members      []Member            `json:"members"`
-	CommentCount int                 `json:"comment_count"`
-	IsArchived   bool                `json:"is_archived"`
-	IsCompleted  bool                `json:"is_completed"`
-	CreatedAt    string              `json:"created_at"`
-	UpdatedAt    string              `json:"updated_at"`
+	Id           uint              `json:"id"`
+	Title        string            `json:"title"`
+	Description  string            `json:"description"`
+	Status       string            `json:"status"`
+	UserCreated  string            `json:"user_created"`
+	Members      []WorkspaceMember `json:"members"`
+	CommentCount int               `json:"comment_count"`
+	IsArchived   bool              `json:"is_archived"`
+	IsCompleted  bool              `json:"is_completed"`
+	CreatedAt    string            `json:"created_at"`
+	UpdatedAt    string            `json:"updated_at"`
 }
 
 type CountWorkspaceCard struct {
@@ -77,22 +55,10 @@ type WorkspaceResponse struct {
 	Id          uint               `json:"id"`
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
-	Type        WorkspaceType      `json:"type"`
-	Status      WorkspaceStatus    `json:"status,omitempty"`
-	Members     []Member           `json:"members"`
-	Tags        []string           `json:"tags"`
-	IsArchived  bool               `json:"is_archived"`
+	Members     []WorkspaceMember  `json:"members"`
 	CountCards  CountWorkspaceCard `json:"count_cards"`
 	CreatedAt   string             `json:"created_at"`
 	UpdatedAt   string             `json:"updated_at"`
-}
-
-type WorkspaceByStatusResponse struct {
-	Id         uint                `json:"id"`
-	Name       string              `json:"name"`
-	Color      string              `json:"color"`
-	Workspaces []WorkspaceResponse `json:"workspaces"`
-	IsArchived bool                `json:"is_archived"`
 }
 
 type WorkspaceCreateRequest struct {

@@ -56,7 +56,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 			})
 			return err
 		}
-		workspace_card.Status.Id = uint(req.StatusId)
+		workspace_card.WorkspaceCardStatusId = uint(req.StatusId)
 
 		if err := trx.Save(&workspace_card).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
@@ -105,13 +105,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 				Id:          workspace_card.Id,
 				Title:       workspace_card.Title,
 				Description: workspace_card.Description,
-				Status: structs.WorkspaceCardStatus{
-					Id:         workspace_card.Status.Id,
-					Order:      workspace_card.Status.Order,
-					Name:       workspace_card.Status.Name,
-					Color:      workspace_card.Status.Color,
-					IsArchived: workspace_card.Status.IsArchived,
-				},
+				Status:      workspace_card.WorkspaceCardStatus.Name,
 				UserCreated: workspace_card.UserCreated.Username,
 				IsArchived:  workspace_card.IsArchived,
 				CreatedAt:   workspace_card.CreatedAt.Format("2006-01-02 15:04:05"),

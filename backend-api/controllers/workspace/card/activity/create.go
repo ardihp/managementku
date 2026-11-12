@@ -37,10 +37,10 @@ func CreateWorkspaceCardActivity(c *gin.Context) {
 	}
 
 	workspace_card_activity := models.WorkspaceCardActivity{
-		CardId:  uint(parsed_card_id),
-		UserId:  uint(user_id),
-		Type:    "comment",
-		Message: req.Message,
+		WorkspaceCardId: uint(parsed_card_id),
+		UserId:          uint(user_id),
+		Type:            "comment",
+		Message:         req.Message,
 	}
 
 	if err := database.DB.Create(&workspace_card_activity).Error; err != nil {

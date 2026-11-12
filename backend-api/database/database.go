@@ -31,10 +31,9 @@ func InitDB() {
 
 	fmt.Println("Database connected successfully!")
 
-	err = DB.AutoMigrate(&models.User{}, &models.WorkspaceType{}, &models.Workspace{},
-		&models.WorkspaceMember{}, &models.WorkspaceTag{},
-		&models.WorkspaceStatus{}, &models.WorkspaceCard{}, &models.WorkspaceCardStatus{},
-		&models.WorkspaceCardMember{}, &models.HistoryLog{}, &models.UserHistoryLog{}, &models.WorkspaceHistoryLog{},
+	err = DB.AutoMigrate(&models.User{}, &models.Workspace{}, &models.WorkspaceMember{},
+		&models.WorkspaceCardStatus{}, &models.WorkspaceCard{}, &models.WorkspaceCardMember{},
+		&models.HistoryLog{}, &models.UserHistoryLog{}, &models.WorkspaceHistoryLog{},
 		&models.WorkspaceCardActivity{})
 
 	if err != nil {

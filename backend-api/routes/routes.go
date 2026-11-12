@@ -9,8 +9,6 @@ import (
 	workspaceCardControllers "kanban-board/backend-api/controllers/workspace/card"
 	workspaceCardActivityControllers "kanban-board/backend-api/controllers/workspace/card/activity"
 	workspaceCardStatusControllers "kanban-board/backend-api/controllers/workspace/card/status"
-	workspaceStatusControllers "kanban-board/backend-api/controllers/workspace/status"
-	workspaceTypeControllers "kanban-board/backend-api/controllers/workspace/type"
 
 	"kanban-board/backend-api/middlewares"
 
@@ -45,31 +43,11 @@ func SetupRouter() *gin.Engine {
 
 	// Workspace
 	router.GET("/api/workspace", middlewares.AuthMiddleware(), workspaceControllers.ListWorkspace)
-	router.GET("/api/workspace/:id", middlewares.AuthMiddleware(), workspaceControllers.ListWorkspaceByID)
+	router.GET("/api/workspace/:id", middlewares.AuthMiddleware())
 	router.POST("/api/workspace/create", middlewares.AuthMiddleware(), workspaceControllers.CreateWorkspace)
 	router.PUT("/api/workspace/update/:id", middlewares.AuthMiddleware(), workspaceControllers.UpdateWorkspace)
-	router.PUT("/api/workspace/archive/:id", middlewares.AuthMiddleware(), workspaceControllers.ArchieveWorkspace)
-	router.PUT("/api/workspace/unarchive/:id", middlewares.AuthMiddleware(), workspaceControllers.UnArchieveWorkspace)
 	router.POST("/api/workspace/assign", middlewares.AuthMiddleware(), workspaceControllers.AssignMemberToWorkspace)
-	router.GET("/api/workspace/archived", middlewares.AuthMiddleware(), workspaceControllers.ListArchivedWorkspace)
 	router.DELETE("/api/workspace/delete/:id", middlewares.AuthMiddleware(), workspaceControllers.DeleteWorkspace)
-	router.POST("/api/workspace/update-order", middlewares.AuthMiddleware(), workspaceControllers.UpdateWorkspaceOrder)
-
-	// Workspace Status
-	router.GET("/api/workspace/status", middlewares.AuthMiddleware(), workspaceStatusControllers.ListWorkspaceStatus)
-	router.GET("/api/workspace/status/archived", middlewares.AuthMiddleware(), workspaceStatusControllers.ListArchivedWorkspaceStatus)
-	router.POST("/api/workspace/status/create", middlewares.AuthMiddleware(), workspaceStatusControllers.CreateWorkspaceStatus)
-	router.PUT("/api/workspace/status/update", middlewares.AuthMiddleware(), workspaceStatusControllers.UpdateWorkspaceStatus)
-	router.PUT("/api/workspace/status/update-order", middlewares.AuthMiddleware(), workspaceStatusControllers.UpdateOrderWorkspaceStatus)
-	router.PUT("/api/workspace/status/archive/:id", middlewares.AuthMiddleware(), workspaceStatusControllers.ArchieveWorkspaceStatus)
-	router.PUT("/api/workspace/status/unarchive/:id", middlewares.AuthMiddleware(), workspaceStatusControllers.UnArchieveWorkspaceStatus)
-	router.DELETE("/api/workspace/status/delete/:id", middlewares.AuthMiddleware(), workspaceStatusControllers.DeleteWorkspaceStatus)
-
-	// Workspace Type
-	router.GET("/api/workspace/type", middlewares.AuthMiddleware(), workspaceTypeControllers.ListWorkspaceType)
-	router.POST("/api/workspace/type/create", middlewares.AuthMiddleware(), workspaceTypeControllers.CreateWorkspaceType)
-	router.PUT("/api/workspace/type/update", middlewares.AuthMiddleware(), workspaceTypeControllers.UpdateWorkspaceType)
-	router.DELETE("/api/workspace/type/delete/:id", middlewares.AuthMiddleware(), workspaceTypeControllers.DeleteWorkspaceType)
 
 	// Workspace Card
 	router.GET("/api/workspace/:id/card", middlewares.AuthMiddleware(), workspaceCardControllers.ListWorkspaceCard)

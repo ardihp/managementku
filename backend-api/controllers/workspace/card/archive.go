@@ -53,10 +53,10 @@ func ArchieveWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_card_activity := models.WorkspaceCardActivity{
-			CardId:  workspace_card.Id,
-			UserId:  uint(user_id),
-			Type:    "general",
-			Message: fmt.Sprintf("User %s archive this card", user.Username),
+			WorkspaceCardId: workspace_card.Id,
+			UserId:          uint(user_id),
+			Type:            "general",
+			Message:         fmt.Sprintf("User %s archive this card", user.Username),
 		}
 
 		if err := trx.Create(&workspace_card_activity).Error; err != nil {
@@ -151,10 +151,10 @@ func UnarchieveWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_card_activity := models.WorkspaceCardActivity{
-			CardId:  workspace_card.Id,
-			UserId:  uint(user_id),
-			Type:    "general",
-			Message: fmt.Sprintf("User %s unarchive this card", user.Username),
+			WorkspaceCardId: workspace_card.Id,
+			UserId:          uint(user_id),
+			Type:            "general",
+			Message:         fmt.Sprintf("User %s unarchive this card", user.Username),
 		}
 
 		if err := trx.Create(&workspace_card_activity).Error; err != nil {

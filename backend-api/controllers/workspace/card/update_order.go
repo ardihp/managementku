@@ -97,7 +97,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 			}
 
 			for index, card_id := range order.CardId {
-				var new_workspace_card = models.WorkspaceCard{Id: uint(card_id)}
+				new_workspace_card := models.WorkspaceCard{Id: uint(card_id)}
 
 				if err := database.DB.Where("id = ? AND workspace_id = ?", card_id, workspace_id).First(&new_workspace_card).Error; err != nil {
 					c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
@@ -108,7 +108,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 					return err
 				}
 
-				new_workspace_card.Status.Id = uint(order.StatusId)
+				new_workspace_card.WorkspaceCardStatusId = uint(order.StatusId)
 				new_workspace_card.Order = index
 
 				if err := database.DB.Save(&new_workspace_card).Error; err != nil {
@@ -163,13 +163,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 				Id:          workspace_card.Id,
 				Title:       workspace_card.Title,
 				Description: workspace_card.Description,
-				Status: structs.WorkspaceCardStatus{
-					Id:         workspace_card.Status.Id,
-					Order:      workspace_card.Status.Order,
-					Name:       workspace_card.Status.Name,
-					Color:      workspace_card.Status.Color,
-					IsArchived: workspace_card.Status.IsArchived,
-				},
+				Status:      workspace_card.WorkspaceCardStatus.Name,
 				UserCreated: workspace_card.UserCreated.Username,
 				IsArchived:  workspace_card.IsArchived,
 				CreatedAt:   workspace_card.CreatedAt.Format("2006-01-02 15:04:05"),

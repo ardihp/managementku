@@ -8,38 +8,29 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 func ListWorkspaceCard(c *gin.Context) {
 	id := c.Param("id")
-	workspace_cards := []models.WorkspaceCardStatus{}
+	workspace_card_statuses := []models.WorkspaceCardStatus{}
 
-	if err := database.DB.Where("workspace_id = ? AND is_archived = ?", id, false).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_cards).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+	if err := database.DB.Where("workspace_id = ?", id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_card_statuses).Error; err != nil {
+		helpers.SendError(c, http.StatusNotFound, "Workspace not found", err)
 		return
 	}
 
-	var list_workspace_cards = []structs.WorkspaceCardByStatusResponse{}
+	list_workspace_cards := []structs.WorkspaceCardByStatusResponse{}
 
-	for _, status := range workspace_cards {
+	for _, status := range workspace_card_statuses {
 		workspace_card_by_status := []models.WorkspaceCard{}
 
 		if err := database.DB.Where("workspace_id = ? AND status_id = ? AND is_archived = ?", id, status.Id, false).Preload(clause.Associations).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_card_by_status).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to retrieve workspace status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+			helpers.SendError(c, http.StatusInternalServerError, "Failed to retrieve workspace status", err)
 			return
 		}
 
-		list_workspace_card_by_status := []structs.WorkspaceCardResponse{}
+		list_workspace_card := []structs.WorkspaceCardResponse{}
 
 		for _, card := range workspace_card_by_status {
 			members := []models.WorkspaceCardMember{}
@@ -53,10 +44,10 @@ func ListWorkspaceCard(c *gin.Context) {
 				return
 			}
 
-			list_member := []structs.Member{}
+			list_member := []structs.WorkspaceMember{}
 
 			for _, member := range members {
-				list_member = append(list_member, structs.Member{
+				list_member = append(list_member, structs.WorkspaceMember{
 					Id:       member.User.Id,
 					Name:     member.User.Name,
 					Username: member.User.Username,
@@ -66,17 +57,11 @@ func ListWorkspaceCard(c *gin.Context) {
 
 			result := database.DB.Where("card_id = ? AND type = ?", card.Id, "comment").Preload(clause.Associations).Find(&[]models.WorkspaceCardActivity{})
 
-			list_workspace_card_by_status = append(list_workspace_card_by_status, structs.WorkspaceCardResponse{
-				Id:          card.Id,
-				Title:       card.Title,
-				Description: card.Description,
-				Status: structs.WorkspaceCardStatus{
-					Id:         card.Status.Id,
-					Name:       card.Status.Name,
-					Color:      card.Status.Color,
-					IsArchived: card.Status.IsArchived,
-					Order:      card.Status.Order,
-				},
+			list_workspace_card = append(list_workspace_card, structs.WorkspaceCardResponse{
+				Id:           card.Id,
+				Title:        card.Title,
+				Description:  card.Description,
+				Status:       status.Name,
 				UserCreated:  card.UserCreated.Username,
 				Members:      list_member,
 				CommentCount: int(result.RowsAffected),
@@ -92,7 +77,7 @@ func ListWorkspaceCard(c *gin.Context) {
 			Name:       status.Name,
 			Color:      status.Color,
 			IsArchived: status.IsArchived,
-			Cards:      list_workspace_card_by_status,
+			Cards:      list_workspace_card,
 		})
 	}
 
@@ -106,71 +91,53 @@ func ListWorkspaceCard(c *gin.Context) {
 func ListArchivedWorkspaceCard(c *gin.Context) {
 	workspace_id := c.Param("id")
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
-		archived_workspace_cards := []models.WorkspaceCard{}
-		list_archived_workspace_cards := []structs.WorkspaceCardResponse{}
+	archived_workspace_cards := []models.WorkspaceCard{}
+	list_archived_workspace_cards := []structs.WorkspaceCardResponse{}
 
-		if err := trx.Where("workspace_id = ? AND is_archived = ?", workspace_id, true).Preload(clause.Associations).Find(&archived_workspace_cards).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace cards not found",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return err
+	if err := database.DB.Where("workspace_id = ? AND is_archived = ?", workspace_id, true).Preload(clause.Associations).Find(&archived_workspace_cards).Error; err != nil {
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace cards not found", err)
+		return
+	}
+
+	for _, card := range archived_workspace_cards {
+		members := []models.WorkspaceCardMember{}
+
+		if err := database.DB.Where("card_id = ?", card.Id).Preload(clause.Associations).Find(&members).Error; err != nil {
+			helpers.SendError(c, http.StatusInternalServerError, "Failed to retrieve workspace card", err)
+			return
 		}
 
-		for _, card := range archived_workspace_cards {
-			members := []models.WorkspaceCardMember{}
+		list_member := []structs.WorkspaceMember{}
 
-			if err := trx.Where("card_id = ?", card.Id).Preload(clause.Associations).Find(&members).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-					Success: false,
-					Message: "Failed to retrieve workspace card",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
-				return err
-			}
-
-			list_member := []structs.Member{}
-
-			for _, member := range members {
-				list_member = append(list_member, structs.Member{
-					Id:       member.User.Id,
-					Name:     member.User.Name,
-					Username: member.User.Username,
-					Email:    member.User.Email,
-				})
-			}
-
-			result := trx.Where("card_id = ? AND type = ?", card.Id, "comment").Preload(clause.Associations).Find(&[]models.WorkspaceCardActivity{})
-
-			list_archived_workspace_cards = append(list_archived_workspace_cards, structs.WorkspaceCardResponse{
-				Id:          card.Id,
-				Title:       card.Title,
-				Description: card.Description,
-				Status: structs.WorkspaceCardStatus{
-					Id:         card.Status.Id,
-					Name:       card.Status.Name,
-					Color:      card.Status.Color,
-					IsArchived: card.Status.IsArchived,
-					Order:      card.Status.Order,
-				},
-				UserCreated:  card.UserCreated.Username,
-				Members:      list_member,
-				CommentCount: int(result.RowsAffected),
-				IsArchived:   card.IsArchived,
-				IsCompleted:  card.IsCompleted,
-				CreatedAt:    card.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt:    card.UpdatedAt.Format("2006-01-02 15:04:05"),
+		for _, member := range members {
+			list_member = append(list_member, structs.WorkspaceMember{
+				Id:       member.User.Id,
+				Name:     member.User.Name,
+				Username: member.User.Username,
+				Email:    member.User.Email,
 			})
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Success to retreive workspace card",
-			Data:    list_archived_workspace_cards,
+		result := database.DB.Where("card_id = ? AND type = ?", card.Id, "comment").Preload(clause.Associations).Find(&[]models.WorkspaceCardActivity{})
+
+		list_archived_workspace_cards = append(list_archived_workspace_cards, structs.WorkspaceCardResponse{
+			Id:           card.Id,
+			Title:        card.Title,
+			Description:  card.Description,
+			Status:       card.WorkspaceCardStatus.Name,
+			UserCreated:  card.UserCreated.Username,
+			Members:      list_member,
+			CommentCount: int(result.RowsAffected),
+			IsArchived:   card.IsArchived,
+			IsCompleted:  card.IsCompleted,
+			CreatedAt:    card.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:    card.UpdatedAt.Format("2006-01-02 15:04:05"),
 		})
+	}
 
-		return nil
+	c.JSON(http.StatusOK, structs.SuccessResponse{
+		Success: true,
+		Message: "Success to retreive workspace card",
+		Data:    list_archived_workspace_cards,
 	})
 }
