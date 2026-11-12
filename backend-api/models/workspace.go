@@ -21,7 +21,7 @@ type WorkspaceMember struct {
 	JoinedAt    time.Time `json:"joined_at"`
 }
 
-type WorkspaceStatus struct {
+type WorkspaceCardStatus struct {
 	Id          uint `json:"id" gorm:"primaryKey"`
 	Order       int  `json:"order" gorm:"not null"`
 	WorkspaceId uint `json:"workspace_id" gorm:"primaryKey"`
@@ -34,20 +34,20 @@ type WorkspaceStatus struct {
 }
 
 type WorkspaceCard struct {
-	Id            uint `json:"id" gorm:"primaryKey"`
-	Order         int  `json:"order" gorm:"not null"`
-	WorkspaceId   uint `json:"workspace_id" gorm:"primaryKey"`
-	Workspace     Workspace
-	StatusId      uint `json:"status_id" gorm:"primaryKey"`
-	Status        WorkspaceStatus
-	UserCreatedId uint `json:"user_id" gorm:"primaryKey"`
-	UserCreated   User
-	Title         string    `json:"title" gorm:"not null"`
-	Description   string    `json:"description"`
-	IsArchived    bool      `json:"is_archived" gorm:"default:false"`
-	IsCompleted   bool      `json:"is_completed" gorm:"default:false"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	Id                    uint `json:"id" gorm:"primaryKey"`
+	Order                 int  `json:"order" gorm:"not null"`
+	WorkspaceId           uint `json:"workspace_id" gorm:"primaryKey"`
+	Workspace             Workspace
+	WorkspaceCardStatusId uint `json:"status_id" gorm:"primaryKey"`
+	WorkspaceCardStatus   WorkspaceCardStatus
+	UserCreatedId         uint `json:"user_id" gorm:"primaryKey"`
+	UserCreated           User
+	Title                 string    `json:"title" gorm:"not null"`
+	Description           string    `json:"description"`
+	IsArchived            bool      `json:"is_archived" gorm:"default:false"`
+	IsCompleted           bool      `json:"is_completed" gorm:"default:false"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
 }
 
 type WorkspaceCardMember struct {
