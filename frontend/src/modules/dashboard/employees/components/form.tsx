@@ -37,16 +37,12 @@ interface FormUser {
   name: string;
   username: string;
   email: string;
-  role: string;
-  password?: string;
 }
 
 const schema = yup.object().shape({
   name: yup.string().required("Name is required"),
   username: yup.string().required("Username is required"),
   email: yup.string().email().required("Email is required"),
-  role: yup.string().required("Role is required"),
-  password: yup.string().optional(),
 });
 
 export default function FormUser({
@@ -60,17 +56,10 @@ export default function FormUser({
     name: user?.name || "",
     username: user?.username || "",
     email: user?.email || "",
-    role: user?.role || "",
-    password: "",
   };
-  const [showPassword, setShowPassword] = useState(false);
-
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
-    clearErrors,
     reset,
     formState: { errors },
   } = useForm({
@@ -83,11 +72,6 @@ export default function FormUser({
 
   const isPending = loadingCreate || loadingUpdate;
 
-  useEffect(() => {
-    reset(defaultValues);
-    setShowPassword(false);
-  }, [open]);
-
   const onSubmit = async (data: FormUser) => {
     try {
       if (isEdit) {
@@ -97,10 +81,10 @@ export default function FormUser({
             onSuccess: (response) => {
               afterUpdate(response?.data);
             },
-          }
+          },
         );
       } else {
-        await create({ ...data, password: data.password! });
+        await create({ ...data, password: "" });
       }
     } catch (error: any) {
       console.log(error);
@@ -114,9 +98,7 @@ export default function FormUser({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{isEdit ? "Update" : "New"} User</DialogTitle>
-          <DialogDescription>
-            {isEdit ? "Update" : "Create"} User Form
-          </DialogDescription>
+          <DialogDescription />
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
@@ -162,71 +144,10 @@ export default function FormUser({
             <small className="text-red-500">{errors.email?.message}</small>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="role" className="text-sm">
-              Role
-            </label>
-            <Select
-              value={watch("role")}
-              onValueChange={(value) => {
-                setValue("role", value);
-                clearErrors("role");
-              }}
-              {...register("role")}
-              disabled={isPending}
-            >
-              <SelectTrigger className="w-full !bg-transparent capitalize">
-                <SelectValue placeholder="User role" className="capitalize" />
-              </SelectTrigger>
-              <SelectContent>
-                {["manager", "employee"]?.map((role, key) => (
-                  <SelectItem
-                    key={key}
-                    value={role}
-                    className="capitalize hover:bg-zinc-50"
-                  >
-                    {role}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <small className="text-red-500">{errors.name?.message}</small>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-sm">
-              {isEdit ? "New Password" : "Password"}
-            </label>
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder={
-                isEdit
-                  ? "Just leave it blank if you don't want to change the password"
-                  : "Input password..."
-              }
-              className="bg-transparent!"
-              rightIcon={
-                <div
-                  className="flex items-center justify-center bg-white w-10 h-full right-0 cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <Eye className="size-4" />
-                  ) : (
-                    <EyeClosed className="size-4" />
-                  )}
-                </div>
-              }
-              disabled={isPending}
-              {...register("password")}
-            />
-            <small className="text-red-500">{errors.password?.message}</small>
-          </div>
-
           <button
             className={cn(
               "border border-zinc-200 h-10 bg-zinc-700 rounded-lg shadow w-full cursor-pointer duration-200",
-              isPending && "cursor-not-allowed opacity-60"
+              isPending && "cursor-not-allowed opacity-60",
             )}
             disabled={isPending}
           >
