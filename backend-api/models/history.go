@@ -15,18 +15,18 @@ type HistoryLog struct {
 }
 
 type UserHistoryLog struct {
-	HistoryId uint `json:"history_id" gorm:"not null"`
+	HistoryId uint `json:"history_id" gorm:"primaryKey"`
 	History   HistoryLog
-	UserId    uint `json:"user_id" gorm:"not null"`
+	UserId    uint `json:"user_id" gorm:"primaryKey"`
 	User      User
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type WorkspaceHistoryLog struct {
-	HistoryId   uint `json:"history_id" gorm:"not null"`
+	HistoryId   uint `json:"history_id" gorm:"primaryKey"`
 	History     HistoryLog
-	WorkspaceId uint `json:"workspace_id" gorm:"not null"`
+	WorkspaceId uint `json:"workspace_id" gorm:"primaryKey"`
 	Workspace   Workspace
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
