@@ -146,16 +146,12 @@ func AssignMemberToWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, structs.SuccessResponse{
-		Success: true,
-		Message: "User assigned successfully",
-		Data: structs.WorkspaceResponse{
-			Id:          workspace.Id,
-			Name:        workspace.Name,
-			Description: workspace.Description,
-			Members:     members,
-			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
-		},
+	helpers.SendSuccess(c, http.StatusCreated, "User assigned successfully", structs.WorkspaceResponse{
+		Id:          workspace.Id,
+		Name:        workspace.Name,
+		Description: workspace.Description,
+		Members:     members,
+		CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 	})
 }

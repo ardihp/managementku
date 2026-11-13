@@ -24,26 +24,17 @@ func UpdateWorkspaceCardActivity(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		workspace_activity := models.WorkspaceCardActivity{}
 		database.DB.First(&workspace_activity, activity_id)
 
 		workspace_activity.Message = req.Message
 
 		if err := trx.Save(&workspace_activity).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace card activity",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -53,17 +44,11 @@ func UpdateWorkspaceCardActivity(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "update-workspace-card-activity",
 			Description: fmt.Sprintf("User %s has update comment on card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace card activity",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -75,20 +60,16 @@ func UpdateWorkspaceCardActivity(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace card activity",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
-
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Success update workspace card activity",
-		})
 
 		return nil
 	})
 
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to update workspace card activity", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Success update workspace card activity", nil)
 }

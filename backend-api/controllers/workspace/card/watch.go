@@ -25,52 +25,33 @@ func WatchWorkspaceCard(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
 	if err := database.DB.Where("workspace_id = ? AND id = ?", workspace_id, card_id).Preload(clause.Associations).First(&workspace_card).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Workspace card not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		member := models.WorkspaceCardMember{
-			CardId: workspace_card.Id,
-			UserId: uint(req.UserId),
+			WorkspaceCardId: workspace_card.Id,
+			UserId:          uint(req.UserId),
 		}
 
 		if err := trx.Create(&member).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to watch workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "archive-workspace-card",
 			Description: fmt.Sprintf("User %s start to watch card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to watch workspace",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -82,22 +63,18 @@ func WatchWorkspaceCard(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to watch workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Workspace card watched successfully",
-			Data:    "",
-		})
-
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to watch workspace card", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card watched successfully", "")
 }
 
 func UnwatchWorkspaceCard(c *gin.Context) {
@@ -111,47 +88,28 @@ func UnwatchWorkspaceCard(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
 	if err := database.DB.Where("workspace_id = ? AND id = ?", workspace_id, card_id).Preload(clause.Associations).First(&workspace_card).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Workspace card not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Delete(&models.WorkspaceCardMember{}, "user_id = ?", req.UserId).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to unwatch workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "unarchive-workspace-card",
 			Description: fmt.Sprintf("User %s has unwatch card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to unwatch workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -163,20 +121,16 @@ func UnwatchWorkspaceCard(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to unwatch workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Workspace card unwatched successfully",
-			Data:    "",
-		})
-
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to unwatch workspace card", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card unwatched successfully", "")
 }

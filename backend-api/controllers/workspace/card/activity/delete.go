@@ -5,7 +5,6 @@ import (
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
-	"kanban-board/backend-api/structs"
 	"net/http"
 	"strconv"
 
@@ -22,13 +21,8 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Where("card_id = ? AND id = ?", card_id, activity_id).Delete(&models.WorkspaceCardActivity{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card activity",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -38,17 +32,11 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "delete-workspace-card-activity",
 			Description: fmt.Sprintf("User %s has delete comment on card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card activity",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -60,20 +48,16 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card activity",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
-
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Success delete workspace card activity",
-		})
 
 		return nil
 	})
 
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to delete workspace card activity", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Success delete workspace card activity", nil)
 }

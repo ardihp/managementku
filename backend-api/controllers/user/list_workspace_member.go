@@ -15,22 +15,14 @@ func ListWorkspaceMember(c *gin.Context) {
 	workspace_id := c.Param("id")
 
 	if err := database.DB.Preload(clause.Associations).First(&models.Workspace{}, workspace_id).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace not found", err)
 		return
 	}
 
 	workspace_members := []models.WorkspaceMember{}
 
 	if err := database.DB.Where("workspace_id = ? AND role = ?", workspace_id, "member").Preload(clause.Associations).Find(&workspace_members).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to retreive workspace member",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Failed to retreive workspace member", err)
 		return
 	}
 
@@ -42,13 +34,9 @@ func ListWorkspaceMember(c *gin.Context) {
 			Name:     member.User.Name,
 			Username: member.User.Username,
 			Email:    member.User.Email,
-			Role:     member.User.Role,
+			Role:     member.Role,
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success to retreive workspace member",
-		Data:    list_workspace_members,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success to retreive workspace member", list_workspace_members)
 }

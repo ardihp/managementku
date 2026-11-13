@@ -10,13 +10,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 func UpdateWorkspace(c *gin.Context) {
 	req := structs.WorkspaceUpdateRequest{}
-	id := c.Param("id")
+	workspace_id := c.Param("id")
 	user_id := c.GetInt("user_id")
+
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -26,25 +26,26 @@ func UpdateWorkspace(c *gin.Context) {
 	}
 
 	workspace := models.Workspace{}
-	if err := database.DB.Model(&models.Workspace{}).Preload(clause.Associations).First(&workspace, id).Error; err != nil {
+
+	if err := database.DB.First(&workspace, workspace_id).Error; err != nil {
 		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace not found", err)
 		return
 	}
 
-	err := database.DB.Transaction(func(trx *gorm.DB) error {
-		workspace.Name = req.Name
-		workspace.Description = req.Description
+	workspace.Name = req.Name
+	workspace.Description = req.Description
 
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Save(&workspace).Error; err != nil {
 			return err
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user.Id,
 			Type:        "general",
 			UserRole:    "manager",
-			Action:      "create-workspace",
-			Description: fmt.Sprintf("User %s has update changes on workspace %s", user.Username, workspace.Name),
+			Action:      "update-workspace",
+			Description: fmt.Sprintf("User %s has updated workspace %s", user.Username, workspace.Name),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
@@ -53,7 +54,7 @@ func UpdateWorkspace(c *gin.Context) {
 
 		user_history := models.UserHistoryLog{
 			HistoryId: history_log.ID,
-			UserId:    uint(user_id),
+			UserId:    user.Id,
 		}
 
 		if err := trx.Create(&user_history).Error; err != nil {
@@ -68,16 +69,12 @@ func UpdateWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Workspace updated successfully",
-		Data: structs.WorkspaceResponse{
-			Id:          workspace.Id,
-			Name:        workspace.Name,
-			Description: workspace.Description,
-			Members:     []structs.WorkspaceMember{},
-			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
-		},
+	helpers.SendSuccess(c, http.StatusOK, "Workspace updated successfully", structs.WorkspaceResponse{
+		Id:          workspace.Id,
+		Name:        workspace.Name,
+		Description: workspace.Description,
+		Members:     []structs.WorkspaceMember{},
+		CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 	})
 }

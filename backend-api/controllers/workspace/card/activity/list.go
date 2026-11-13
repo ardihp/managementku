@@ -17,11 +17,7 @@ func ListWorkspaceCardActivity(c *gin.Context) {
 	workspace_card_activities := []models.WorkspaceCardActivity{}
 
 	if err := database.DB.Preload(clause.Associations).Order("created_at DESC").Find(&workspace_card_activities, "card_id = ?", card_id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to retrieve workspace card activities",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to retrieve workspace card activities", err)
 		return
 	}
 
@@ -38,9 +34,5 @@ func ListWorkspaceCardActivity(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success retrieve workspace card activities",
-		Data:    list_workspace_card_activies,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success retrieve workspace card activities", list_workspace_card_activies)
 }

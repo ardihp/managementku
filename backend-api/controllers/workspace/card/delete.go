@@ -5,7 +5,6 @@ import (
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
-	"kanban-board/backend-api/structs"
 	"net/http"
 	"strconv"
 
@@ -23,32 +22,22 @@ func DeleteWorkspaceCard(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := database.DB.Where("workspace_id = ? AND id = ?", workspace_id, card_id).First(&models.WorkspaceCard{}).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Workspace card not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		workspace_card := models.WorkspaceCard{}
 		trx.Where("workspace_id = ? AND id = ?", workspace_id, card_id).First(&workspace_card)
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "delete-workspace-card",
 			Description: fmt.Sprintf("User %s has deleted card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -58,47 +47,28 @@ func DeleteWorkspaceCard(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		if err := trx.Where("card_id = ?", card_id).Delete(&models.WorkspaceCardActivity{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		if err := trx.Where("card_id = ?", card_id).Delete(&models.WorkspaceCardMember{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		if err := trx.Where("workspace_id = ? AND id = ?", workspace_id, card_id).Delete(&models.WorkspaceCard{}).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to delete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Workspace card deleted successfully",
-			Data:    "",
-		})
-
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to delete workspace card", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card deleted successfully", "")
 }

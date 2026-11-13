@@ -19,20 +19,12 @@ func CreateWorkspaceCardActivity(c *gin.Context) {
 	user_id := c.GetInt("user_id")
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
 	if err := database.DB.First(&models.WorkspaceCard{}, card_id).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card is not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace card is not found", err)
 		return
 	}
 
@@ -44,17 +36,9 @@ func CreateWorkspaceCardActivity(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&workspace_card_activity).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to create workspace activity",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to create workspace activity", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success create workspace card activity",
-		Data:    "",
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success create workspace card activity", "")
 }

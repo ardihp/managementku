@@ -5,7 +5,6 @@ import (
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
-	"kanban-board/backend-api/structs"
 	"net/http"
 	"strconv"
 
@@ -80,9 +79,5 @@ func DeleteWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Workspace deleted successfully",
-		Data:    "",
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Workspace deleted successfully", "")
 }

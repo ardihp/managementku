@@ -58,16 +58,12 @@ func CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, structs.SuccessResponse{
-		Success: true,
-		Message: "Workspace created successfully",
-		Data: structs.WorkspaceResponse{
-			Id:          workspace.Id,
-			Name:        workspace.Name,
-			Description: workspace.Description,
-			Members:     []structs.WorkspaceMember{},
-			CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
-		},
+	helpers.SendSuccess(c, http.StatusCreated, "Workspace created successfully", structs.WorkspaceResponse{
+		Id:          workspace.Id,
+		Name:        workspace.Name,
+		Description: workspace.Description,
+		Members:     []structs.WorkspaceMember{},
+		CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 	})
 }

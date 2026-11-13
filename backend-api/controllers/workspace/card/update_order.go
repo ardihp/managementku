@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
@@ -19,11 +20,7 @@ func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
 	var workspace_id = c.Param("id")
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
@@ -31,31 +28,19 @@ func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
 		var new_workspace_card_status = models.WorkspaceCardStatus{}
 
 		if err := database.DB.Where("id = ? AND workspace_id = ?", id, workspace_id).First(&new_workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace card status not found",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+			helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace card status not found", err)
 			return
 		}
 
 		new_workspace_card_status.Order = index
 
 		if err := database.DB.Save(&new_workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace order",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
+			helpers.SendError(c, http.StatusInternalServerError, "Failed to update workspace order", err)
 			return
 		}
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success update workspace card status order",
-		Data:    "",
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success update workspace card status order", "")
 }
 
 func UpdateWorkspaceCardOrder(c *gin.Context) {
@@ -68,24 +53,18 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
 	if err := database.DB.Where("id = ?", workspace_id).First(&models.Workspace{}).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	workspace_card := models.WorkspaceCard{}
+
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		status_before := &models.WorkspaceCardStatus{}
 		status_after := &models.WorkspaceCardStatus{}
 
@@ -100,11 +79,6 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 				new_workspace_card := models.WorkspaceCard{Id: uint(card_id)}
 
 				if err := database.DB.Where("id = ? AND workspace_id = ?", card_id, workspace_id).First(&new_workspace_card).Error; err != nil {
-					c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-						Success: false,
-						Message: "Workspace card not found",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
@@ -112,18 +86,12 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 				new_workspace_card.Order = index
 
 				if err := database.DB.Save(&new_workspace_card).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to update workspace card order",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 			}
 		}
 
-		workspace_card := models.WorkspaceCard{}
-		database.DB.First(&workspace_card, req.CardId)
+		database.DB.Preload(clause.Associations).First(&workspace_card, req.CardId)
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
@@ -134,11 +102,6 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace card order",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -148,29 +111,25 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to update workspace card order",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Success update workspace card order",
-			Data: structs.WorkspaceCardResponse{
-				Id:          workspace_card.Id,
-				Title:       workspace_card.Title,
-				Description: workspace_card.Description,
-				Status:      workspace_card.WorkspaceCardStatus.Name,
-				UserCreated: workspace_card.UserCreated.Username,
-				IsArchived:  workspace_card.IsArchived,
-				CreatedAt:   workspace_card.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt:   workspace_card.UpdatedAt.Format("2006-01-02 15:04:05"),
-			},
-		})
-
 		return nil
+	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to update workspace card order", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Success update workspace card order", structs.WorkspaceCardResponse{
+		Id:          workspace_card.Id,
+		Title:       workspace_card.Title,
+		Description: workspace_card.Description,
+		Status:      workspace_card.WorkspaceCardStatus.Name,
+		UserCreated: workspace_card.UserCreated.Username,
+		IsArchived:  workspace_card.IsArchived,
+		CreatedAt:   workspace_card.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   workspace_card.UpdatedAt.Format("2006-01-02 15:04:05"),
 	})
 }

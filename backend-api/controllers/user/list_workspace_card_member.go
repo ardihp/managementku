@@ -15,22 +15,14 @@ func ListWorkspaceCardMember(c *gin.Context) {
 	card_id := c.Param("id")
 
 	if err := database.DB.Preload(clause.Associations).First(&models.WorkspaceCard{}, card_id).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace card not found", err)
 		return
 	}
 
 	workspace_card_members := []models.WorkspaceCardMember{}
 
-	if err := database.DB.Where("card_id = ?", card_id).Preload(clause.Associations).Find(&workspace_card_members).Error; err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to retreive workspace card member",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+	if err := database.DB.Where("workspace_card_id = ?", card_id).Preload(clause.Associations).Find(&workspace_card_members).Error; err != nil {
+		helpers.SendError(c, http.StatusUnprocessableEntity, "Failed to retreive workspace card member", err)
 		return
 	}
 
@@ -42,13 +34,8 @@ func ListWorkspaceCardMember(c *gin.Context) {
 			Name:     member.User.Name,
 			Username: member.User.Username,
 			Email:    member.User.Email,
-			Role:     member.User.Role,
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success to retreive workspace card member",
-		Data:    list_workspace_card_members,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success to retreive workspace card member", list_workspace_card_members)
 }

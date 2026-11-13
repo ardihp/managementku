@@ -23,38 +23,28 @@ func CreateWorkspaceCard(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
 	if err := database.DB.First(&models.Workspace{}, workspace_id).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Workspace not found", err)
 		return
 	}
 
 	workspace_card_status := models.WorkspaceCardStatus{}
 
 	if err := database.DB.Where("id = ? AND workspace_id = ? AND is_archived = ?", req.StatusId, workspace_id, false).First(&workspace_card_status).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Status card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Status card not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	var card models.WorkspaceCard
+
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		result := trx.Where("status_id = ?", req.StatusId).Find(&[]models.WorkspaceCard{})
 
-		var card = models.WorkspaceCard{
+		card = models.WorkspaceCard{
 			WorkspaceId:           uint(parsed_workspace_id),
 			WorkspaceCardStatusId: uint(req.StatusId),
 			UserCreatedId:         uint(user_id),
@@ -64,11 +54,6 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		if err := trx.Create(&card).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -80,28 +65,17 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_card_activity).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "create-workspace-card",
 			Description: fmt.Sprintf("User %s has added new card to status %s", user.Username, workspace_card_status.Name),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -111,25 +85,21 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusCreated, structs.SuccessResponse{
-			Success: true,
-			Message: "Workspace card created successfully",
-			Data: structs.WorkspaceCardResponse{
-				Id:          card.Id,
-				Title:       card.Title,
-				Description: card.Description,
-				Members:     []structs.WorkspaceMember{},
-			},
-		})
-
 		return nil
+	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to create workspace card", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusCreated, "Workspace card created successfully", structs.WorkspaceCardResponse{
+		Id:          card.Id,
+		Title:       card.Title,
+		Description: card.Description,
+		Members:     []structs.WorkspaceMember{},
 	})
 }

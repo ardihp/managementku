@@ -22,11 +22,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
@@ -36,34 +32,23 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 		Color:       req.Color,
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		list_workspace_card_status := []models.WorkspaceCardStatus{}
 		trx.Find(&list_workspace_card_status, "workspace_id = ?", workspace_id)
 		workspace_card_status.Order = len(list_workspace_card_status)
 
 		if err := trx.Create(&workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "create-workspace-card-status",
 			Description: fmt.Sprintf("User %s has created new status", user.Username),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -73,26 +58,22 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to create workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Success to create workspace status",
-			Data: structs.WorkspaceCardStatus{
-				Id:         workspace_card_status.Id,
-				Order:      workspace_card_status.Order,
-				Name:       workspace_card_status.Name,
-				Color:      workspace_card_status.Color,
-				IsArchived: workspace_card_status.IsArchived,
-			},
-		})
-
 		return nil
+	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to create workspace card status", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Success to create workspace status", structs.WorkspaceCardStatus{
+		Id:         workspace_card_status.Id,
+		Order:      workspace_card_status.Order,
+		Name:       workspace_card_status.Name,
+		Color:      workspace_card_status.Color,
+		IsArchived: workspace_card_status.IsArchived,
 	})
 }

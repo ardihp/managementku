@@ -5,7 +5,6 @@ import (
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
-	"kanban-board/backend-api/structs"
 	"net/http"
 	"strconv"
 
@@ -22,50 +21,31 @@ func ArchieveWorkspaceCardStatus(c *gin.Context) {
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
-		if err := trx.Where("workspace_id = ? AND id = ?", workspace_id, status_id).First(&workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusNotFound, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace card status not found",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return err
-		}
+	if err := database.DB.Where("workspace_id = ? AND id = ?", workspace_id, status_id).First(&workspace_card_status).Error; err != nil {
+		helpers.SendError(c, http.StatusNotFound, "Workspace card status not found", err)
+		return
+	}
 
-		if workspace_card_status.IsArchived {
-			c.JSON(http.StatusConflict, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace card status is already archived",
-				Errors:  nil,
-			})
-			return trx.Error
-		}
+	if workspace_card_status.IsArchived {
+		helpers.SendError(c, http.StatusConflict, "Workspace card status is already archived", nil)
+		return
+	}
 
-		workspace_card_status.IsArchived = true
+	workspace_card_status.IsArchived = true
 
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Save(&workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to archive workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "archive-workspace-card-status",
 			Description: fmt.Sprintf("User %s has archived status %s", user.Username, workspace_card_status.Name),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to archive workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -77,22 +57,18 @@ func ArchieveWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to archive workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		return nil
 	})
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Workspace card status archived successfully",
-		Data:    "",
-	})
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to archive workspace card status", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card status archived successfully", "")
 }
 
 func UnArchieveWorkspaceCardStatus(c *gin.Context) {
@@ -104,50 +80,31 @@ func UnArchieveWorkspaceCardStatus(c *gin.Context) {
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
-		if err := trx.Where("workspace_id = ? AND id = ?", workspace_id, status_id).First(&workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusNotFound, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace card status not found",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
-			return err
-		}
+	if err := database.DB.Where("workspace_id = ? AND id = ?", workspace_id, status_id).First(&workspace_card_status).Error; err != nil {
+		helpers.SendError(c, http.StatusNotFound, "Workspace card status not found", err)
+		return
+	}
 
-		if !workspace_card_status.IsArchived {
-			c.JSON(http.StatusConflict, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace card status is already active",
-				Errors:  nil,
-			})
-			return trx.Error
-		}
+	if !workspace_card_status.IsArchived {
+		helpers.SendError(c, http.StatusConflict, "Workspace card status is already active", nil)
+		return
+	}
 
-		workspace_card_status.IsArchived = false
+	workspace_card_status.IsArchived = false
 
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Save(&workspace_card_status).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to unarchive workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      uint(user_id),
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "unarchive-workspace-card-status",
 			Description: fmt.Sprintf("User %s has unarchive status %s", user.Username, workspace_card_status.Name),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to unarchive workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -159,20 +116,16 @@ func UnArchieveWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to unarchive workspace card status",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		return nil
 	})
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Workspace card status activated successfully",
-		Data:    "",
-	})
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to unarchive workspace card status", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card status activated successfully", "")
 }

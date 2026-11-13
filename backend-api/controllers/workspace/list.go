@@ -30,9 +30,5 @@ func ListWorkspace(c *gin.Context) {
 		workspaces = append(workspaces, workspace)
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Workspace retrieved successfully",
-		Data:    workspaces,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Workspace retrieved successfully", workspaces)
 }

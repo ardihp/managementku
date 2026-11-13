@@ -21,11 +21,7 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 	req := structs.WorkspaceCardAssignMember{}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-			Success: false,
-			Message: "Validation Errors",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.ValidationError(c, err)
 		return
 	}
 
@@ -54,13 +50,8 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 		WorkspaceId: uint(parsed_workspace_id),
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Preload(clause.Associations).First(&workspace_card, req.CardId).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Workspace not found",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -78,11 +69,6 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 				logs := []models.HistoryLog{user_log, manager_log}
 
 				if err := trx.Create(&logs).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to assign user",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
@@ -94,20 +80,10 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 				workspace_log.HistoryId = logs[1].ID
 
 				if err := trx.Create(&workspace_log).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to assign user",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to update workspace order",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 			}
@@ -120,19 +96,14 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 			exist_member := models.WorkspaceCardMember{}
 
 			if err := trx.First(&user, req.UserId[key]).Error; err != nil {
-				c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-					Success: false,
-					Message: "User Not Found",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
 				return err
 			}
 
 			trx.Where("card_id = ? AND user_id = ?", req.CardId, user.Id).First(&exist_member)
 
 			assigned_user = append(assigned_user, models.WorkspaceCardMember{
-				CardId: uint(req.CardId),
-				UserId: user.Id,
+				WorkspaceCardId: uint(req.CardId),
+				UserId:          user.Id,
 			})
 
 			members = append(members, structs.WorkspaceMember{
@@ -150,11 +121,6 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 				logs := []models.HistoryLog{user_log, manager_log}
 
 				if err := trx.Create(&logs).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to assign user",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
@@ -166,52 +132,32 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 				workspace_log.HistoryId = logs[1].ID
 
 				if err := trx.Create(&workspace_log).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to assign user",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
-					c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-						Success: false,
-						Message: "Failed to update workspace order",
-						Errors:  helpers.TranslateErrorMessage(err),
-					})
 					return err
 				}
 			}
 		}
 
 		if err := trx.Where("card_id = ?", req.CardId).Delete(&models.WorkspaceCardMember{}).Error; err != nil {
-			c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to assign user",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		if len(assigned_user) >= 1 {
 			if err := trx.Create(&assigned_user).Error; err != nil {
-				c.JSON(http.StatusUnprocessableEntity, structs.ErrorResponse{
-					Success: false,
-					Message: "Failed to assign user",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
 				return err
 			}
 		}
 
-		c.JSON(http.StatusCreated, structs.SuccessResponse{
-			Success: true,
-			Message: "Update workspace card member successfully",
-			Data:    "",
-		})
-
 		return nil
 	})
 
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to assign user", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusCreated, "Update workspace card member successfully", "")
 }

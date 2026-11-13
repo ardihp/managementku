@@ -36,11 +36,7 @@ func ListWorkspaceCard(c *gin.Context) {
 			members := []models.WorkspaceCardMember{}
 
 			if err := database.DB.Where("card_id = ?", card.Id).Preload(clause.Associations).Find(&members).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-					Success: false,
-					Message: "Failed to retrieve workspace status",
-					Errors:  helpers.TranslateErrorMessage(err),
-				})
+				helpers.SendError(c, http.StatusInternalServerError, "Failed to retrieve workspace status", err)
 				return
 			}
 
@@ -81,11 +77,7 @@ func ListWorkspaceCard(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success retrieve workspace status",
-		Data:    list_workspace_cards,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success retrieve workspace status", list_workspace_cards)
 }
 
 func ListArchivedWorkspaceCard(c *gin.Context) {
@@ -135,9 +127,5 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success to retreive workspace card",
-		Data:    list_archived_workspace_cards,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success to retreive workspace card", list_archived_workspace_cards)
 }

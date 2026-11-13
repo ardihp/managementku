@@ -5,7 +5,6 @@ import (
 	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
-	"kanban-board/backend-api/structs"
 	"net/http"
 	"strconv"
 
@@ -24,40 +23,25 @@ func MarkWorkspaceCardComplete(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := database.DB.Preload(clause.Associations).First(&workspace_card, card_id).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Workspace card not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		workspace_card.IsCompleted = true
 
 		if err := trx.Save(&workspace_card).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to complete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "complete-workspace-card",
 			Description: fmt.Sprintf("User %s mark complete to card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to complete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -69,22 +53,18 @@ func MarkWorkspaceCardComplete(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to complete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Workspace card completed successfully",
-			Data:    "",
-		})
-
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to complete workspace card", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card completed successfully", "")
 }
 
 func MarkWorkspaceCardIncomplete(c *gin.Context) {
@@ -97,40 +77,25 @@ func MarkWorkspaceCardIncomplete(c *gin.Context) {
 	database.DB.First(&user, user_id)
 
 	if err := database.DB.Preload(clause.Associations).First(&workspace_card, card_id).Error; err != nil {
-		c.JSON(http.StatusNotFound, structs.ErrorResponse{
-			Success: false,
-			Message: "Workspace card not found",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusNotFound, "Workspace card not found", err)
 		return
 	}
 
-	database.DB.Transaction(func(trx *gorm.DB) error {
+	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		workspace_card.IsCompleted = false
 
 		if err := trx.Save(&workspace_card).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to incomplete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "workspace",
-			UserRole:    user.Role,
 			Action:      "incomplete-workspace-card",
 			Description: fmt.Sprintf("User %s mark incomplete to card %s", user.Username, workspace_card.Title),
 		}
 
 		if err := trx.Create(&history_log).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to incomplete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
@@ -142,20 +107,16 @@ func MarkWorkspaceCardIncomplete(c *gin.Context) {
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-				Success: false,
-				Message: "Failed to incomplete workspace card",
-				Errors:  helpers.TranslateErrorMessage(err),
-			})
 			return err
 		}
 
-		c.JSON(http.StatusOK, structs.SuccessResponse{
-			Success: true,
-			Message: "Workspace card incomplete successfully",
-			Data:    "",
-		})
-
 		return nil
 	})
+
+	if err != nil {
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to incomplete workspace card", err)
+		return
+	}
+
+	helpers.SendSuccess(c, http.StatusOK, "Workspace card incomplete successfully", "")
 }

@@ -16,11 +16,7 @@ func ListWorkspaceCardStatus(c *gin.Context) {
 	workspace_id := c.Param("id")
 
 	if err := database.DB.Where("is_archived = ? AND workspace_id = ?", false, workspace_id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_status).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to retreive workspace card status",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to retreive workspace card status", err)
 		return
 	}
 
@@ -36,11 +32,7 @@ func ListWorkspaceCardStatus(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success to retreive workspace card status",
-		Data:    list_workspace_card_status,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success to retreive workspace card status", list_workspace_card_status)
 }
 
 func ListArchivedWorkspaceCardStatus(c *gin.Context) {
@@ -48,11 +40,7 @@ func ListArchivedWorkspaceCardStatus(c *gin.Context) {
 	workspace_id := c.Param("id")
 
 	if err := database.DB.Where("is_archived = ? AND workspace_id = ?", true, workspace_id).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}, Desc: false}).Find(&workspace_status).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, structs.ErrorResponse{
-			Success: false,
-			Message: "Failed to retreive archived workspace card status",
-			Errors:  helpers.TranslateErrorMessage(err),
-		})
+		helpers.SendError(c, http.StatusInternalServerError, "Failed to retreive archived workspace card status", err)
 		return
 	}
 
@@ -68,9 +56,5 @@ func ListArchivedWorkspaceCardStatus(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, structs.SuccessResponse{
-		Success: true,
-		Message: "Success to retreive archived workspace card status",
-		Data:    list_workspace_card_status,
-	})
+	helpers.SendSuccess(c, http.StatusOK, "Success to retreive archived workspace card status", list_workspace_card_status)
 }
