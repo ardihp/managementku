@@ -7,6 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func SendSuccess(c *gin.Context, statusCode int, message string, data any) {
+	c.JSON(statusCode, structs.SuccessResponse{
+		Success: true,
+		Message: message,
+		Data:    data,
+	})
+}
+
 func SendError(c *gin.Context, statusCode int, message string, err error) {
 	c.JSON(statusCode, structs.ErrorResponse{
 		Success: false,
