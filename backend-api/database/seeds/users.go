@@ -12,8 +12,8 @@ import (
 
 func UserSeeds() {
 	users := []models.User{
-		{Name: "Joko Dodoh", Username: "Joko", Email: "joko@gmail.com", Role: "manager", Password: helpers.HashPassword("test12345"), IsDeleted: false, CreatedAt: time.Now(), UpdatedAt: time.Now()},
-		{Name: "Puhdidi", Username: "Didih", Email: "puhdidi@gmail.com", Role: "employee", Password: helpers.HashPassword("test12345"), IsDeleted: false, CreatedAt: time.Now(), UpdatedAt: time.Now()},
+		{Name: "Joko Dodoh", Username: "Joko", Email: "joko@gmail.com", Password: helpers.HashPassword("test12345"), IsDeleted: false, CreatedAt: time.Now(), UpdatedAt: time.Now()},
+		{Name: "Puhdidi", Username: "Didih", Email: "puhdidi@gmail.com", Password: helpers.HashPassword("test12345"), IsDeleted: false, CreatedAt: time.Now(), UpdatedAt: time.Now()},
 	}
 
 	database.DB.Transaction(func(trx *gorm.DB) error {
