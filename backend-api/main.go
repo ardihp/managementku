@@ -27,7 +27,6 @@ func main() {
 		default:
 			fmt.Println("your argument not found")
 		}
-		return
 	}
 
 	go socketController.Manager.Start()
