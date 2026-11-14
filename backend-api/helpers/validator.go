@@ -13,43 +13,44 @@ func TranslateErrorMessage(err error) map[string]string {
 
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, fieldError := range validationErrors {
-			field := fieldError.Field() // Menyimpan nama field yang gagal validasi
-			switch fieldError.Tag() {   // Menangani berbagai jenis validasi
+			field := fieldError.Field()
+			switch fieldError.Tag() {
 			case "required":
-				errorsMap[field] = fmt.Sprintf("%s is required", field) // Pesan error jika field kosong
+				errorsMap[field] = fmt.Sprintf("%s is required", field)
 			case "email":
-				errorsMap[field] = "Invalid email format" // Pesan error jika format email tidak valid
+				errorsMap[field] = "Invalid email format"
 			case "unique":
-				errorsMap[field] = fmt.Sprintf("%s already exists", field) // Pesan error jika data sudah ada
+				errorsMap[field] = fmt.Sprintf("%s already exists", field)
 			case "min":
-				errorsMap[field] = fmt.Sprintf("%s must be at least %s characters", field, fieldError.Param()) // Pesan error jika nilai terlalu pendek
+				errorsMap[field] = fmt.Sprintf("%s must be at least %s characters", field, fieldError.Param())
 			case "max":
-				errorsMap[field] = fmt.Sprintf("%s must be at most %s characters", field, fieldError.Param()) // Pesan error jika nilai terlalu panjang
+				errorsMap[field] = fmt.Sprintf("%s must be at most %s characters", field, fieldError.Param())
 			case "numeric":
-				errorsMap[field] = fmt.Sprintf("%s must be a number", field) // Pesan error jika nilai bukan angka
+				errorsMap[field] = fmt.Sprintf("%s must be a number", field)
 			default:
-				errorsMap[field] = "Invalid value" // Pesan error default untuk kesalahan validasi lainnya
+				errorsMap[field] = "Invalid value"
 			}
 		}
 	}
 
-	// Handle error dari GORM untuk duplicate entry
 	if err != nil {
-		// Cek jika error mengandung "Duplicate entry" (duplikasi data di database)
 		if strings.Contains(err.Error(), "Duplicate entry") {
 			if strings.Contains(err.Error(), "username") {
-				errorsMap["Username"] = "Username already exists" // Pesan error jika username sudah ada
+				errorsMap["Username"] = "Username already exists"
 			}
 			if strings.Contains(err.Error(), "email") {
-				errorsMap["Email"] = "Email already exists" // Pesan error jika email sudah ada
+				errorsMap["Email"] = "Email already exists"
 			}
 		} else if err == gorm.ErrRecordNotFound {
-			// Jika data yang dicari tidak ditemukan di database
 			errorsMap["Error"] = "Record not found"
 		}
 	}
 
-	// Mengembalikan map yang berisi pesan error
+	// FALLBACK: Jika bukan validation error atau duplicate, tampilkan pesan error aslinya
+	if len(errorsMap) == 0 && err != nil {
+		errorsMap["error"] = err.Error()
+	}
+
 	return errorsMap
 }
 
