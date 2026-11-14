@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func AssignMemberToWorkspace(c *gin.Context) {
+func AssignMember(c *gin.Context) {
 	req := structs.WorkspaceAssignMember{}
 	user_id := c.GetInt("user_id")
 	user := models.User{}
@@ -26,19 +26,19 @@ func AssignMemberToWorkspace(c *gin.Context) {
 	}
 
 	workspace := models.Workspace{}
-	members := []structs.WorkspaceMember{}
+	members := []structs.MemberDetail{}
 
 	member_log := models.HistoryLog{
 		UserId:   uint(user_id),
 		Type:     "general",
-		UserRole: "employee",
+		UserRole: "user",
 		Action:   "assign-member",
 	}
 
 	user_log := models.HistoryLog{
 		UserId:   uint(user_id),
 		Type:     "general",
-		UserRole: "manager",
+		UserRole: "admin",
 		Action:   "assign-member",
 	}
 
@@ -101,7 +101,7 @@ func AssignMemberToWorkspace(c *gin.Context) {
 				Role:        role,
 			})
 
-			members = append(members, structs.WorkspaceMember{
+			members = append(members, structs.MemberDetail{
 				Id:       user.Id,
 				Name:     user.Name,
 				Username: user.Username,

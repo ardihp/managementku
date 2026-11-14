@@ -50,6 +50,12 @@ func CreateWorkspace(c *gin.Context) {
 			}
 		}
 
+		workspace_member := models.WorkspaceMember{WorkspaceId: workspace.Id, UserId: uint(user_id), Role: "admin"}
+
+		if err := trx.Create(&workspace_member).Error; err != nil {
+			return err
+		}
+
 		return nil
 	})
 
@@ -62,7 +68,7 @@ func CreateWorkspace(c *gin.Context) {
 		Id:          workspace.Id,
 		Name:        workspace.Name,
 		Description: workspace.Description,
-		Members:     []structs.WorkspaceMember{},
+		Members:     []structs.MemberDetail{},
 		CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
 	})

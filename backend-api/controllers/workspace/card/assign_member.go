@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func AssignMemberToWorkspaceCard(c *gin.Context) {
+func AssignMember(c *gin.Context) {
 	workspace_id := c.Param("id")
 	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 	req := structs.WorkspaceCardAssignMember{}
@@ -30,19 +30,19 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 	database.DB.First(&manager, manager_id)
 
 	workspace_card := models.WorkspaceCard{}
-	members := []structs.WorkspaceMember{}
+	members := []structs.MemberDetail{}
 
 	user_log := models.HistoryLog{
 		UserId:   uint(manager_id),
 		Type:     "workspace",
-		UserRole: "employee",
+		UserRole: "user",
 		Action:   "assign-member-card",
 	}
 
 	manager_log := models.HistoryLog{
 		UserId:   uint(manager_id),
 		Type:     "workspace",
-		UserRole: "manager",
+		UserRole: "admin",
 		Action:   "assign-member-card",
 	}
 
@@ -106,12 +106,12 @@ func AssignMemberToWorkspaceCard(c *gin.Context) {
 				UserId:          user.Id,
 			})
 
-			members = append(members, structs.WorkspaceMember{
+			members = append(members, structs.MemberDetail{
 				Id:       user.Id,
 				Name:     user.Name,
 				Username: user.Username,
 				Email:    user.Email,
-				Role:     "employee",
+				Role:     "user",
 			})
 
 			if user.Id != uint(manager_id) && !slices.Contains(existing_members, int(user.Id)) {

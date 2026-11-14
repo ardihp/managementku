@@ -100,6 +100,6 @@ func CreateWorkspaceCard(c *gin.Context) {
 		Id:          card.Id,
 		Title:       card.Title,
 		Description: card.Description,
-		Members:     []structs.WorkspaceMember{},
+		Members:     []structs.MemberDetail{},
 	})
 }

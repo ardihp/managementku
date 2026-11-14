@@ -26,8 +26,30 @@ func ListWorkspace(c *gin.Context) {
 
 	for _, workspace_id := range workspace_by_member {
 		workspace := structs.WorkspaceResponse{}
-		database.DB.Model(&models.Workspace{Id: workspace_id}).First(&workspace)
-		workspaces = append(workspaces, workspace)
+		workspace_member := []models.WorkspaceMember{}
+
+		database.DB.Model(&models.Workspace{}).Where("id = ?", workspace_id).First(&workspace)
+		database.DB.Where("workspace_id = ?", workspace_id).Preload("User").Find(&workspace_member)
+
+		for _, member := range workspace_member {
+			workspace.Members = append(workspace.Members, structs.MemberDetail{
+				Id:       member.UserId,
+				Name:     member.User.Name,
+				Username: member.User.Username,
+				Email:    member.User.Email,
+				Role:     member.Role,
+			})
+		}
+
+		workspaces = append(workspaces, structs.WorkspaceResponse{
+			Id:          workspace_id,
+			Name:        workspace.Name,
+			Description: workspace.Description,
+			Members:     workspace.Members,
+			CountCards:  workspace.CountCards,
+			CreatedAt:   workspace.CreatedAt,
+			UpdatedAt:   workspace.UpdatedAt,
+		})
 	}
 
 	helpers.SendSuccess(c, http.StatusOK, "Workspace retrieved successfully", workspaces)

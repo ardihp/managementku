@@ -26,10 +26,10 @@ func ListWorkspaceMember(c *gin.Context) {
 		return
 	}
 
-	list_workspace_members := []structs.WorkspaceMember{}
+	list_workspace_members := []structs.MemberDetail{}
 
 	for _, member := range workspace_members {
-		list_workspace_members = append(list_workspace_members, structs.WorkspaceMember{
+		list_workspace_members = append(list_workspace_members, structs.MemberDetail{
 			Id:       member.User.Id,
 			Name:     member.User.Name,
 			Username: member.User.Username,

@@ -40,10 +40,10 @@ func ListWorkspaceCard(c *gin.Context) {
 				return
 			}
 
-			list_member := []structs.WorkspaceMember{}
+			list_member := []structs.MemberDetail{}
 
 			for _, member := range members {
-				list_member = append(list_member, structs.WorkspaceMember{
+				list_member = append(list_member, structs.MemberDetail{
 					Id:       member.User.Id,
 					Name:     member.User.Name,
 					Username: member.User.Username,
@@ -99,10 +99,10 @@ func ListArchivedWorkspaceCard(c *gin.Context) {
 			return
 		}
 
-		list_member := []structs.WorkspaceMember{}
+		list_member := []structs.MemberDetail{}
 
 		for _, member := range members {
-			list_member = append(list_member, structs.WorkspaceMember{
+			list_member = append(list_member, structs.MemberDetail{
 				Id:       member.User.Id,
 				Name:     member.User.Name,
 				Username: member.User.Username,
