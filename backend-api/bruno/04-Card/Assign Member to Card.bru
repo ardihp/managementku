@@ -1,0 +1,18 @@
+meta {
+  name: Assign Member to Card
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/card/{{cardId}}/assign-member
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "card_id": {{cardId}},
+    "user_id": [1, 2]
+  }
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Update Card
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/card/{{cardId}}/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status_id": 1,
+    "title": "Design user onboarding flow updated",
+    "description": "Updated wireframe and mockup tasks"
+  }
+}

@@ -1,0 +1,18 @@
+meta {
+  name: Assign Member to Workspace
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/workspace/assign
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "workspace_id": {{workspaceId}},
+    "user_id": [1, 2]
+  }
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Create Workspace
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/workspace/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Workspace 1",
+    "description": "Workspace for managing personal projects"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.id) {
+    bru.setEnvVar("workspaceId", res.body.data.id);
+  }
+}

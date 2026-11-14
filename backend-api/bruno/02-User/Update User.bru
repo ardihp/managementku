@@ -1,0 +1,21 @@
+meta {
+  name: Update User
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/user/{{userId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "John Doe Updated",
+    "username": "johndoe",
+    "email": "johndoe@example.com",
+    "role": "manager",
+    "password": "newpassword123"
+  }
+}

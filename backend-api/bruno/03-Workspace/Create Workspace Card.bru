@@ -1,0 +1,25 @@
+meta {
+  name: Create Workspace Card
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/workspace/{{workspaceId}}/card/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status_id": 1,
+    "title": "Design user onboarding flow",
+    "description": "Create wireframes and mockups for new user signup and tour"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.id) {
+    bru.setEnvVar("cardId", res.body.data.id);
+  }
+}

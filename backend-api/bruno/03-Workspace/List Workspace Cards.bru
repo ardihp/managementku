@@ -1,0 +1,11 @@
+meta {
+  name: List Workspace Cards
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/workspace/{{workspaceId}}/card/
+  body: none
+  auth: inherit
+}

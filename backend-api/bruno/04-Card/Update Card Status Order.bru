@@ -1,0 +1,17 @@
+meta {
+  name: Update Card Status Order
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/card/{{cardId}}/status-order
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "order_status": [1, 2, 3]
+  }
+}

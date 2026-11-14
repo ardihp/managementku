@@ -1,0 +1,18 @@
+meta {
+  name: Update Workspace
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/workspace/{{workspaceId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "My Workspace Updated",
+    "description": "Updated description for workspace"
+  }
+}
