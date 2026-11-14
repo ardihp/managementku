@@ -7,7 +7,7 @@ type HistoryLog struct {
 	UserId      uint `json:"user_id" gorm:"not null"`
 	User        User
 	Type        string    `json:"type" gorm:"type:enum('general', 'workspace')"`
-	UserRole    string    `json:"user_role" gorm:"type:enum('manager', 'employee')"`
+	UserRole    string    `json:"user_role" gorm:"type:enum('admin', 'user')"`
 	Action      string    `json:"action"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`

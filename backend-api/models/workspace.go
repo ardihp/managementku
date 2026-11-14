@@ -17,8 +17,8 @@ type WorkspaceMember struct {
 	Workspace   Workspace
 	UserId      uint `json:"user_id" gorm:"primaryKey"`
 	User        User
-	Role        string    `json:"role" gorm:"default:'employee'"`
-	JoinedAt    time.Time `json:"joined_at"`
+	Role        string    `json:"role" gorm:"default:'user'"`
+	JoinedAt    time.Time `json:"joined_at" gorm:"autoCreateTime"`
 }
 
 type WorkspaceCardStatus struct {

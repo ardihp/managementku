@@ -5,7 +5,6 @@ type UserResponse struct {
 	Name      string  `json:"name"`
 	Username  string  `json:"username"`
 	Email     string  `json:"email"`
-	Role      string  `json:"role"`
 	IsDeleted bool    `json:"is_deleted"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt string  `json:"updated_at"`
@@ -16,7 +15,6 @@ type UserCreateRequest struct {
 	Name     string `json:"name" binding:"required"`
 	Username string `json:"username" binding:"required" gorm:"unique;not null"`
 	Email    string `json:"email" binding:"required" gorm:"unique;not null"`
-	Role     string `json:"role" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -25,7 +23,6 @@ type UserUpdateRequest struct {
 	Name     string `json:"name" binding:"required"`
 	Username string `json:"username" binding:"required" gorm:"unique;not null"`
 	Email    string `json:"email" binding:"required" gorm:"unique;not null"`
-	Role     string `json:"role,omitempty"`
 	Password string `json:"password,omitempty"`
 }
 

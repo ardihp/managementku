@@ -1,11 +1,17 @@
 package structs
 
-type WorkspaceMember struct {
+type MemberDetail struct {
 	Id       uint   `json:"id"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
+}
+
+type WorkspaceMember struct {
+	WorkspaceId uint   `json:"workspace_id"`
+	UserId      uint   `json:"user_id"`
+	Role        string `json:"role"`
 }
 
 type WorkspaceCardStatus struct {
@@ -14,13 +20,6 @@ type WorkspaceCardStatus struct {
 	Color      string `json:"color"`
 	IsArchived bool   `json:"is_archived"`
 	Order      int    `json:"order"`
-}
-
-type WorkspaceRoleResponse struct {
-	Id        uint   `json:"id"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
 }
 
 type WorkspaceCardActivityResponse struct {
@@ -33,17 +32,17 @@ type WorkspaceCardActivityResponse struct {
 }
 
 type WorkspaceCardResponse struct {
-	Id           uint              `json:"id"`
-	Title        string            `json:"title"`
-	Description  string            `json:"description"`
-	Status       string            `json:"status"`
-	UserCreated  string            `json:"user_created"`
-	Members      []WorkspaceMember `json:"members"`
-	CommentCount int               `json:"comment_count"`
-	IsArchived   bool              `json:"is_archived"`
-	IsCompleted  bool              `json:"is_completed"`
-	CreatedAt    string            `json:"created_at"`
-	UpdatedAt    string            `json:"updated_at"`
+	Id           uint           `json:"id"`
+	Title        string         `json:"title"`
+	Description  string         `json:"description"`
+	Status       string         `json:"status"`
+	UserCreated  string         `json:"user_created"`
+	Members      []MemberDetail `json:"members"`
+	CommentCount int            `json:"comment_count"`
+	IsArchived   bool           `json:"is_archived"`
+	IsCompleted  bool           `json:"is_completed"`
+	CreatedAt    string         `json:"created_at"`
+	UpdatedAt    string         `json:"updated_at"`
 }
 
 type CountWorkspaceCard struct {
@@ -55,26 +54,20 @@ type WorkspaceResponse struct {
 	Id          uint               `json:"id"`
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
-	Members     []WorkspaceMember  `json:"members"`
+	Members     []MemberDetail     `json:"members"`
 	CountCards  CountWorkspaceCard `json:"count_cards"`
 	CreatedAt   string             `json:"created_at"`
 	UpdatedAt   string             `json:"updated_at"`
 }
 
 type WorkspaceCreateRequest struct {
-	Name        string   `json:"name" binding:"required"`
-	Description string   `json:"description" binding:"required"`
-	TypeId      int      `json:"type_id" binding:"required"`
-	StatusId    int      `json:"status_id" binding:"required"`
-	Tags        []string `json:"tags,omitempty"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }
 
 type WorkspaceUpdateRequest struct {
-	Name        string   `json:"name" binding:"required"`
-	Description string   `json:"description" binding:"required"`
-	TypeId      int      `json:"type_id" binding:"required"`
-	StatusId    int      `json:"status_id" binding:"required"`
-	Tags        []string `json:"tags,omitempty"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }
 
 type WorkspaceAssignMember struct {
