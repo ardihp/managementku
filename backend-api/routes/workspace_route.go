@@ -7,17 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func workspaceRoute(router *gin.RouterGroup) {
-	workspaceController := workspace.NewWorkspaceController()
-
+func workspaceRoute(router *gin.RouterGroup, ctrl *workspace.WorkspaceController) {
 	route := router.Group("/workspace")
 	{
-		route.GET("/", workspaceController.ListWorkspace)
-		route.GET("/:id", workspaceController.DetailWorkspace)
-		route.POST("/create", workspaceController.CreateWorkspace)
-		route.POST("/assign", workspaceController.AssignMember)
-		route.PUT("/:id", workspaceController.UpdateWorkspace)
-		route.DELETE("/:id", workspaceController.DeleteWorkspace)
+		route.GET("/", ctrl.ListWorkspace)
+		route.GET("/:id", ctrl.DetailWorkspace)
+		route.POST("/create", ctrl.CreateWorkspace)
+		route.POST("/assign", ctrl.AssignMember)
+		route.PUT("/:id", ctrl.UpdateWorkspace)
+		route.DELETE("/:id", ctrl.DeleteWorkspace)
 
 		card := route.Group("/:id/card")
 		{

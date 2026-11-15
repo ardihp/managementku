@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"kanban-board/backend-api/controllers"
 	socketControllers "kanban-board/backend-api/controllers/socket"
+	"kanban-board/backend-api/database"
 
 	"kanban-board/backend-api/middlewares"
 
@@ -11,6 +13,8 @@ import (
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
+	db := database.DB
+	ctrls := controllers.InitControllers(db)
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:  []string{"*"},
@@ -30,7 +34,7 @@ func SetupRouter() *gin.Engine {
 		protected.Use(middlewares.AuthMiddleware())
 		{
 			userRoute(protected)
-			workspaceRoute(protected)
+			workspaceRoute(protected, ctrls.Workspace)
 			workspaceCardRoute(protected)
 		}
 	}
