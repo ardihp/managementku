@@ -24,14 +24,16 @@ func (c *WorkspaceController) ListWorkspace(ctx *gin.Context) {
 	c.DB.Model(&models.WorkspaceMember{UserId: user.Id}).Pluck("workspace_id", &workspace_by_member)
 
 	for _, workspace_id := range workspace_by_member {
-		workspace := structs.WorkspaceResponse{}
+		workspace := models.Workspace{}
 		workspace_member := []models.WorkspaceMember{}
 
-		c.DB.Model(&models.Workspace{}).Where("id = ?", workspace_id).First(&workspace)
-		c.DB.Where("workspace_id = ?", workspace_id).Preload("User").Find(&workspace_member)
+		c.DB.First(&workspace, workspace_id)
+		c.DB.Preload("User").Where("workspace_id = ?", workspace_id).Find(&workspace_member)
+
+		members := []structs.MemberDetail{}
 
 		for _, member := range workspace_member {
-			workspace.Members = append(workspace.Members, structs.MemberDetail{
+			members = append(members, structs.MemberDetail{
 				Id:       member.UserId,
 				Name:     member.User.Name,
 				Username: member.User.Username,
@@ -44,7 +46,7 @@ func (c *WorkspaceController) ListWorkspace(ctx *gin.Context) {
 			Id:          workspace_id,
 			Name:        workspace.Name,
 			Description: workspace.Description,
-			Members:     workspace.Members,
+			Members:     members,
 			CreatedAt:   workspace.CreatedAt,
 			UpdatedAt:   workspace.UpdatedAt,
 		})

@@ -66,8 +66,8 @@ type WorkspaceResponse struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Members     []MemberDetail `json:"members"`
-	CreatedAt   string         `json:"created_at"`
-	UpdatedAt   string         `json:"updated_at"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
 type WorkspaceCreateRequest struct {

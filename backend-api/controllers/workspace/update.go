@@ -73,7 +73,7 @@ func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 		Name:        workspace.Name,
 		Description: workspace.Description,
 		Members:     []structs.MemberDetail{},
-		CreatedAt:   workspace.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:   workspace.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:   workspace.CreatedAt,
+		UpdatedAt:   workspace.UpdatedAt,
 	})
 }
