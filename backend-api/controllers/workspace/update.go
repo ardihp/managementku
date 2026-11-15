@@ -1,8 +1,7 @@
-package controllers
+package workspace
 
 import (
 	"fmt"
-	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
@@ -12,30 +11,30 @@ import (
 	"gorm.io/gorm"
 )
 
-func UpdateWorkspace(c *gin.Context) {
+func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 	req := structs.WorkspaceUpdateRequest{}
-	workspace_id := c.Param("id")
-	user_id := c.GetInt("user_id")
+	workspace_id := ctx.Param("id")
+	user_id := ctx.GetInt("user_id")
 
 	user := models.User{}
-	database.DB.First(&user, user_id)
+	c.DB.First(&user, user_id)
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helpers.ValidationError(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.ValidationError(ctx, err)
 		return
 	}
 
 	workspace := models.Workspace{}
 
-	if err := database.DB.First(&workspace, workspace_id).Error; err != nil {
-		helpers.SendError(c, http.StatusUnprocessableEntity, "Workspace not found", err)
+	if err := c.DB.First(&workspace, workspace_id).Error; err != nil {
+		helpers.SendError(ctx, http.StatusUnprocessableEntity, "Workspace not found", err)
 		return
 	}
 
 	workspace.Name = req.Name
 	workspace.Description = req.Description
 
-	err := database.DB.Transaction(func(trx *gorm.DB) error {
+	err := c.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Save(&workspace).Error; err != nil {
 			return err
 		}
@@ -65,11 +64,11 @@ func UpdateWorkspace(c *gin.Context) {
 	})
 
 	if err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Failed to create workspace", err)
+		helpers.SendError(ctx, http.StatusInternalServerError, "Failed to create workspace", err)
 		return
 	}
 
-	helpers.SendSuccess(c, http.StatusOK, "Workspace updated successfully", structs.WorkspaceResponse{
+	helpers.SendSuccess(ctx, http.StatusOK, "Workspace updated successfully", structs.WorkspaceResponse{
 		Id:          workspace.Id,
 		Name:        workspace.Name,
 		Description: workspace.Description,

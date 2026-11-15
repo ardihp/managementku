@@ -1,8 +1,7 @@
-package controllers
+package workspace
 
 import (
 	"fmt"
-	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"net/http"
@@ -12,20 +11,20 @@ import (
 	"gorm.io/gorm"
 )
 
-func DeleteWorkspace(c *gin.Context) {
-	workspace_id := c.Param("id")
+func (c *WorkspaceController) DeleteWorkspace(ctx *gin.Context) {
+	workspace_id := ctx.Param("id")
 	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 
-	user_id := c.GetInt("user_id")
+	user_id := ctx.GetInt("user_id")
 	user := models.User{}
-	database.DB.First(&user, user_id)
+	c.DB.First(&user, user_id)
 
-	if err := database.DB.First(&models.Workspace{}, parsed_workspace_id).Error; err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Workspace not found", err)
+	if err := c.DB.First(&models.Workspace{}, parsed_workspace_id).Error; err != nil {
+		helpers.SendError(ctx, http.StatusInternalServerError, "Workspace not found", err)
 		return
 	}
 
-	err := database.DB.Transaction(func(trx *gorm.DB) error {
+	err := c.DB.Transaction(func(trx *gorm.DB) error {
 		workspace := models.Workspace{}
 		trx.First(&workspace, parsed_workspace_id)
 
@@ -75,9 +74,9 @@ func DeleteWorkspace(c *gin.Context) {
 	})
 
 	if err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Failed to delete workspace", err)
+		helpers.SendError(ctx, http.StatusInternalServerError, "Failed to delete workspace", err)
 		return
 	}
 
-	helpers.SendSuccess(c, http.StatusOK, "Workspace deleted successfully", "")
+	helpers.SendSuccess(ctx, http.StatusOK, "Workspace deleted successfully", "")
 }

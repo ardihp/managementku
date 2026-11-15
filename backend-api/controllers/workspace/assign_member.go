@@ -1,8 +1,7 @@
-package controllers
+package workspace
 
 import (
 	"fmt"
-	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
@@ -14,14 +13,14 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func AssignMember(c *gin.Context) {
+func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 	req := structs.WorkspaceAssignMember{}
-	user_id := c.GetInt("user_id")
+	user_id := ctx.GetInt("user_id")
 	user := models.User{}
-	database.DB.First(&user, user_id)
+	c.DB.First(&user, user_id)
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helpers.ValidationError(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.ValidationError(ctx, err)
 		return
 	}
 
@@ -42,7 +41,7 @@ func AssignMember(c *gin.Context) {
 		Action:   "assign-member",
 	}
 
-	err := database.DB.Transaction(func(trx *gorm.DB) error {
+	err := c.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Preload(clause.Associations).First(&workspace, req.WorkspaceId).Error; err != nil {
 			return err
 		}
@@ -142,11 +141,11 @@ func AssignMember(c *gin.Context) {
 	})
 
 	if err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Failed assign member to workspace", err)
+		helpers.SendError(ctx, http.StatusInternalServerError, "Failed assign member to workspace", err)
 		return
 	}
 
-	helpers.SendSuccess(c, http.StatusCreated, "User assigned successfully", structs.WorkspaceResponse{
+	helpers.SendSuccess(ctx, http.StatusCreated, "User assigned successfully", structs.WorkspaceResponse{
 		Id:          workspace.Id,
 		Name:        workspace.Name,
 		Description: workspace.Description,

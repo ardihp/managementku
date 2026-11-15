@@ -1,7 +1,6 @@
-package controllers
+package workspace
 
 import (
-	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
@@ -11,13 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateWorkspace(c *gin.Context) {
+func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 	req := structs.WorkspaceCreateRequest{}
-	user_id := c.GetInt("user_id")
+	user_id := ctx.GetInt("user_id")
 	user := models.User{Id: uint(user_id)}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helpers.ValidationError(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.ValidationError(ctx, err)
 		return
 	}
 
@@ -27,7 +26,7 @@ func CreateWorkspace(c *gin.Context) {
 		UserCreatedId: user.Id,
 	}
 
-	err := database.DB.Transaction(func(trx *gorm.DB) error {
+	err := c.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Create(&workspace).Error; err != nil {
 			return err
 		}
@@ -60,11 +59,11 @@ func CreateWorkspace(c *gin.Context) {
 	})
 
 	if err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Failed to create workspace", err)
+		helpers.SendError(ctx, http.StatusInternalServerError, "Failed to create workspace", err)
 		return
 	}
 
-	helpers.SendSuccess(c, http.StatusCreated, "Workspace created successfully", structs.WorkspaceResponse{
+	helpers.SendSuccess(ctx, http.StatusCreated, "Workspace created successfully", structs.WorkspaceResponse{
 		Id:          workspace.Id,
 		Name:        workspace.Name,
 		Description: workspace.Description,
