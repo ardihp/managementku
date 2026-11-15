@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 type MemberDetail struct {
 	Id       uint   `json:"id"`
 	Name     string `json:"name"`
@@ -12,6 +14,15 @@ type WorkspaceMember struct {
 	WorkspaceId uint   `json:"workspace_id"`
 	UserId      uint   `json:"user_id"`
 	Role        string `json:"role"`
+}
+
+type WorkspaceDetailResponse struct {
+	Id          uint           `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Members     []MemberDetail `json:"members"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
 type WorkspaceCardStatus struct {
@@ -51,13 +62,12 @@ type CountWorkspaceCard struct {
 }
 
 type WorkspaceResponse struct {
-	Id          uint               `json:"id"`
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	Members     []MemberDetail     `json:"members"`
-	CountCards  CountWorkspaceCard `json:"count_cards"`
-	CreatedAt   string             `json:"created_at"`
-	UpdatedAt   string             `json:"updated_at"`
+	Id          uint           `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Members     []MemberDetail `json:"members"`
+	CreatedAt   string         `json:"created_at"`
+	UpdatedAt   string         `json:"updated_at"`
 }
 
 type WorkspaceCreateRequest struct {
