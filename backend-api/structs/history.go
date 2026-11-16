@@ -1,7 +1,7 @@
 package structs
 
 type HistoryLogResponse struct {
-	ID          int    `json:"id"`
+	ID          string `json:"id"`
 	User        string `json:"user"`
 	Type        string `json:"type"`
 	Action      string `json:"action"`

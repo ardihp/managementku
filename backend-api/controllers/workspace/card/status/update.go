@@ -7,7 +7,6 @@ import (
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -15,7 +14,7 @@ import (
 
 func UpdateWorkspaceCardStatus(c *gin.Context) {
 	req := structs.WorkspaceUpdateCardStatusRequest{}
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	workspace_id := c.Param("id")
 	status_id := c.Param("status_id")
 
@@ -43,7 +42,7 @@ func UpdateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user_id,
 			Type:        "workspace",
 			Action:      "update-workspace-card-status",
 			Description: fmt.Sprintf("User %s has changes to status %s", user.Username, workspace_card_status.Name),
@@ -53,11 +52,9 @@ func UpdateWorkspaceCardStatus(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_log := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

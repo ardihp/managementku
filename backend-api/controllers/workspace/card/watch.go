@@ -7,7 +7,6 @@ import (
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ func WatchWorkspaceCard(c *gin.Context) {
 	card_id := c.Param("card_id")
 	workspace_card := models.WorkspaceCard{}
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -37,7 +36,7 @@ func WatchWorkspaceCard(c *gin.Context) {
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		member := models.WorkspaceCardMember{
 			WorkspaceCardId: workspace_card.Id,
-			UserId:          uint(req.UserId),
+			UserId:          req.UserId,
 		}
 
 		if err := trx.Create(&member).Error; err != nil {
@@ -55,11 +54,9 @@ func WatchWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_history := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
@@ -83,7 +80,7 @@ func UnwatchWorkspaceCard(c *gin.Context) {
 	card_id := c.Param("card_id")
 	workspace_card := models.WorkspaceCard{}
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -113,11 +110,9 @@ func UnwatchWorkspaceCard(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_history := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

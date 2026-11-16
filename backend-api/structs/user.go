@@ -1,7 +1,7 @@
 package structs
 
 type UserResponse struct {
-	Id        uint    `json:"id"`
+	Id        string  `json:"id"`
 	Name      string  `json:"name"`
 	Username  string  `json:"username"`
 	Email     string  `json:"email"`

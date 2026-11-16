@@ -18,6 +18,13 @@ func UserSeeds() {
 
 	database.DB.Transaction(func(trx *gorm.DB) error {
 		for _, user := range users {
+			user_id, err := helpers.GenerateUUIDv4()
+			if err != nil {
+				return err
+			}
+
+			user.Id = user_id
+
 			if err := trx.Save(&user).Error; err != nil {
 				return err
 			}

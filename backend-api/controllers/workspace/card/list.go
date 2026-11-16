@@ -67,7 +67,7 @@ func ListWorkspaceCard(c *gin.Context) {
 			})
 
 			response = append(response, structs.WorkspaceCardByStatusResponse{
-				Id:         int(status.Id),
+				Id:         status.Id,
 				Name:       status.Name,
 				Color:      status.Color,
 				IsArchived: status.IsArchived,

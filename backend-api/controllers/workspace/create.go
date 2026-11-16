@@ -12,8 +12,8 @@ import (
 
 func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 	req := structs.WorkspaceCreateRequest{}
-	user_id := ctx.GetInt("user_id")
-	user := models.User{Id: uint(user_id)}
+	user_id := ctx.GetString("user_id")
+	user := models.User{Id: user_id}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		helpers.ValidationError(ctx, err)
@@ -49,7 +49,7 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 			}
 		}
 
-		workspace_member := models.WorkspaceMember{WorkspaceId: workspace.Id, UserId: uint(user_id), Role: "admin"}
+		workspace_member := models.WorkspaceMember{WorkspaceId: workspace.Id, UserId: user_id, Role: "admin"}
 
 		if err := trx.Create(&workspace_member).Error; err != nil {
 			return err
@@ -63,11 +63,10 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 		return
 	}
 
-	helpers.SendSuccess(ctx, http.StatusCreated, "Workspace created successfully", structs.WorkspaceResponse{
+	helpers.SendSuccess(ctx, http.StatusCreated, "Workspace created successfully", structs.CreateWorkspaceResponse{
 		Id:          workspace.Id,
 		Name:        workspace.Name,
 		Description: workspace.Description,
-		Members:     []structs.MemberDetail{},
 		CreatedAt:   workspace.CreatedAt,
 		UpdatedAt:   workspace.UpdatedAt,
 	})

@@ -3,7 +3,7 @@ package structs
 import "time"
 
 type MemberDetail struct {
-	Id       uint   `json:"id"`
+	Id       string `json:"id"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
@@ -11,13 +11,13 @@ type MemberDetail struct {
 }
 
 type WorkspaceMember struct {
-	WorkspaceId uint   `json:"workspace_id"`
-	UserId      uint   `json:"user_id"`
+	WorkspaceId string `json:"workspace_id"`
+	UserId      string `json:"user_id"`
 	Role        string `json:"role"`
 }
 
 type WorkspaceDetailResponse struct {
-	Id          uint           `json:"id"`
+	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Members     []MemberDetail `json:"members"`
@@ -26,7 +26,7 @@ type WorkspaceDetailResponse struct {
 }
 
 type WorkspaceCardStatus struct {
-	Id         uint   `json:"id"`
+	Id         string `json:"id"`
 	Name       string `json:"name"`
 	Color      string `json:"color"`
 	IsArchived bool   `json:"is_archived"`
@@ -34,7 +34,7 @@ type WorkspaceCardStatus struct {
 }
 
 type WorkspaceCardActivityResponse struct {
-	Id          int    `json:"id"`
+	Id          string `json:"id"`
 	UserCreated string `json:"user_created"`
 	Type        string `json:"type"`
 	Message     string `json:"message"`
@@ -43,7 +43,7 @@ type WorkspaceCardActivityResponse struct {
 }
 
 type WorkspaceCardResponse struct {
-	Id           uint           `json:"id"`
+	Id           string         `json:"id"`
 	Title        string         `json:"title"`
 	Description  string         `json:"description"`
 	Status       string         `json:"status"`
@@ -57,17 +57,25 @@ type WorkspaceCardResponse struct {
 }
 
 type CountWorkspaceCard struct {
-	Completed   int `json:"completed"`
-	Incompleted int `json:"incomplete"`
+	Completed   string `json:"completed"`
+	Incompleted string `json:"incomplete"`
 }
 
 type WorkspaceResponse struct {
-	Id          uint           `json:"id"`
+	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Members     []MemberDetail `json:"members"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
+}
+
+type CreateWorkspaceResponse struct {
+	Id          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type WorkspaceCreateRequest struct {
@@ -81,17 +89,16 @@ type WorkspaceUpdateRequest struct {
 }
 
 type WorkspaceAssignMember struct {
-	WorkspaceId int   `json:"workspace_id" binding:"required"`
-	UserId      []int `json:"user_id" binding:"required"`
+	UserId []string `json:"user_id" binding:"required"`
 }
 
 type WorkspaceCardAssignMember struct {
-	CardId int   `json:"card_id" binding:"required"`
-	UserId []int `json:"user_id" binding:"required"`
+	CardId string   `json:"card_id" binding:"required"`
+	UserId []string `json:"user_id" binding:"required"`
 }
 
 type WorkspaceWatchCardRequest struct {
-	UserId int `json:"user_id" binding:"required"`
+	UserId string `json:"user_id" binding:"required"`
 }
 
 type WorkspaceCreateRoleRequest struct {
@@ -104,17 +111,17 @@ type WorkspaceCreateTypeRequest struct {
 }
 
 type WorkspaceUpdateTypeRequest struct {
-	Id    int    `json:"id" binding:"required"`
+	Id    string `json:"id" binding:"required"`
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
 }
 
 type WorkspaceUpdateTypeOrderRequest struct {
-	OrderStatus []int `json:"order_status" binding:"required"`
+	OrderStatus []string `json:"order_status" binding:"required"`
 }
 
 type WorkspaceCardByStatusResponse struct {
-	Id         int                     `json:"id"`
+	Id         string                  `json:"id"`
 	Name       string                  `json:"name"`
 	Color      string                  `json:"color"`
 	IsArchived bool                    `json:"is_archived"`
@@ -122,13 +129,13 @@ type WorkspaceCardByStatusResponse struct {
 }
 
 type WorkspaceCreateCardRequest struct {
-	StatusId    int    `json:"status_id" binding:"required"`
+	StatusId    string `json:"status_id" binding:"required"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description"`
 }
 
 type WorkspaceUpdateCardRequest struct {
-	StatusId    int    `json:"status_id" binding:"required"`
+	StatusId    string `json:"status_id" binding:"required"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description"`
 }
@@ -144,7 +151,7 @@ type WorkspaceCreateCardStatusRequest struct {
 }
 
 type WorkspaceUpdateStatusRequest struct {
-	Id    int    `json:"id" binding:"required"`
+	Id    string `json:"id" binding:"required"`
 	Name  string `json:"name" binding:"required"`
 	Color string `json:"color" binding:"required"`
 }
@@ -155,26 +162,26 @@ type WorkspaceUpdateCardStatusRequest struct {
 }
 
 type WorkspaceOrder struct {
-	StatusId    int   `json:"status_id" binding:"required"`
-	WorkspaceId []int `json:"workspace_id" binding:"required"`
+	StatusId    string   `json:"status_id" binding:"required"`
+	WorkspaceId []string `json:"workspace_id" binding:"required"`
 }
 
 type WorkspaceUpdateOrderRequest struct {
-	WorkspaceId int              `json:"workspace_id" binding:"required"`
+	WorkspaceId string           `json:"workspace_id" binding:"required"`
 	OrderStatus []WorkspaceOrder `json:"order_status" binding:"required"`
 }
 
 type WorkspaceCardUpdateOrderStatusRequest struct {
-	OrderStatus []int `json:"order_status" binding:"required"`
+	OrderStatus []string `json:"order_status" binding:"required"`
 }
 
 type WorkspaceCardOrder struct {
-	StatusId int   `json:"status_id" binding:"required"`
-	CardId   []int `json:"card_id" binding:"required"`
+	StatusId string   `json:"status_id" binding:"required"`
+	CardId   []string `json:"card_id" binding:"required"`
 }
 
 type WorkspaceCardUpdateOrderRequest struct {
-	CardId      int                  `json:"card_id" binding:"required"`
+	CardId      string               `json:"card_id" binding:"required"`
 	OrderStatus []WorkspaceCardOrder `json:"order_status" binding:"required"`
 }
 

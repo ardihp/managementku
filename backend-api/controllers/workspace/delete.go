@@ -15,7 +15,7 @@ func (c *WorkspaceController) DeleteWorkspace(ctx *gin.Context) {
 	workspace_id := ctx.Param("id")
 	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 
-	user_id := ctx.GetInt("user_id")
+	user_id := ctx.GetString("user_id")
 	user := models.User{}
 	c.DB.First(&user, user_id)
 
@@ -31,7 +31,7 @@ func (c *WorkspaceController) DeleteWorkspace(ctx *gin.Context) {
 		history_log := models.HistoryLog{
 			UserId:      user.Id,
 			Type:        "general",
-			UserRole:    "manager",
+			UserRole:    "admin",
 			Action:      "delete-workspace",
 			Description: fmt.Sprintf("User %s has deleted workspace %s", user.Username, workspace.Name),
 		}

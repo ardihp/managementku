@@ -34,7 +34,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	token := helpers.GenerateToken(user.Username, int(user.Id))
+	token := helpers.GenerateToken(user.Username, user.Id)
 
 	helpers.SendSuccess(c, http.StatusCreated, "User created successfully", structs.UserResponse{
 		Id:        user.Id,

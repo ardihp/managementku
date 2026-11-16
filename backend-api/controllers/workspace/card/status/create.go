@@ -7,7 +7,6 @@ import (
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -16,8 +15,7 @@ import (
 func CreateWorkspaceCardStatus(c *gin.Context) {
 	req := structs.WorkspaceCreateCardStatusRequest{}
 	workspace_id := c.Param("id")
-	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -27,7 +25,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 	}
 
 	workspace_card_status := models.WorkspaceCardStatus{
-		WorkspaceId: uint(parsed_workspace_id),
+		WorkspaceId: workspace_id,
 		Name:        req.Name,
 		Color:       req.Color,
 	}
@@ -42,7 +40,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user_id,
 			Type:        "workspace",
 			Action:      "create-workspace-card-status",
 			Description: fmt.Sprintf("User %s has created new status", user.Username),
@@ -54,7 +52,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 
 		workspace_log := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

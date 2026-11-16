@@ -6,7 +6,6 @@ import (
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -18,7 +17,7 @@ func MarkWorkspaceCardComplete(c *gin.Context) {
 	card_id := c.Param("card_id")
 	workspace_card := models.WorkspaceCard{}
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -45,11 +44,9 @@ func MarkWorkspaceCardComplete(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_history := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
@@ -72,7 +69,7 @@ func MarkWorkspaceCardIncomplete(c *gin.Context) {
 	card_id := c.Param("card_id")
 	workspace_card := models.WorkspaceCard{}
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -99,11 +96,9 @@ func MarkWorkspaceCardIncomplete(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_history := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

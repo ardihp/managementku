@@ -8,7 +8,6 @@ import (
 	"kanban-board/backend-api/structs"
 	"net/http"
 	"slices"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -17,7 +16,6 @@ import (
 
 func AssignMember(c *gin.Context) {
 	workspace_id := c.Param("id")
-	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 	req := structs.WorkspaceCardAssignMember{}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -25,7 +23,7 @@ func AssignMember(c *gin.Context) {
 		return
 	}
 
-	manager_id := c.GetInt("user_id")
+	manager_id := c.GetString("user_id")
 	manager := models.User{}
 	database.DB.First(&manager, manager_id)
 
@@ -33,21 +31,21 @@ func AssignMember(c *gin.Context) {
 	members := []structs.MemberDetail{}
 
 	user_log := models.HistoryLog{
-		UserId:   uint(manager_id),
+		UserId:   manager_id,
 		Type:     "workspace",
 		UserRole: "user",
 		Action:   "assign-member-card",
 	}
 
 	manager_log := models.HistoryLog{
-		UserId:   uint(manager_id),
+		UserId:   manager_id,
 		Type:     "workspace",
 		UserRole: "admin",
 		Action:   "assign-member-card",
 	}
 
 	workspace_log := models.WorkspaceHistoryLog{
-		WorkspaceId: uint(parsed_workspace_id),
+		WorkspaceId: workspace_id,
 	}
 
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
@@ -55,14 +53,14 @@ func AssignMember(c *gin.Context) {
 			return err
 		}
 
-		existing_members := []int{}
+		existing_members := []string{}
 		trx.Model(&models.WorkspaceCardMember{}).Where("card_id = ?", req.CardId).Pluck("user_id", &existing_members)
 
 		for _, member_id := range existing_members {
 			user := models.User{}
 			trx.First(&user, member_id)
 
-			if !slices.Contains(req.UserId, int(member_id)) && member_id != manager_id {
+			if !slices.Contains(req.UserId, member_id) && member_id != manager_id {
 				user_log.Description = fmt.Sprintf("User %s has remove you from card %s", manager.Username, workspace_card.Title)
 				manager_log.Description = fmt.Sprintf("User %s remove %s from card %s", manager.Username, user.Username, workspace_card.Title)
 
@@ -74,7 +72,7 @@ func AssignMember(c *gin.Context) {
 
 				user_history := []models.UserHistoryLog{
 					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: uint(manager_id)},
+					{HistoryId: logs[1].ID, UserId: manager_id},
 				}
 
 				workspace_log.HistoryId = logs[1].ID
@@ -102,7 +100,7 @@ func AssignMember(c *gin.Context) {
 			trx.Where("card_id = ? AND user_id = ?", req.CardId, user.Id).First(&exist_member)
 
 			assigned_user = append(assigned_user, models.WorkspaceCardMember{
-				WorkspaceCardId: uint(req.CardId),
+				WorkspaceCardId: req.CardId,
 				UserId:          user.Id,
 			})
 
@@ -114,7 +112,7 @@ func AssignMember(c *gin.Context) {
 				Role:     "user",
 			})
 
-			if user.Id != uint(manager_id) && !slices.Contains(existing_members, int(user.Id)) {
+			if user.Id != manager_id && !slices.Contains(existing_members, user.Id) {
 				user_log.Description = fmt.Sprintf("User %s has added you to card %s", manager.Username, workspace_card.Title)
 				manager_log.Description = fmt.Sprintf("User %s added %s to card %s", manager.Username, user.Username, workspace_card.Title)
 
@@ -126,7 +124,7 @@ func AssignMember(c *gin.Context) {
 
 				user_history := []models.UserHistoryLog{
 					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: uint(manager_id)},
+					{HistoryId: logs[1].ID, UserId: manager_id},
 				}
 
 				workspace_log.HistoryId = logs[1].ID

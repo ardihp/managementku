@@ -6,7 +6,6 @@ import (
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +13,8 @@ import (
 func CreateWorkspaceCardActivity(c *gin.Context) {
 	req := structs.WorkspaceCardCreateActivityRequst{}
 	card_id := c.Param("card_id")
-	parsed_card_id, _ := strconv.Atoi(card_id)
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helpers.ValidationError(c, err)
@@ -29,8 +27,8 @@ func CreateWorkspaceCardActivity(c *gin.Context) {
 	}
 
 	workspace_card_activity := models.WorkspaceCardActivity{
-		WorkspaceCardId: uint(parsed_card_id),
-		UserId:          uint(user_id),
+		WorkspaceCardId: card_id,
+		UserId:          user_id,
 		Type:            "comment",
 		Message:         req.Message,
 	}

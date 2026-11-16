@@ -8,7 +8,6 @@ import (
 	"kanban-board/backend-api/structs"
 	"net/http"
 	"slices"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -46,9 +45,8 @@ func UpdateWorkspaceCardStatusOrder(c *gin.Context) {
 func UpdateWorkspaceCardOrder(c *gin.Context) {
 	req := structs.WorkspaceCardUpdateOrderRequest{}
 	workspace_id := c.Param("id")
-	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -76,13 +74,13 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 			}
 
 			for index, card_id := range order.CardId {
-				new_workspace_card := models.WorkspaceCard{Id: uint(card_id)}
+				new_workspace_card := models.WorkspaceCard{Id: card_id}
 
 				if err := database.DB.Where("id = ? AND workspace_id = ?", card_id, workspace_id).First(&new_workspace_card).Error; err != nil {
 					return err
 				}
 
-				new_workspace_card.WorkspaceCardStatusId = uint(order.StatusId)
+				new_workspace_card.WorkspaceCardStatusId = order.StatusId
 				new_workspace_card.Order = index
 
 				if err := database.DB.Save(&new_workspace_card).Error; err != nil {
@@ -107,7 +105,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 
 		workspace_history := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

@@ -7,7 +7,6 @@ import (
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -18,9 +17,8 @@ func UpdateWorkspaceCard(c *gin.Context) {
 	req := structs.WorkspaceUpdateCardRequest{}
 	workspace_id := c.Param("id")
 	card_id := c.Param("card_id")
-	parsed_workspace_id, _ := strconv.Atoi(workspace_id)
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -43,7 +41,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 
 	workspace_card.Title = req.Title
 	workspace_card.Description = req.Description
-	workspace_card.WorkspaceCardStatusId = uint(req.StatusId)
+	workspace_card.WorkspaceCardStatusId = req.StatusId
 
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Save(&workspace_card).Error; err != nil {
@@ -51,7 +49,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user_id,
 			Type:        "workspace",
 			Action:      "update-workspace-card",
 			Description: fmt.Sprintf("User %s has update changes on card %s", user.Username, workspace_card.Title),
@@ -63,7 +61,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 
 		workspace_history := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

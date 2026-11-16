@@ -6,7 +6,6 @@ import (
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -14,7 +13,7 @@ import (
 
 func ArchieveWorkspaceCardStatus(c *gin.Context) {
 	workspace_card_status := models.WorkspaceCardStatus{}
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	workspace_id := c.Param("id")
 	status_id := c.Param("status_id")
 
@@ -39,7 +38,7 @@ func ArchieveWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user_id,
 			Type:        "workspace",
 			Action:      "archive-workspace-card-status",
 			Description: fmt.Sprintf("User %s has archived status %s", user.Username, workspace_card_status.Name),
@@ -49,11 +48,9 @@ func ArchieveWorkspaceCardStatus(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_log := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {
@@ -73,7 +70,7 @@ func ArchieveWorkspaceCardStatus(c *gin.Context) {
 
 func UnArchieveWorkspaceCardStatus(c *gin.Context) {
 	workspace_card_status := models.WorkspaceCardStatus{}
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	workspace_id := c.Param("id")
 	status_id := c.Param("status_id")
 
@@ -98,7 +95,7 @@ func UnArchieveWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user_id,
 			Type:        "workspace",
 			Action:      "unarchive-workspace-card-status",
 			Description: fmt.Sprintf("User %s has unarchive status %s", user.Username, workspace_card_status.Name),
@@ -108,11 +105,9 @@ func UnArchieveWorkspaceCardStatus(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_log := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

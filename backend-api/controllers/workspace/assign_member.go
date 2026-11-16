@@ -10,12 +10,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 	req := structs.WorkspaceAssignMember{}
-	user_id := ctx.GetInt("user_id")
+	user_id := ctx.GetString("user_id")
+	workspace_id := ctx.Param("id")
+
 	user := models.User{}
 	c.DB.First(&user, user_id)
 
@@ -28,32 +29,32 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 	members := []structs.MemberDetail{}
 
 	member_log := models.HistoryLog{
-		UserId:   uint(user_id),
+		UserId:   user_id,
 		Type:     "general",
 		UserRole: "user",
 		Action:   "assign-member",
 	}
 
 	user_log := models.HistoryLog{
-		UserId:   uint(user_id),
+		UserId:   user_id,
 		Type:     "general",
 		UserRole: "admin",
 		Action:   "assign-member",
 	}
 
 	err := c.DB.Transaction(func(trx *gorm.DB) error {
-		if err := trx.Preload(clause.Associations).First(&workspace, req.WorkspaceId).Error; err != nil {
+		if err := trx.First(&workspace, workspace_id).Error; err != nil {
 			return err
 		}
 
-		existing_members := []int{}
-		trx.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", req.WorkspaceId).Pluck("user_id", &existing_members)
+		existing_members := []string{}
+		trx.Model(&models.WorkspaceMember{}).Where("workspace_id = ?", workspace_id).Pluck("user_id", &existing_members)
 
 		for _, member_id := range existing_members {
 			user := models.User{}
 			trx.First(&user, member_id)
 
-			if !slices.Contains(req.UserId, int(member_id)) && member_id != user_id {
+			if !slices.Contains(req.UserId, member_id) && member_id != user_id {
 				member_log.Description = fmt.Sprintf("User %s has remove you from workspace %s", user.Username, workspace.Name)
 				user_log.Description = fmt.Sprintf("User %s remove %s from workspace %s", user.Username, user.Username, workspace.Name)
 
@@ -65,7 +66,7 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 
 				user_history := []models.UserHistoryLog{
 					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: uint(user_id)},
+					{HistoryId: logs[1].ID, UserId: user_id},
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
@@ -84,18 +85,18 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 				return err
 			}
 
-			trx.Where("workspace_id = ? AND user_id = ?", req.WorkspaceId, user.Id).First(&exist_member)
+			trx.Where("workspace_id = ? AND user_id = ?", workspace_id, user.Id).First(&exist_member)
 
 			role := ""
 
 			if exist_member.Role != "" {
 				role = exist_member.Role
 			} else {
-				role = "member"
+				role = "user"
 			}
 
 			assigned_user = append(assigned_user, models.WorkspaceMember{
-				WorkspaceId: uint(req.WorkspaceId),
+				WorkspaceId: workspace_id,
 				UserId:      user.Id,
 				Role:        role,
 			})
@@ -108,7 +109,7 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 				Role:     role,
 			})
 
-			if user.Id != uint(user_id) && !slices.Contains(existing_members, int(user.Id)) {
+			if user.Id != user_id && !slices.Contains(existing_members, user.Id) {
 				member_log.Description = fmt.Sprintf("User %s has added you to workspace %s", user.Username, workspace.Name)
 				user_log.Description = fmt.Sprintf("User %s added %s to workspace %s", user.Username, user.Username, workspace.Name)
 
@@ -120,7 +121,7 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 
 				user_history := []models.UserHistoryLog{
 					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: uint(user_id)},
+					{HistoryId: logs[1].ID, UserId: user_id},
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
@@ -129,7 +130,7 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 			}
 		}
 
-		if err := trx.Where("workspace_id = ?", req.WorkspaceId).Delete(&models.WorkspaceMember{}).Error; err != nil {
+		if err := trx.Where("workspace_id = ?", workspace_id).Delete(&models.WorkspaceMember{}).Error; err != nil {
 			return err
 		}
 

@@ -25,7 +25,7 @@ func ListWorkspaceCardActivity(c *gin.Context) {
 
 	for _, card_activity := range workspace_card_activities {
 		list_workspace_card_activies = append(list_workspace_card_activies, structs.WorkspaceCardActivityResponse{
-			Id:          int(card_activity.Id),
+			Id:          card_activity.Id,
 			UserCreated: card_activity.User.Username,
 			Type:        card_activity.Type,
 			Message:     card_activity.Message,

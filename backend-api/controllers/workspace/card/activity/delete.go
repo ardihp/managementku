@@ -6,14 +6,13 @@ import (
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func DeleteWorkspaceCardActivity(c *gin.Context) {
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	workspace_id := c.Param("id")
 	card_id := c.Param("card_id")
 	activity_id := c.Param("activity_id")
@@ -30,7 +29,7 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 		database.DB.Find(&workspace_card, card_id)
 
 		history_log := models.HistoryLog{
-			UserId:      uint(user_id),
+			UserId:      user_id,
 			Type:        "workspace",
 			Action:      "delete-workspace-card-activity",
 			Description: fmt.Sprintf("User %s has delete comment on card %s", user.Username, workspace_card.Title),
@@ -40,11 +39,9 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 			return err
 		}
 
-		parsed_workspace_id, _ := strconv.Atoi(workspace_id)
-
 		workspace_log := models.WorkspaceHistoryLog{
 			HistoryId:   history_log.ID,
-			WorkspaceId: uint(parsed_workspace_id),
+			WorkspaceId: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

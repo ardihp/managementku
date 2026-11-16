@@ -10,11 +10,11 @@ import (
 var jwtKey = []byte(config.GetEnv("JWT_SECRET", "secret_key"))
 
 type MyCustomClaims struct {
-	UserId int `json:"user_id"`
+	UserId string `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(username string, user_id int) string {
+func GenerateToken(username string, user_id string) string {
 	exparationTime := time.Now().Add(60 * 24 * time.Minute)
 
 	claims := MyCustomClaims{

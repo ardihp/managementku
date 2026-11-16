@@ -11,16 +11,21 @@ func workspaceRoute(router *gin.RouterGroup, ctrl *workspace.WorkspaceController
 	route := router.Group("/workspace")
 	{
 		route.GET("/", ctrl.ListWorkspace)
-		route.GET("/:id", ctrl.DetailWorkspace)
 		route.POST("/create", ctrl.CreateWorkspace)
-		route.POST("/assign", ctrl.AssignMember)
-		route.PUT("/:id", ctrl.UpdateWorkspace)
-		route.DELETE("/:id", ctrl.DeleteWorkspace)
 
-		card := route.Group("/:id/card")
+		detail := route.Group("/:id")
 		{
-			card.GET("/", workspaceCardControllers.ListWorkspaceCard)
-			card.POST("/create", workspaceCardControllers.CreateWorkspaceCard)
+			detail.GET("/", ctrl.DetailWorkspace)
+			detail.POST("/assign", ctrl.AssignMember)
+			detail.PUT("/", ctrl.UpdateWorkspace)
+			detail.DELETE("/", ctrl.DeleteWorkspace)
+
+			card := route.Group("/card")
+			{
+				card.GET("/", workspaceCardControllers.ListWorkspaceCard)
+				card.POST("/create", workspaceCardControllers.CreateWorkspaceCard)
+			}
 		}
+
 	}
 }

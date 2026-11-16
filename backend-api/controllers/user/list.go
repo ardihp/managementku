@@ -10,8 +10,8 @@ import (
 )
 
 func (c *UserController) ListUser(ctx *gin.Context) {
-	user_id := ctx.GetInt("user_id")
-	user := models.User{Id: uint(user_id)}
+	user_id := ctx.GetString("user_id")
+	user := models.User{Id: (user_id)}
 
 	if err := c.DB.First(&user).Error; err != nil {
 		helpers.SendError(ctx, http.StatusInternalServerError, "Failed to get user info", err)

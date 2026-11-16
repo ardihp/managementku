@@ -14,7 +14,7 @@ import (
 func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 	req := structs.WorkspaceUpdateRequest{}
 	workspace_id := ctx.Param("id")
-	user_id := ctx.GetInt("user_id")
+	user_id := ctx.GetString("user_id")
 
 	user := models.User{}
 	c.DB.First(&user, user_id)

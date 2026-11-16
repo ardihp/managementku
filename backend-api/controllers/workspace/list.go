@@ -10,8 +10,8 @@ import (
 )
 
 func (c *WorkspaceController) ListWorkspace(ctx *gin.Context) {
-	user_id := ctx.GetInt("user_id")
-	user := models.User{Id: uint(user_id)}
+	user_id := ctx.GetString("user_id")
+	user := models.User{Id: (user_id)}
 
 	if err := c.DB.First(&user).Error; err != nil {
 		helpers.SendError(ctx, http.StatusInternalServerError, "Failed get user info", err)
@@ -19,7 +19,7 @@ func (c *WorkspaceController) ListWorkspace(ctx *gin.Context) {
 	}
 
 	response := []structs.WorkspaceResponse{}
-	workspace_by_member := []uint{}
+	workspace_by_member := []string{}
 
 	c.DB.Model(&models.WorkspaceMember{UserId: user.Id}).Pluck("workspace_id", &workspace_by_member)
 

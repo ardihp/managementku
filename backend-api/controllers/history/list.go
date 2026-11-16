@@ -13,7 +13,7 @@ import (
 
 func ListHistoryLog(c *gin.Context) {
 	req := structs.ListHistoryLogRequest{}
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -36,7 +36,7 @@ func ListHistoryLog(c *gin.Context) {
 		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
 
 		list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
-			ID:          int(history_log.ID),
+			ID:          history_log.ID,
 			User:        history_log.User.Username,
 			Type:        history_log.Type,
 			Action:      history_log.Action,
@@ -52,7 +52,7 @@ func ListHistoryLog(c *gin.Context) {
 func ListWorkspaceHistoryLog(c *gin.Context) {
 	workspace_id := c.Param("id")
 
-	user_id := c.GetInt("user_id")
+	user_id := c.GetString("user_id")
 	user := models.User{}
 	database.DB.First(&user, user_id)
 
@@ -71,7 +71,7 @@ func ListWorkspaceHistoryLog(c *gin.Context) {
 		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
 
 		list_history_logs = append(list_history_logs, structs.HistoryLogResponse{
-			ID:          int(history_log.ID),
+			ID:          history_log.ID,
 			User:        history_log.User.Username,
 			Type:        history_log.Type,
 			Action:      history_log.Action,
