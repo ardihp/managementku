@@ -1,7 +1,6 @@
-package controllers
+package user
 
 import (
-	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
@@ -10,19 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UpdateUser(c *gin.Context) {
+func (c *UserController) UpdateUser(ctx *gin.Context) {
 	req := structs.UserUpdateRequest{}
-	user_id := c.Param("id")
+	user_id := ctx.Param("id")
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helpers.ValidationError(c, err)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.ValidationError(ctx, err)
 		return
 	}
 
 	user := models.User{}
 
-	if err := database.DB.First(&user, user_id).Error; err != nil {
-		helpers.SendError(c, http.StatusUnprocessableEntity, "User not found", err)
+	if err := c.DB.First(&user, user_id).Error; err != nil {
+		helpers.SendError(ctx, http.StatusUnprocessableEntity, "User not found", err)
 		return
 	}
 
@@ -34,16 +33,16 @@ func UpdateUser(c *gin.Context) {
 		user.Password = helpers.HashPassword(req.Password)
 	}
 
-	if err := database.DB.Save(&user).Error; err != nil {
+	if err := c.DB.Save(&user).Error; err != nil {
 		if helpers.IsDuplicateEntryError(err) {
-			helpers.SendError(c, http.StatusConflict, "Duplicate entry error", err)
+			helpers.SendError(ctx, http.StatusConflict, "Duplicate entry error", err)
 		} else {
-			helpers.SendError(c, http.StatusInternalServerError, "Failed to save user", err)
+			helpers.SendError(ctx, http.StatusInternalServerError, "Failed to save user", err)
 		}
 		return
 	}
 
-	helpers.SendSuccess(c, http.StatusOK, "Success to save user", structs.UserResponse{
+	helpers.SendSuccess(ctx, http.StatusOK, "Success to save user", structs.UserResponse{
 		Id:        user.Id,
 		Name:      user.Name,
 		Username:  user.Username,

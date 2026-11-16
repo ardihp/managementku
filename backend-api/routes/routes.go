@@ -33,7 +33,7 @@ func SetupRouter() *gin.Engine {
 		protected := api.Group("")
 		protected.Use(middlewares.AuthMiddleware())
 		{
-			userRoute(protected)
+			userRoute(protected, ctrls.User)
 			workspaceRoute(protected, ctrls.Workspace)
 			workspaceCardRoute(protected)
 		}

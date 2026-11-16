@@ -1,7 +1,6 @@
-package controllers
+package user
 
 import (
-	"kanban-board/backend-api/database"
 	"kanban-board/backend-api/helpers"
 	"kanban-board/backend-api/models"
 	"kanban-board/backend-api/structs"
@@ -10,19 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ListUser(c *gin.Context) {
-	user_id := c.GetInt("user_id")
+func (c *UserController) ListUser(ctx *gin.Context) {
+	user_id := ctx.GetInt("user_id")
 	user := models.User{Id: uint(user_id)}
 
-	if err := database.DB.First(&user).Error; err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Failed to get user info", err)
+	if err := c.DB.First(&user).Error; err != nil {
+		helpers.SendError(ctx, http.StatusInternalServerError, "Failed to get user info", err)
 		return
 	}
 
 	users := []models.User{}
 
-	if err := database.DB.Find(&users, "is_deleted = ?", false).Error; err != nil {
-		helpers.SendError(c, http.StatusInternalServerError, "Failed to retreive users", err)
+	if err := c.DB.Find(&users, "is_deleted = ?", false).Error; err != nil {
+		helpers.SendError(ctx, http.StatusInternalServerError, "Failed to retreive users", err)
 		return
 	}
 
@@ -40,5 +39,5 @@ func ListUser(c *gin.Context) {
 		})
 	}
 
-	helpers.SendSuccess(c, http.StatusOK, "Success to retreive users", list_users)
+	helpers.SendSuccess(ctx, http.StatusOK, "Success to retreive users", list_users)
 }

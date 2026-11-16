@@ -1,16 +1,16 @@
 package routes
 
 import (
-	userControllers "kanban-board/backend-api/controllers/user"
+	"kanban-board/backend-api/controllers/user"
 
 	"github.com/gin-gonic/gin"
 )
 
-func userRoute(router *gin.RouterGroup) {
-	user := router.Group("/user")
+func userRoute(router *gin.RouterGroup, ctrl *user.UserController) {
+	route := router.Group("/user")
 	{
-		user.GET("/", userControllers.ListUser)
-		user.PUT("/:id", userControllers.UpdateUser)
-		user.DELETE("/:id", userControllers.DeleteUser)
+		route.GET("/", ctrl.ListUser)
+		route.PUT("/:id", ctrl.UpdateUser)
+		route.DELETE("/:id", ctrl.DeleteUser)
 	}
 }
