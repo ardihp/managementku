@@ -25,7 +25,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 	}
 
 	workspace_card_status := models.WorkspaceCardStatus{
-		WorkspaceId: workspace_id,
+		WorkspaceID: workspace_id,
 		Name:        req.Name,
 		Color:       req.Color,
 	}
@@ -40,7 +40,7 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user_id,
+			UserID:      user_id,
 			Type:        "workspace",
 			Action:      "create-workspace-card-status",
 			Description: fmt.Sprintf("User %s has created new status", user.Username),
@@ -51,8 +51,8 @@ func CreateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		workspace_log := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

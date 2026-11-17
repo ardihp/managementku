@@ -30,15 +30,22 @@ func InitDB() {
 	}
 
 	fmt.Println("Database connected successfully!")
+}
 
-	err = DB.AutoMigrate(&models.User{}, &models.Workspace{}, &models.WorkspaceMember{},
-		&models.WorkspaceCardStatus{}, &models.WorkspaceCard{}, &models.WorkspaceCardMember{},
-		&models.HistoryLog{}, &models.UserHistoryLog{}, &models.WorkspaceHistoryLog{},
-		&models.WorkspaceCardActivity{})
+func MigrateDB() {
+	DB.Transaction(func(tx *gorm.DB) error {
+		fmt.Println("Starting database migration")
 
-	if err != nil {
-		log.Fatal("Failed to migrate database:", err)
-	}
+		err := tx.AutoMigrate(&models.User{}, &models.Workspace{}, &models.WorkspaceMember{},
+			&models.WorkspaceCardStatus{}, &models.WorkspaceCard{}, &models.WorkspaceCardMember{},
+			&models.HistoryLog{}, &models.UserHistoryLog{}, &models.WorkspaceHistoryLog{},
+			&models.WorkspaceCardActivity{})
 
-	fmt.Println("Database migrated successfully!")
+		if err != nil {
+			return fmt.Errorf("Database migration error, %w", err)
+		}
+
+		fmt.Println("Database migrated successfully!")
+		return nil
+	})
 }

@@ -31,21 +31,21 @@ func AssignMember(c *gin.Context) {
 	members := []structs.MemberDetail{}
 
 	user_log := models.HistoryLog{
-		UserId:   manager_id,
+		UserID:   manager_id,
 		Type:     "workspace",
 		UserRole: "user",
 		Action:   "assign-member-card",
 	}
 
 	manager_log := models.HistoryLog{
-		UserId:   manager_id,
+		UserID:   manager_id,
 		Type:     "workspace",
 		UserRole: "admin",
 		Action:   "assign-member-card",
 	}
 
 	workspace_log := models.WorkspaceHistoryLog{
-		WorkspaceId: workspace_id,
+		WorkspaceID: workspace_id,
 	}
 
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
@@ -60,7 +60,7 @@ func AssignMember(c *gin.Context) {
 			user := models.User{}
 			trx.First(&user, member_id)
 
-			if !slices.Contains(req.UserId, member_id) && member_id != manager_id {
+			if !slices.Contains(req.UserID, member_id) && member_id != manager_id {
 				user_log.Description = fmt.Sprintf("User %s has remove you from card %s", manager.Username, workspace_card.Title)
 				manager_log.Description = fmt.Sprintf("User %s remove %s from card %s", manager.Username, user.Username, workspace_card.Title)
 
@@ -71,11 +71,11 @@ func AssignMember(c *gin.Context) {
 				}
 
 				user_history := []models.UserHistoryLog{
-					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: manager_id},
+					{HistoryID: logs[0].ID, UserID: user.Id},
+					{HistoryID: logs[1].ID, UserID: manager_id},
 				}
 
-				workspace_log.HistoryId = logs[1].ID
+				workspace_log.HistoryID = logs[1].ID
 
 				if err := trx.Create(&workspace_log).Error; err != nil {
 					return err
@@ -89,19 +89,19 @@ func AssignMember(c *gin.Context) {
 
 		assigned_user := []models.WorkspaceCardMember{}
 
-		for key := range req.UserId {
+		for key := range req.UserID {
 			user := models.User{}
 			exist_member := models.WorkspaceCardMember{}
 
-			if err := trx.First(&user, req.UserId[key]).Error; err != nil {
+			if err := trx.First(&user, req.UserID[key]).Error; err != nil {
 				return err
 			}
 
 			trx.Where("card_id = ? AND user_id = ?", req.CardId, user.Id).First(&exist_member)
 
 			assigned_user = append(assigned_user, models.WorkspaceCardMember{
-				WorkspaceCardId: req.CardId,
-				UserId:          user.Id,
+				CardID: req.CardId,
+				UserID: user.Id,
 			})
 
 			members = append(members, structs.MemberDetail{
@@ -123,11 +123,11 @@ func AssignMember(c *gin.Context) {
 				}
 
 				user_history := []models.UserHistoryLog{
-					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: manager_id},
+					{HistoryID: logs[0].ID, UserID: user.Id},
+					{HistoryID: logs[1].ID, UserID: manager_id},
 				}
 
-				workspace_log.HistoryId = logs[1].ID
+				workspace_log.HistoryID = logs[1].ID
 
 				if err := trx.Create(&workspace_log).Error; err != nil {
 					return err

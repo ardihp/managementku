@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"kanban-board/backend-api/config"
 	"kanban-board/backend-api/database"
 	seeds "kanban-board/backend-api/database/seeds"
@@ -16,17 +15,21 @@ func main() {
 
 	database.InitDB()
 
-	tableFlag := flag.String("table", "", "specify the table")
+	seedFlag := flag.Bool("seed", false, "Run seeders to database")
+	migrationFlag := flag.Bool("migrate", false, "Run migration to database")
 	flag.Parse()
-	table := *tableFlag
 
-	if table != "" {
-		switch {
-		case table == "users":
-			seeds.UserSeeds()
-		default:
-			fmt.Println("your argument not found")
-		}
+	seed := *seedFlag
+	migration := *migrationFlag
+
+	if migration {
+		database.MigrateDB()
+		return
+	}
+
+	if seed {
+		seeds.UserSeeds()
+		return
 	}
 
 	go socketController.Manager.Start()

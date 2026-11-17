@@ -3,69 +3,69 @@ package models
 import "time"
 
 type Workspace struct {
-	Id            string `json:"id" gorm:"primaryKey"`
-	Name          string `json:"name" gorm:"not null"`
-	Description   string `json:"description"`
-	UserCreatedId string `json:"user_id" gorm:"not null"`
+	Id            string `json:"id" gorm:"primaryKey;type:varchar(36)"`
+	Name          string `json:"name" gorm:"not null;type:varchar(255)"`
+	Description   string `json:"description" gorm:"type:text"`
+	UserCreatedID string `json:"user_id" gorm:"not null;type:varchar(36)"`
 	UserCreated   User
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type WorkspaceMember struct {
-	WorkspaceId string `json:"workspace_id" gorm:"primaryKey"`
+	WorkspaceID string `json:"workspace_id" gorm:"primaryKey;type:varchar(36)"`
 	Workspace   Workspace
-	UserId      string `json:"user_id" gorm:"primaryKey"`
+	UserID      string `json:"user_id" gorm:"primaryKey;type:varchar(36)"`
 	User        User
-	Role        string    `json:"role" gorm:"default:'user'"`
+	Role        string    `json:"role" gorm:"type:enum('admin', 'member');default:'member';not null"`
 	JoinedAt    time.Time `json:"joined_at" gorm:"autoCreateTime"`
 }
 
 type WorkspaceCardStatus struct {
-	Id          string `json:"id" gorm:"primaryKey"`
+	Id          string `json:"id" gorm:"primaryKey;type:varchar(36)"`
 	Order       int    `json:"order" gorm:"not null"`
-	WorkspaceId string `json:"workspace_id" gorm:"not null"`
+	WorkspaceID string `json:"workspace_id" gorm:"not null;type:varchar(36)"`
 	Workspace   Workspace
-	Name        string    `json:"name"`
-	Color       string    `json:"color"`
+	Name        string    `json:"name" gorm:"not null;type:varchar(255)"`
+	Color       string    `json:"color" gorm:"not null;type:varchar(255)"`
 	IsArchived  bool      `json:"is_archived" gorm:"default:false"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type WorkspaceCard struct {
-	Id                    string `json:"id" gorm:"primaryKey"`
-	Order                 int    `json:"order" gorm:"not null"`
-	WorkspaceId           string `json:"workspace_id" gorm:"not null"`
-	Workspace             Workspace
-	WorkspaceCardStatusId string `json:"workspace_card_status_id" gorm:"not null"`
-	WorkspaceCardStatus   WorkspaceCardStatus
-	UserCreatedId         string `json:"user_id" gorm:"not null"`
-	UserCreated           User
-	Title                 string    `json:"title" gorm:"not null"`
-	Description           string    `json:"description"`
-	IsArchived            bool      `json:"is_archived" gorm:"default:false"`
-	IsCompleted           bool      `json:"is_completed" gorm:"default:false"`
-	CreatedAt             time.Time `json:"created_at"`
-	UpdatedAt             time.Time `json:"updated_at"`
+	Id            string `json:"id" gorm:"primaryKey;type:varchar(36)"`
+	Order         int    `json:"order" gorm:"not null"`
+	WorkspaceID   string `json:"workspace_id" gorm:"not null;type:varchar(36)"`
+	Workspace     Workspace
+	StatusID      string `json:"status_id" gorm:"not null;type:varchar(36)"`
+	Status        WorkspaceCardStatus
+	UserCreatedID string `json:"user_id" gorm:"not null;type:varchar(36)"`
+	UserCreated   User
+	Title         string    `json:"title" gorm:"not null;type:varchar(255)"`
+	Description   string    `json:"description;type:text"`
+	IsArchived    bool      `json:"is_archived" gorm:"default:false"`
+	IsCompleted   bool      `json:"is_completed" gorm:"default:false"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type WorkspaceCardMember struct {
-	WorkspaceCardId string `json:"workspace_card_id" gorm:"primaryKey"`
-	WorkspaceCard   WorkspaceCard
-	UserId          string `json:"user_id" gorm:"primaryKey"`
-	User            User
-	JoinedAt        time.Time `json:"joined_at"`
+	CardID   string `json:"card_id" gorm:"primaryKey;type:varchar(36)"`
+	Card     WorkspaceCard
+	UserID   string `json:"user_id" gorm:"primaryKey;type:varchar(36)"`
+	User     User
+	JoinedAt time.Time `json:"joined_at" gorm:"autoCreateTime"`
 }
 
 type WorkspaceCardActivity struct {
-	Id              string `json:"id" gorm:"primaryKey"`
-	WorkspaceCardId string `json:"workspace_card_id" gorm:"not null"`
-	WorkspaceCard   WorkspaceCard
-	UserId          string `json:"user_id" gorm:"not null"`
-	User            User
-	Type            string    `json:"type" gorm:"type:enum('general', 'comment')"`
-	Message         string    `json:"message"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	Id        string `json:"id" gorm:"primaryKey;type:varchar(36)"`
+	CardID    string `json:"card_id" gorm:"not null;type:varchar(36)"`
+	Card      WorkspaceCard
+	UserID    string `json:"user_id" gorm:"not null;type:varchar(36)"`
+	User      User
+	Type      string    `json:"type" gorm:"type:enum('general', 'comment')"`
+	Message   string    `json:"message" gorm:"not null"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

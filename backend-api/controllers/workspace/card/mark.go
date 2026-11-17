@@ -34,7 +34,7 @@ func MarkWorkspaceCardComplete(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			Action:      "complete-workspace-card",
 			Description: fmt.Sprintf("User %s mark complete to card %s", user.Username, workspace_card.Title),
@@ -45,8 +45,8 @@ func MarkWorkspaceCardComplete(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
@@ -86,7 +86,7 @@ func MarkWorkspaceCardIncomplete(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			Action:      "incomplete-workspace-card",
 			Description: fmt.Sprintf("User %s mark incomplete to card %s", user.Username, workspace_card.Title),
@@ -97,8 +97,8 @@ func MarkWorkspaceCardIncomplete(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

@@ -40,7 +40,7 @@ func DeleteWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user_id,
+			UserID:      user_id,
 			Type:        "workspace",
 			Action:      "delete-workspace-card-status",
 			Description: fmt.Sprintf("User %s has deleted status %s", user.Username, workspace_card_status.Name),
@@ -51,8 +51,8 @@ func DeleteWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		workspace_log := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

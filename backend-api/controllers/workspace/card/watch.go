@@ -35,8 +35,8 @@ func WatchWorkspaceCard(c *gin.Context) {
 
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		member := models.WorkspaceCardMember{
-			WorkspaceCardId: workspace_card.Id,
-			UserId:          req.UserId,
+			CardID: workspace_card.Id,
+			UserID: req.UserID,
 		}
 
 		if err := trx.Create(&member).Error; err != nil {
@@ -44,7 +44,7 @@ func WatchWorkspaceCard(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			Action:      "archive-workspace-card",
 			Description: fmt.Sprintf("User %s start to watch card %s", user.Username, workspace_card.Title),
@@ -55,8 +55,8 @@ func WatchWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
@@ -95,12 +95,12 @@ func UnwatchWorkspaceCard(c *gin.Context) {
 	}
 
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
-		if err := trx.Delete(&models.WorkspaceCardMember{}, "user_id = ?", req.UserId).Error; err != nil {
+		if err := trx.Delete(&models.WorkspaceCardMember{}, "user_id = ?", req.UserID).Error; err != nil {
 			return err
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			Action:      "unarchive-workspace-card",
 			Description: fmt.Sprintf("User %s has unwatch card %s", user.Username, workspace_card.Title),
@@ -111,8 +111,8 @@ func UnwatchWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

@@ -40,7 +40,7 @@ func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "general",
 			UserRole:    "manager",
 			Action:      "update-workspace",
@@ -52,8 +52,8 @@ func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 		}
 
 		user_history := models.UserHistoryLog{
-			HistoryId: history_log.ID,
-			UserId:    user.Id,
+			HistoryID: history_log.ID,
+			UserID:    user.Id,
 		}
 
 		if err := trx.Create(&user_history).Error; err != nil {

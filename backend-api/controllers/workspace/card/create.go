@@ -43,12 +43,12 @@ func CreateWorkspaceCard(c *gin.Context) {
 		result := trx.Where("status_id = ?", req.StatusId).Find(&[]models.WorkspaceCard{})
 
 		card = models.WorkspaceCard{
-			WorkspaceId:           workspace_id,
-			WorkspaceCardStatusId: req.StatusId,
-			UserCreatedId:         user_id,
-			Title:                 req.Title,
-			Description:           req.Description,
-			Order:                 int(result.RowsAffected),
+			WorkspaceID:   workspace_id,
+			StatusID:      req.StatusId,
+			UserCreatedID: user_id,
+			Title:         req.Title,
+			Description:   req.Description,
+			Order:         int(result.RowsAffected),
 		}
 
 		if err := trx.Create(&card).Error; err != nil {
@@ -56,10 +56,10 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_card_activity := models.WorkspaceCardActivity{
-			WorkspaceCardId: card.Id,
-			UserId:          user_id,
-			Type:            "general",
-			Message:         fmt.Sprintf("User %s created this card", user.Username),
+			CardID:  card.Id,
+			UserID:  user_id,
+			Type:    "general",
+			Message: fmt.Sprintf("User %s created this card", user.Username),
 		}
 
 		if err := trx.Create(&workspace_card_activity).Error; err != nil {
@@ -67,7 +67,7 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			Action:      "create-workspace-card",
 			Description: fmt.Sprintf("User %s has added new card to status %s", user.Username, workspace_card_status.Name),
@@ -78,8 +78,8 @@ func CreateWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {

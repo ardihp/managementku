@@ -41,7 +41,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 
 	workspace_card.Title = req.Title
 	workspace_card.Description = req.Description
-	workspace_card.WorkspaceCardStatusId = req.StatusId
+	workspace_card.StatusID = req.StatusId
 
 	err := database.DB.Transaction(func(trx *gorm.DB) error {
 		if err := trx.Save(&workspace_card).Error; err != nil {
@@ -49,7 +49,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user_id,
+			UserID:      user_id,
 			Type:        "workspace",
 			Action:      "update-workspace-card",
 			Description: fmt.Sprintf("User %s has update changes on card %s", user.Username, workspace_card.Title),
@@ -60,8 +60,8 @@ func UpdateWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
@@ -77,7 +77,7 @@ func UpdateWorkspaceCard(c *gin.Context) {
 	}
 
 	var updated_status models.WorkspaceCardStatus
-	database.DB.First(&updated_status, workspace_card.WorkspaceCardStatusId)
+	database.DB.First(&updated_status, workspace_card.StatusID)
 
 	helpers.SendSuccess(c, http.StatusOK, "Workspace updated successfully", structs.WorkspaceCardResponse{
 		Id:          workspace_card.Id,

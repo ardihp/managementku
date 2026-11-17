@@ -10,7 +10,7 @@ import (
 var jwtKey = []byte(config.GetEnv("JWT_SECRET", "secret_key"))
 
 type MyCustomClaims struct {
-	UserId string `json:"user_id"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
 

@@ -18,7 +18,7 @@ func UserSeeds() {
 
 	database.DB.Transaction(func(trx *gorm.DB) error {
 		for _, user := range users {
-			user_id, err := helpers.GenerateUUIDv4()
+			user_id, err := helpers.GenerateUUIDv7()
 			if err != nil {
 				return err
 			}

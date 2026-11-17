@@ -29,14 +29,14 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 	members := []structs.MemberDetail{}
 
 	member_log := models.HistoryLog{
-		UserId:   user_id,
+		UserID:   user_id,
 		Type:     "general",
 		UserRole: "user",
 		Action:   "assign-member",
 	}
 
 	user_log := models.HistoryLog{
-		UserId:   user_id,
+		UserID:   user_id,
 		Type:     "general",
 		UserRole: "admin",
 		Action:   "assign-member",
@@ -54,7 +54,7 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 			user := models.User{}
 			trx.First(&user, member_id)
 
-			if !slices.Contains(req.UserId, member_id) && member_id != user_id {
+			if !slices.Contains(req.UserID, member_id) && member_id != user_id {
 				member_log.Description = fmt.Sprintf("User %s has remove you from workspace %s", user.Username, workspace.Name)
 				user_log.Description = fmt.Sprintf("User %s remove %s from workspace %s", user.Username, user.Username, workspace.Name)
 
@@ -65,8 +65,8 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 				}
 
 				user_history := []models.UserHistoryLog{
-					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: user_id},
+					{HistoryID: logs[0].ID, UserID: user.Id},
+					{HistoryID: logs[1].ID, UserID: user_id},
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {
@@ -77,11 +77,11 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 
 		assigned_user := []models.WorkspaceMember{}
 
-		for key := range req.UserId {
+		for key := range req.UserID {
 			user := models.User{}
 			exist_member := models.WorkspaceMember{}
 
-			if err := trx.First(&user, req.UserId[key]).Error; err != nil {
+			if err := trx.First(&user, req.UserID[key]).Error; err != nil {
 				return err
 			}
 
@@ -96,8 +96,8 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 			}
 
 			assigned_user = append(assigned_user, models.WorkspaceMember{
-				WorkspaceId: workspace_id,
-				UserId:      user.Id,
+				WorkspaceID: workspace_id,
+				UserID:      user.Id,
 				Role:        role,
 			})
 
@@ -120,8 +120,8 @@ func (c *WorkspaceController) AssignMember(ctx *gin.Context) {
 				}
 
 				user_history := []models.UserHistoryLog{
-					{HistoryId: logs[0].ID, UserId: user.Id},
-					{HistoryId: logs[1].ID, UserId: user_id},
+					{HistoryID: logs[0].ID, UserID: user.Id},
+					{HistoryID: logs[1].ID, UserID: user_id},
 				}
 
 				if err := trx.Create(&user_history).Error; err != nil {

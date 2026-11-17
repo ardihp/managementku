@@ -11,8 +11,8 @@ type MemberDetail struct {
 }
 
 type WorkspaceMember struct {
-	WorkspaceId string `json:"workspace_id"`
-	UserId      string `json:"user_id"`
+	WorkspaceID string `json:"workspace_id"`
+	UserID      string `json:"user_id"`
 	Role        string `json:"role"`
 }
 
@@ -89,16 +89,16 @@ type WorkspaceUpdateRequest struct {
 }
 
 type WorkspaceAssignMember struct {
-	UserId []string `json:"user_id" binding:"required"`
+	UserID []string `json:"user_id" binding:"required"`
 }
 
 type WorkspaceCardAssignMember struct {
 	CardId string   `json:"card_id" binding:"required"`
-	UserId []string `json:"user_id" binding:"required"`
+	UserID []string `json:"user_id" binding:"required"`
 }
 
 type WorkspaceWatchCardRequest struct {
-	UserId string `json:"user_id" binding:"required"`
+	UserID string `json:"user_id" binding:"required"`
 }
 
 type WorkspaceCreateRoleRequest struct {
@@ -163,11 +163,11 @@ type WorkspaceUpdateCardStatusRequest struct {
 
 type WorkspaceOrder struct {
 	StatusId    string   `json:"status_id" binding:"required"`
-	WorkspaceId []string `json:"workspace_id" binding:"required"`
+	WorkspaceID []string `json:"workspace_id" binding:"required"`
 }
 
 type WorkspaceUpdateOrderRequest struct {
-	WorkspaceId string           `json:"workspace_id" binding:"required"`
+	WorkspaceID string           `json:"workspace_id" binding:"required"`
 	OrderStatus []WorkspaceOrder `json:"order_status" binding:"required"`
 }
 

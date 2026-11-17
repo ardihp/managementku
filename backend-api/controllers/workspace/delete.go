@@ -29,7 +29,7 @@ func (c *WorkspaceController) DeleteWorkspace(ctx *gin.Context) {
 		trx.First(&workspace, parsed_workspace_id)
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "general",
 			UserRole:    "admin",
 			Action:      "delete-workspace",
@@ -45,8 +45,8 @@ func (c *WorkspaceController) DeleteWorkspace(ctx *gin.Context) {
 
 		for _, member := range workspace_members {
 			user_history := models.UserHistoryLog{
-				HistoryId: history_log.ID,
-				UserId:    member.UserId,
+				HistoryID: history_log.ID,
+				UserID:    member.UserID,
 			}
 
 			if err := trx.Create(&user_history).Error; err != nil {

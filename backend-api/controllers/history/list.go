@@ -33,7 +33,7 @@ func ListHistoryLog(c *gin.Context) {
 	for _, log := range user_history_logs {
 		history_log := models.HistoryLog{}
 
-		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
+		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryID)
 
 		list_histor_logs = append(list_histor_logs, structs.HistoryLogResponse{
 			ID:          history_log.ID,
@@ -68,7 +68,7 @@ func ListWorkspaceHistoryLog(c *gin.Context) {
 	for _, log := range workspace_history_logs {
 		history_log := models.HistoryLog{}
 
-		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryId)
+		database.DB.Preload(clause.Associations).First(&history_log, log.HistoryID)
 
 		list_history_logs = append(list_history_logs, structs.HistoryLogResponse{
 			ID:          history_log.ID,

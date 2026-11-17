@@ -3,8 +3,8 @@ package models
 import "time"
 
 type HistoryLog struct {
-	ID          string `json:"id" gorm:"primaryKey"`
-	UserId      string `json:"user_id" gorm:"not null"`
+	ID          string `json:"id" gorm:"primaryKey;type:varchar(36)"`
+	UserID      string `json:"user_id" gorm:"not null;type:varchar(36)"`
 	User        User
 	Type        string    `json:"type" gorm:"type:enum('general', 'workspace')"`
 	UserRole    string    `json:"user_role" gorm:"type:enum('admin', 'user')"`
@@ -15,18 +15,18 @@ type HistoryLog struct {
 }
 
 type UserHistoryLog struct {
-	HistoryId string `json:"history_id" gorm:"primaryKey"`
+	HistoryID string `json:"history_id" gorm:"primaryKey;type:varchar(36)"`
 	History   HistoryLog
-	UserId    string `json:"user_id" gorm:"primaryKey"`
+	UserID    string `json:"user_id" gorm:"primaryKey;type:varchar(36)"`
 	User      User
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type WorkspaceHistoryLog struct {
-	HistoryId   string `json:"history_id" gorm:"primaryKey"`
+	HistoryID   string `json:"history_id" gorm:"primaryKey;type:varchar(36)"`
 	History     HistoryLog
-	WorkspaceId string `json:"workspace_id" gorm:"primaryKey"`
+	WorkspaceID string `json:"workspace_id" gorm:"primaryKey;type:varchar(36)"`
 	Workspace   Workspace
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`

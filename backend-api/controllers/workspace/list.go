@@ -21,7 +21,7 @@ func (c *WorkspaceController) ListWorkspace(ctx *gin.Context) {
 	response := []structs.WorkspaceResponse{}
 	workspace_by_member := []string{}
 
-	c.DB.Model(&models.WorkspaceMember{UserId: user.Id}).Pluck("workspace_id", &workspace_by_member)
+	c.DB.Model(&models.WorkspaceMember{UserID: user.Id}).Pluck("workspace_id", &workspace_by_member)
 
 	for _, workspace_id := range workspace_by_member {
 		workspace := models.Workspace{}
@@ -34,7 +34,7 @@ func (c *WorkspaceController) ListWorkspace(ctx *gin.Context) {
 
 		for _, member := range workspace_member {
 			members = append(members, structs.MemberDetail{
-				Id:       member.UserId,
+				Id:       member.UserID,
 				Name:     member.User.Name,
 				Username: member.User.Username,
 				Email:    member.User.Email,

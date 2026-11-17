@@ -23,7 +23,7 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 	workspace := models.Workspace{
 		Name:          req.Name,
 		Description:   req.Description,
-		UserCreatedId: user.Id,
+		UserCreatedID: user.Id,
 	}
 
 	err := c.DB.Transaction(func(trx *gorm.DB) error {
@@ -38,7 +38,7 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 
 		for _, status := range statuses {
 			workspace_card_status := models.WorkspaceCardStatus{
-				WorkspaceId: workspace.Id,
+				WorkspaceID: workspace.Id,
 				Name:        status.Name,
 				Color:       status.Color,
 				Order:       status.Order,
@@ -49,7 +49,7 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 			}
 		}
 
-		workspace_member := models.WorkspaceMember{WorkspaceId: workspace.Id, UserId: user_id, Role: "admin"}
+		workspace_member := models.WorkspaceMember{WorkspaceID: workspace.Id, UserID: user_id, Role: "admin"}
 
 		if err := trx.Create(&workspace_member).Error; err != nil {
 			return err

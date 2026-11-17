@@ -41,7 +41,7 @@ func UpdateWorkspaceCardActivity(c *gin.Context) {
 		database.DB.Find(&workspace_card, card_id)
 
 		history_log := models.HistoryLog{
-			UserId:      user_id,
+			UserID:      user_id,
 			Type:        "workspace",
 			Action:      "update-workspace-card-activity",
 			Description: fmt.Sprintf("User %s has update comment on card %s", user.Username, workspace_card.Title),
@@ -52,8 +52,8 @@ func UpdateWorkspaceCardActivity(c *gin.Context) {
 		}
 
 		workspace_log := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

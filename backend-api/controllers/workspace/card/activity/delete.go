@@ -29,7 +29,7 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 		database.DB.Find(&workspace_card, card_id)
 
 		history_log := models.HistoryLog{
-			UserId:      user_id,
+			UserID:      user_id,
 			Type:        "workspace",
 			Action:      "delete-workspace-card-activity",
 			Description: fmt.Sprintf("User %s has delete comment on card %s", user.Username, workspace_card.Title),
@@ -40,8 +40,8 @@ func DeleteWorkspaceCardActivity(c *gin.Context) {
 		}
 
 		workspace_log := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

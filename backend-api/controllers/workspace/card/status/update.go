@@ -42,7 +42,7 @@ func UpdateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		history_log := models.HistoryLog{
-			UserId:      user_id,
+			UserID:      user_id,
 			Type:        "workspace",
 			Action:      "update-workspace-card-status",
 			Description: fmt.Sprintf("User %s has changes to status %s", user.Username, workspace_card_status.Name),
@@ -53,8 +53,8 @@ func UpdateWorkspaceCardStatus(c *gin.Context) {
 		}
 
 		workspace_log := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_log).Error; err != nil {

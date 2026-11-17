@@ -80,7 +80,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 					return err
 				}
 
-				new_workspace_card.WorkspaceCardStatusId = order.StatusId
+				new_workspace_card.StatusID = order.StatusId
 				new_workspace_card.Order = index
 
 				if err := database.DB.Save(&new_workspace_card).Error; err != nil {
@@ -92,7 +92,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		database.DB.Preload(clause.Associations).First(&workspace_card, req.CardId)
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			UserRole:    "manager",
 			Action:      "update-order",
@@ -104,8 +104,8 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
@@ -124,7 +124,7 @@ func UpdateWorkspaceCardOrder(c *gin.Context) {
 		Id:          workspace_card.Id,
 		Title:       workspace_card.Title,
 		Description: workspace_card.Description,
-		Status:      workspace_card.WorkspaceCardStatus.Name,
+		Status:      workspace_card.Status.Name,
 		UserCreated: workspace_card.UserCreated.Username,
 		IsArchived:  workspace_card.IsArchived,
 		CreatedAt:   workspace_card.CreatedAt.Format("2006-01-02 15:04:05"),

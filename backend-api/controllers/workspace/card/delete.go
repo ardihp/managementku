@@ -29,7 +29,7 @@ func DeleteWorkspaceCard(c *gin.Context) {
 		trx.Where("workspace_id = ? AND id = ?", workspace_id, card_id).First(&workspace_card)
 
 		history_log := models.HistoryLog{
-			UserId:      user.Id,
+			UserID:      user.Id,
 			Type:        "workspace",
 			Action:      "delete-workspace-card",
 			Description: fmt.Sprintf("User %s has deleted card %s", user.Username, workspace_card.Title),
@@ -40,8 +40,8 @@ func DeleteWorkspaceCard(c *gin.Context) {
 		}
 
 		workspace_history := models.WorkspaceHistoryLog{
-			HistoryId:   history_log.ID,
-			WorkspaceId: workspace_id,
+			HistoryID:   history_log.ID,
+			WorkspaceID: workspace_id,
 		}
 
 		if err := trx.Create(&workspace_history).Error; err != nil {
